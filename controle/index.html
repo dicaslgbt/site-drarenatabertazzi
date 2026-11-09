@@ -210,6 +210,11 @@ button.kpi.fora{border-left-color:#bbb;background:#fafafa}
 details.conf{border:1px solid var(--line);border-radius:12px;margin:8px 0;background:#fff} details.conf summary{cursor:pointer;padding:10px 14px;list-style:none} details.conf summary::-webkit-details-marker{display:none}
 details.conf.sem summary b,details.conf.zero summary b{color:#b4472f} details.conf .tbl td small{display:block;color:var(--soft)} details.conf .tbl td small.ok{color:#2f7d4f}
 .conf-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:6px 0 10px} .conf-kpis .kpi.alerta b{color:#b4472f}
+.ag-dia{margin-top:12px} .ag-l{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:9px 4px;border-top:1px solid var(--line)} .ag-l.apagado{opacity:.5}
+.ag-h{font-variant-numeric:tabular-nums;color:var(--soft);font-size:.85rem} .ag-p small{display:block;color:var(--soft);font-size:.78rem} .ag-p .ag-proc{color:#7a8494}
+.ag-st{font-size:.76rem;font-weight:600;padding:4px 9px;border-radius:999px;white-space:nowrap;background:#eef1f5;color:#5b6573} .ag-st.ok{background:#e4f4ea;color:#2f7d4f} .ag-st.outra{background:#e7effa;color:#1d4f91} .ag-st.zero{background:#fdf0dc;color:#a8650f} .ag-st.sem{background:#fbe5e1;color:#b4472f} .ag-st.cir{background:#f1e8fb;color:#6c3fa0}
+.ag-leg{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 6px} .ag-sem{align-self:center;font-weight:600;padding:0 6px}
+@media(max-width:600px){ .ag-l{grid-template-columns:44px 1fr} .ag-st{grid-column:2;justify-self:start} }
 /* Painel por fases */
 .trilha-t{font-weight:700;font-size:.9rem;color:var(--soft);margin:14px 0 8px}
 .fases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
@@ -361,6 +366,7 @@ legend{font-size:.86rem;font-weight:700;color:var(--soft);padding:0;margin-botto
     <img src="../img/simbolo.png" alt="">
     <div class="t"><b>Controle de Pacientes</b><span id="who"></span></div>
     <button class="out" data-tab="lentes" title="Simulador de lentes com valores">👁 Lentes</button>
+    <button class="out" data-tab="agenda" title="Agenda do prontuário">📅 Agenda</button>
     <button class="out" data-tab="repasse" title="Repasse das clínicas">💰 Repasse</button>
     <button class="out" id="bOut">Sair</button>
   </header>
@@ -558,7 +564,7 @@ function cardTrat(c){
 function render(){
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-current", b.dataset.tab===S.tab?"page":"false"));
   const m=$("#main");
-  m.innerHTML = ({repasse:telaRepasse, lentes:telaLentes, painel:telaPainel, semana:telaSemana, ind:telaInd, cir:telaCir, trat:telaTrat, pac:telaPac}[S.tab])();
+  m.innerHTML = ({agenda:telaAgenda, repasse:telaRepasse, lentes:telaLentes, painel:telaPainel, semana:telaSemana, ind:telaInd, cir:telaCir, trat:telaTrat, pac:telaPac}[S.tab])();
   if(S.tab==="repasse"&&$("#fRep")) $("#fRep").addEventListener("submit",async e=>{ e.preventDefault(); const v=$("#rVl").value.trim(); await salvar(sb.from("repasses").update({status:$("#rSt").value,recebido_em:$("#rDt").value||null,valor_recebido:v?parseFloat(v.replace(/\./g,"").replace(",",".")):null}).eq("id",S.repSel),"Repasse atualizado ✔"); });
   if(S.tab==="lentes"){ const f=$("#frLentes"); const envia=()=>{ try{ f.contentWindow.postMessage({tipo:"precos",rows:S.precos,tabela:(S.fLocal||"").startsWith("ICOG")||!S.fLocal?"ICOG":"padrao"},"*"); }catch(e){} }; f.addEventListener("load",envia); envia(); }
   m.insertAdjacentHTML("beforeend", `<p class="footnote">Dados protegidos · acesso restrito à equipe · ${S.pacientes.length} pacientes cadastrados</p>`);
@@ -1190,6 +1196,52 @@ window.importarPlanilhas=async function(arquivos,opc){
   return res;
 };
 
+/* ===================== AGENDA DO PRONTUÁRIO ===================== */
+function statusRepasseAt(a,ctx){
+  if(a.status!=="FINISHED") return {k:"nao",tx:a.status==="CANCELED"?"cancelado":"não finalizado"};
+  if(!ctx.fim||a.data>ctx.fim||a.data<ctx.ini) return {k:"aguarda",tx:"aguardando extrato"};
+  const hits=ctx.ext.filter(e=>e.paciente&&nomeBate(e.paciente,a.paciente));
+  const md=hits.filter(e=>e.data===a.data); const perto=hits.filter(e=>e.data!==a.data&&Math.abs(parse(e.data)-parse(a.data))/864e5<=4);
+  if(md.length){ const v=md.reduce((s,e)=>s+Number(e.valor||0),0); return v>0?{k:"ok",tx:moeda(v),v}:{k:"zero",tx:"R$ 0"}; }
+  if(perto.length){ const v=perto.reduce((s,e)=>s+Number(e.valor||0),0); return {k:"outra",tx:`pago em ${perto.map(e=>br(e.data).slice(0,5)).join(", ")} · ${moeda(v)}`,v}; }
+  if(/^retorno$/i.test((a.itens||"").trim())) return {k:"normal",tx:"retorno · sem cobrança"};
+  if(/FACECTOMIA|VITRECTOMIA/i.test(a.itens||"")) return {k:"cir",tx:"cirurgia · confirmar GoCare"};
+  return {k:"sem",tx:"sem repasse"};
+}
+function telaAgenda(){
+  const at=(S.atend||[]); const sinc=S.ultSync?`sincronizado em ${new Date(S.ultSync.em).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}`:"ainda não sincronizado";
+  if(!at.length) return `<div class="page-h"><div><h2>Agenda do prontuário</h2><p class="sub">EyecareBI · ${sinc}</p></div></div><div class="empty">A agenda aparece aqui depois da primeira sincronização com o EyecareBI.</div>`;
+  const oa=S.reps.filter(r=>/^OA\b/.test(r.local)); const ids=new Set(oa.map(r=>r.id));
+  const ctx={ext:S.repItens.filter(i=>ids.has(i.repasse_id)),ini:oa.map(r=>r.periodo_ini||"9999").sort()[0],fim:oa.map(r=>r.periodo_fim||"0000").sort().at(-1)};
+  // semana selecionada (segunda a sábado)
+  const base=S.agSem?parse(S.agSem):(()=>{ const ult=at.map(a=>a.data).sort().at(-1); return parse(ult<hojeISO()?ult:hojeISO()); })();
+  const seg=new Date(base); seg.setDate(seg.getDate()-((seg.getDay()+6)%7)); const sab=new Date(seg); sab.setDate(seg.getDate()+5);
+  const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  const de=iso(seg), ate=iso(sab); const loc=S.agLoc||"";
+  const lista=at.filter(a=>a.data>=de&&a.data<=ate&&(!loc||a.local===loc));
+  const dias={}; lista.forEach(a=>(dias[a.data]=dias[a.data]||[]).push(a));
+  const cores={ok:"ok",outra:"outra",zero:"zero",sem:"sem",cir:"cir",normal:"neutro",aguarda:"neutro",nao:"neutro"};
+  let tot={at:0,v:0,pend:0};
+  const blocos=Object.keys(dias).sort().map(d=>{
+    // junta itens do mesmo paciente no dia
+    const pac={}; dias[d].forEach(a=>{ const k=normNome(a.paciente); (pac[k]=pac[k]||{nome:a.paciente,local:a.local,plano:new Set(),itens:[],status:[],inicio:a.inicio,fin:false}); pac[k].plano.add(a.plano||""); pac[k].itens.push(a.itens||""); if(a.status==="FINISHED") pac[k].fin=true; if(a.inicio&&a.inicio<pac[k].inicio) pac[k].inicio=a.inicio; });
+    const linhas=Object.values(pac).sort((x,y)=>(x.inicio||"").localeCompare(y.inicio||"")).map(p=>{
+      const st=statusRepasseAt({status:p.fin?"FINISHED":"X",data:d,paciente:p.nome,itens:p.itens.join(" + ")},ctx); if(p.fin) tot.at++; if(st.v) tot.v+=st.v; if(["sem","zero"].includes(st.k)) tot.pend++;
+      const hora=p.inicio?new Date(p.inicio).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):"";
+      const proc=p.itens.join(" | ").replace(/Consulta em consultório \(no horário normal ou preestabelecido\)/gi,"Consulta").replace(/ - (MONOCULAR|BINOCULAR)/gi,"");
+      return `<div class="ag-l ${p.fin?"":"apagado"}"><span class="ag-h">${hora}</span><div class="ag-p"><b>${esc(p.nome)}</b><small>${esc([...p.plano].filter(Boolean).join(" / ")||"—")} · ${esc(p.local)}${loc?"":""}</small><small class="ag-proc">${esc(proc.slice(0,120))}</small></div><span class="ag-st ${cores[st.k]}">${esc(st.tx)}</span></div>`; }).join("");
+    const dt=parse(d); const DO=diasOficiais(); const ofL=Object.keys(DO).filter(l=>/^OA\b/.test(l)&&(DO[l]||[]).includes(dt.getDay())); const of=ofL.length>0;
+    const nFin=Object.values(pac).filter(p=>p.fin).length;
+    return `<div class="panel ag-dia"><div class="panel-h"><h3>${["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"][dt.getDay()]}, ${br(d).slice(0,5)}</h3><span class="sub">${nFin} atendido(s)${of?` · ⭐ dia oficial (${ofL.join(", ")})`:" · fora da agenda oficial"}</span></div>${linhas}</div>`; }).join("");
+  const locs=[...new Set(at.map(a=>a.local))].sort();
+  return `<div class="page-h"><div><h2>Agenda do prontuário</h2><p class="sub">EyecareBI · ${sinc} · cada paciente com a situação do repasse</p></div></div>
+  <div class="rep-bar"><div class="rb-row"><div class="rb-lab">🗓️ Semana</div><div class="rb-chips"><button class="rchip" data-agsem="${iso(new Date(seg.getTime()-7*864e5))}">◀</button><span class="ag-sem">${br(de).slice(0,5)} a ${br(ate).slice(0,5)}</span><button class="rchip" data-agsem="${iso(new Date(seg.getTime()+7*864e5))}">▶</button><button class="rchip" data-agsem="">Última</button></div></div>
+  <div class="rb-row"><div class="rb-lab">📍 Unidade</div><div class="rb-chips"><button class="rchip" data-agloc="" aria-pressed="${!loc}">Todas</button>${locs.map(l=>`<button class="rchip" data-agloc="${esc(l)}" aria-pressed="${loc===l}">${esc(l)}</button>`).join("")}</div></div></div>
+  <div class="conf-kpis"><div class="kpi"><b>${tot.at}</b><span>atendidos na semana</span></div><div class="kpi"><b>${moeda0(tot.v)}</b><span>repasse identificado</span></div><div class="kpi ${tot.pend?"alerta":""}"><b>${tot.pend}</b><span>sem repasse ou R$ 0</span></div></div>
+  <div class="ag-leg"><span class="ag-st ok">pago no dia</span><span class="ag-st outra">pago em outra data</span><span class="ag-st zero">R$ 0</span><span class="ag-st sem">sem repasse</span><span class="ag-st neutro">aguardando extrato / retorno</span></div>
+  ${blocos||`<div class="empty">Nenhum atendimento nesta semana.</div>`}`;
+}
+
 /* ===================== REPASSE ===================== */
 const CAT_LABEL={consulta:"Consultas",exame:"Exames",cirurgia:"Cirurgias",injecao:"Injeções",laser:"Laser",retorno:"Retornos"};
 const normNome=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toUpperCase().replace(/…|\.\.\./g,"").replace(/[^A-Z ]/g," ").replace(/\s+/g," ").trim();
@@ -1741,11 +1793,13 @@ async function ciclarInteresse(id){
 }
 
 document.addEventListener("click", e=>{
-  const t=e.target.closest("[data-rloc],[data-rgrp],[data-ofw],[data-rper],[data-rlist],[data-rfil],[data-acaotg],[data-fpag],[data-finj],[data-fpos],[data-dia],[data-floc],[data-fase],[data-tab],[data-goto],[data-act],[data-pac],[data-ft],[data-fi],[data-int]"); if(!t) return;
+  const t=e.target.closest("[data-agsem],[data-agloc],[data-rloc],[data-rgrp],[data-ofw],[data-rper],[data-rlist],[data-rfil],[data-acaotg],[data-fpag],[data-finj],[data-fpos],[data-dia],[data-floc],[data-fase],[data-tab],[data-goto],[data-act],[data-pac],[data-ft],[data-fi],[data-int]"); if(!t) return;
   if(t.dataset.int){ ciclarInteresse(t.dataset.int); return; }
   if(t.dataset.dia!==undefined){ S.dia=+t.dataset.dia; render(); return; }
   if(t.dataset.floc!==undefined){ S.fLocal=t.dataset.floc; S.fase=null; render(); return; }
   if(t.dataset.fase){ S.fase = S.fase===t.dataset.fase ? null : t.dataset.fase; render(); return; }
+  if(t.dataset.agsem!==undefined){ S.agSem=t.dataset.agsem; render(); return; }
+  if(t.dataset.agloc!==undefined){ S.agLoc=t.dataset.agloc; render(); return; }
   if(t.dataset.rloc!==undefined){ const l=t.dataset.rloc; setRepLocs(!l?[]:(S.repLocs.includes(l)?S.repLocs.filter(x=>x!==l):[...S.repLocs,l])); render(); return; }
   if(t.dataset.rgrp){ const ls=t.dataset.rgrp.split("|"); const igual=ls.length===S.repLocs.length&&ls.every(l=>S.repLocs.includes(l)); setRepLocs(igual?[]:ls); render(); return; }
   if(t.dataset.ofw){ const o=JSON.parse(JSON.stringify(diasOficiais())); const l=t.dataset.ofloc, w=+t.dataset.ofw; const a=o[l]||[]; o[l]=a.includes(w)?a.filter(x=>x!==w):[...a,w].sort(); salvaDiasOf(o); render(); return; }
