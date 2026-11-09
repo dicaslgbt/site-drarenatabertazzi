@@ -1077,6 +1077,119 @@ const REP = (() => {
 })();
 
 
+/* ===================== PLANILHAS DO DRIVE (sincronização) ===================== */
+// Lê as planilhas "OFT. AV. / ICOG / OPUS - CIR./INJ./LASER" e acrescenta no portal só o que é novo:
+// pacientes e casos novos, sessões novas de injeção/laser e cirurgias que passaram a ter data. Nunca apaga nem sobrescreve.
+const PL={
+  s(v){ if(v===null||v===undefined) return ""; if(typeof v==="number") v=String(Math.round(v)); return String(v).replace(/\s+/g," ").trim(); },
+  d(v){ if(v instanceof Date&&!isNaN(v)) return v.getFullYear()>=2025?`${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,"0")}-${String(v.getDate()).padStart(2,"0")}`:null;
+        const m=PL.s(v).match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/); if(!m) return null; const y=m[3].length===2?2000+ +m[3]:+m[3]; return y>=2025?`${y}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`:null; },
+  tel(v){ const t=PL.s(v); const dg=t.replace(/\D/g,""); if(dg.length<8) return null; if(/[ ()-]/.test(t)) return t; if(dg.length===11) return `(${dg.slice(0,2)}) ${dg.slice(2,7)}-${dg.slice(7)}`; if(dg.length===10) return `(${dg.slice(0,2)}) ${dg.slice(2,6)}-${dg.slice(6)}`; return t; },
+  conv(v){ const c=PL.s(v).toUpperCase().replace(/\./g,""); if(!c) return null; if(/^PART/.test(c)) return "PART"; if(/^SERVIR/.test(c)) return "SERVIR"; if(/^MUNIC/.test(c)) return "MUNICÍPIO"; return c; },
+  olho(v){ const m=PL.s(v).toUpperCase().match(/\b(OD|OE|AO)\b/); return m?m[1]:null; },
+  BAIXO:/N[AÃ]O DESEJA|VAI ESPERAR|DESEJA ESPERAR|PEDIU PARA ESPERAR|FALTA DE RECURSO|SEM \$|FINANCEIRO|N[AÃ]O AGENDOU|N[AÃ]O PEDIU|INDECIS|VAI AGUARDAR|2027/i,
+  nomeLoc(txt,padrao){
+    let n=PL.s(txt); const tags=[...n.matchAll(/\(([^)]*)\)/g)].map(m=>m[1]); n=n.replace(/\([^)]*\)/g," "); const extra=[];
+    if(/ - /.test(n)){ const [a,...r]=n.split(" - "); n=a; extra.push(r.join(" - ").trim()); }
+    const t=(tags.join(" ")+" "+extra.join(" ")).toUpperCase(); let loc=padrao;
+    if(/ICOG/.test(t)) loc=/PORTO/.test(t)?"ICOG Porto":"ICOG Palmas";
+    else if(/\bPORTO\b/.test(t)&&/^ICOG/.test(padrao)) loc="ICOG Porto";
+    else if(/\b(PSO|PARAISO|PARAÍSO)\b/.test(t)) loc=/^ICOG/.test(padrao)?padrao:"OA Paraíso";
+    else if(/\bPMW\b/.test(t)&&/^ICOG/.test(padrao)) loc="ICOG Palmas";
+    tags.forEach(x=>{ if(!/^\s*(PMW|PSO|PARAISO|PARAÍSO|PORTO|ICOG[^)]*|PORTO - ICOG|PORTO ICOG)\s*$/i.test(x)) extra.push(x.trim()); });
+    return {n:n.replace(/\s+/g," ").trim().toUpperCase(), loc, extra:extra.filter(Boolean)};
+  },
+  // mapeia colunas pelo cabeçalho
+  mapa(cab,ini,fim){ const m={datas:[]}; for(let i=ini;i<fim;i++){ const h=PL.s(cab[i]).toUpperCase(); if(!h) continue;
+      if(/^(NOME|PACIENTE|FINALIZADOS|INDECISOS)$/.test(h)) m.nome=m.nome??i;
+      else if(/INDICA/.test(h)) m.ind=i; else if(h==="$") m.cv=i; else if(/^(PROCEDIMENTO|CIRURGIA)$/.test(h)) m.pr=i;
+      else if(h==="LIO") m.lio=i; else if(/^OBS/.test(h)||/ENTROU EM CONTATO/.test(h)) m.obs=i; else if(/DATA PROC|REALIZADO/.test(h)) m.dt=i;
+      else if(/^(TEL|CONTATO)/.test(h)) m.tel=i; else if(h==="OLHO") m.olho=i;
+      else if(/(\d)\s*[ªº°]|DATA\s*\d|INJE/.test(h)) m.datas.push(i); }
+    return m; },
+  folha(ws,X){ return X.utils.sheet_to_json(ws,{header:1,raw:true,defval:null}); },
+  ler(wb,X,origem){
+    const padrao=/ICOG/i.test(origem)?"ICOG Palmas":/OPUS/i.test(origem)?"OPUS":"OA Palmas"; const out=[]; const hoje=hojeISO();
+    const add=(k,obs)=>{ const ob=[...obs.filter(Boolean),"Planilha "+origem].join(" · "); k.ob=ob; k.baixo=PL.BAIXO.test(ob); out.push(k); };
+    wb.SheetNames.forEach(nomeF=>{
+      const rows=PL.folha(wb.Sheets[nomeF],X); const tipo=/INJE/i.test(nomeF)?"injecao":/LASER/i.test(nomeF)?"laser":/CIRURG/i.test(nomeF)?"cirurgia":null; if(!tipo) return;
+      const muni=/MUNIC/i.test(nomeF);
+      const hi=rows.findIndex(r=>r&&r.some(c=>/^(NOME|PACIENTE)$/i.test(PL.s(c)))); if(hi<0) return;
+      const cab=rows[hi]; const largura=Math.max(...rows.map(r=>r?r.length:0));
+      // blocos: o principal e, à direita, FINALIZADOS / INDECISOS
+      const ladoIni=cab.findIndex((c,i)=>i>0&&/^(FINALIZADOS|INDECISOS)$/i.test(PL.s(c)));
+      const blocos=[{ini:0,fim:ladoIni>0?ladoIni:largura,modo:"ativo"}]; if(ladoIni>0) blocos.push({ini:ladoIni,fim:largura,modo:/FINAL/i.test(PL.s(cab[ladoIni]))?"finalizado":"indeciso"});
+      let mes="";
+      blocos.forEach(b=>{ let m=PL.mapa(cab,b.ini,b.fim); let modo=b.modo;
+        for(let r=hi+1;r<rows.length;r++){ const row=rows[r]||[]; const nm=PL.s(row[m.nome]);
+          if(!nm){ if(tipo==="cirurgia"){ const mm=row.slice(b.ini,b.fim).map(PL.s).find(x=>/^(JANEIRO|FEVEREIRO|MAR[CÇ]O|ABRIL|MAIO|JUNHO|JULHO|AGOSTO|SETEMBRO|OUTUBRO|NOVEMBRO|DEZEMBRO)$/i.test(x)); if(mm) mes=mm.toLowerCase(); } continue; }
+          if(/^(JANEIRO|FEVEREIRO|MAR[CÇ]O|ABRIL|MAIO|JUNHO|JULHO|AGOSTO|SETEMBRO|OUTUBRO|NOVEMBRO|DEZEMBRO)$/i.test(nm)){ mes=nm.toLowerCase(); continue; }
+          if(/^(FINALIZADOS|INDECISOS)$/i.test(nm)){ modo=/FINAL/i.test(nm)?"finalizado":"indeciso"; // sub-cabeçalho no meio (colunas genéricas): posição fixa
+            m={nome:m.nome,olho:m.nome+1,ind:m.nome+2,cv:m.nome+3,datas:[m.nome+4,m.nome+5,m.nome+6],tel:m.nome+7}; continue; }
+          const {n,loc,extra}=PL.nomeLoc(nm,padrao); if(!n||n.length<4) continue;
+          const obs=[...extra, PL.s(row[m.obs])]; const cv=muni?"MUNICÍPIO":PL.conv(row[m.cv]); const di=PL.d(row[m.ind]); const t=PL.tel(row[m.tel]);
+          if(tipo==="cirurgia"){ const dp=PL.d(row[m.dt]); let e="indicado",dr=null,da=null; if(dp&&dp<=hoje){ e="realizado"; dr=dp; } else if(dp){ e="agendado"; da=dp; }
+            let pr=PL.s(row[m.pr]); if(m.lio!==undefined&&PL.s(row[m.lio])) obs.push("LIO: "+PL.s(row[m.lio])); if(mes) obs.push("Planilha: "+mes);
+            add({n,t,loc,ti:"cirurgia",pr,o:PL.olho(pr),cv,e,di,dr,da},obs); }
+          else { const ses=m.datas.map(i=>PL.d(row[i])).filter(Boolean); const ol=PL.s(row[m.olho]); const o=PL.olho(ol); const pr=ol.replace(/\b(1º|OD|OE|AO)\b/gi,"").trim()||null;
+            let e; if(modo==="finalizado") e="finalizado"; else if(modo==="indeciso"){ e="indicado"; obs.push("indeciso"); }
+            else if(tipo==="laser") e=!ses.length?"indicado":(/FINALIZADO/i.test(obs.join(" "))?"finalizado":"em_tratamento"); else e=ses.length?"em_tratamento":"indicado";
+            add({n,t,loc,ti:tipo,pr,o,cv,e,di,s:ses},obs); }
+        } });
+    });
+    return out;
+  }
+};
+function hojeISO(){ const d=new Date(Date.now()-3*3600e3); return d.toISOString().slice(0,10); }
+const procN=s=>normNome(s).replace(/\b(1º|1O|AO|OD|OE)\b/g,"").replace(/\s+/g,"");
+function acharCaso(r,pac){
+  if(!pac) return null; const cs=S.casos.filter(c=>c.paciente_id===pac.id&&c.tipo===r.ti);
+  if(r.ti==="cirurgia"){ const k=normNome(r.pr).replace(/\s+/g,""); return cs.find(c=>normNome(c.procedimento).replace(/\s+/g,"")===k)||null; }
+  const mesmoOlho=cs.filter(c=>(c.olho||null)===(r.o||null)||!r.o||!c.olho);
+  if(!mesmoOlho.length) return null; if(mesmoOlho.length===1) return mesmoOlho[0];
+  // vários ciclos: prefere o que tem sessões em comum, senão o mais compatível com a etapa
+  const comum=mesmoOlho.find(c=>S.sessoes.some(s=>s.caso_id===c.id&&(r.s||[]).includes(s.data_realizada))); if(comum) return comum;
+  return mesmoOlho.find(c=>(c.etapa==="finalizado")===(r.e==="finalizado"))||mesmoOlho[0];
+}
+window.importarPlanilhas=async function(arquivos,opc){
+  opc=opc||{}; const X=await carregaLib("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js","XLSX");
+  let regs=[]; for(const a of arquivos){ const bin=typeof a.xlsx==="string"?Uint8Array.from(atob(a.xlsx),c=>c.charCodeAt(0)):new Uint8Array(a.xlsx);
+    const wb=X.read(bin,{type:"array",cellDates:true}); regs=regs.concat(PL.ler(wb,X,a.nome)); }
+  const res={lidos:regs.length,novosPacientes:0,novosCasos:0,novasSessoes:0,atualizados:0,detalhes:[]};
+  const pacPorNome=new Map(S.pacientes.map(p=>[normNome(p.nome),p]));
+  for(const r of regs){
+    let pac=pacPorNome.get(normNome(r.n));
+    if(!pac){ res.novosPacientes++; res.detalhes.push("novo paciente: "+r.n);
+      if(!opc.simular){ const q=await sb.from("pacientes").insert({nome:r.n,telefone:r.t||null}).select().single(); if(q.error) throw q.error; pac=q.data; S.pacientes.push(pac); } else pac={id:"sim-"+r.n,nome:r.n};
+      pacPorNome.set(normNome(r.n),pac); }
+    else if(r.t&&!pac.telefone&&!opc.simular){ await sb.from("pacientes").update({telefone:r.t}).eq("id",pac.id); pac.telefone=r.t; }
+    const c=acharCaso(r,pac);
+    if(!c){ res.novosCasos++; res.detalhes.push(`novo caso: ${r.n} · ${r.ti} ${r.pr||""} ${r.o||""} (${r.e})`);
+      if(opc.simular) continue;
+      const fech=["realizado","agendado"].includes(r.e);
+      const novo={paciente_id:pac.id,tipo:r.ti,procedimento:r.pr||null,olho:r.o||null,convenio:r.cv||null,etapa:r.e,data_indicacao:r.di||null,data_realizado:r.dr||null,data_agendada:r.da||null,obs:r.ob,
+        total_sessoes:r.ti==="cirurgia"?null:Math.max(3,(r.s||[]).length),intervalo_dias:r.ti==="cirurgia"?null:30,local:r.loc,pagamento:r.cv==="PART"?"particular":"convenio",
+        interesse:fech?"fechado":r.baixo?"baixo":"medio",fechado_em:fech?(r.dr||r.da):null,etapa_desde:r.dr||r.da||r.di||hojeISO()};
+      const q=await sb.from("casos").insert(novo).select().single(); if(q.error) throw q.error; S.casos.push(q.data);
+      for(let i=0;i<(r.s||[]).length;i++){ const s=await sb.from("sessoes").insert({caso_id:q.data.id,ciclo:1,numero:i+1,data_realizada:r.s[i]}).select().single(); if(!s.error&&s.data) S.sessoes.push(s.data); res.novasSessoes++; }
+      continue; }
+    // caso existente: só acrescenta
+    if(r.ti==="cirurgia"){
+      const upd={};
+      if(r.dr&&!c.data_realizado&&!["realizado","pos_op","finalizado","desistiu"].includes(c.etapa)) Object.assign(upd,{etapa:"realizado",data_realizado:r.dr,etapa_desde:r.dr,interesse:"fechado",fechado_em:c.fechado_em||r.dr});
+      else if(r.da&&!c.data_agendada&&["indicado","orcamento","aguardando","fechado"].includes(c.etapa)) Object.assign(upd,{etapa:"agendado",data_agendada:r.da,etapa_desde:hojeISO(),interesse:"fechado",fechado_em:c.fechado_em||hojeISO()});
+      if(Object.keys(upd).length){ res.atualizados++; res.detalhes.push(`atualizado: ${r.n} · ${r.pr} → ${upd.etapa}`); if(!opc.simular){ await sb.from("casos").update(upd).eq("id",c.id); Object.assign(c,upd); } }
+    } else {
+      const ja=S.sessoes.filter(s=>s.caso_id===c.id); const datas=new Set(ja.map(s=>s.data_realizada)); let num=ja.length;
+      for(const d of (r.s||[])){ if(datas.has(d)) continue; num++; res.novasSessoes++; res.detalhes.push(`sessão: ${r.n} · ${r.ti} ${r.o||""} ${br(d)}`);
+        if(!opc.simular){ const s=await sb.from("sessoes").insert({caso_id:c.id,ciclo:ja[0]?.ciclo||1,numero:num,data_realizada:d}).select().single(); if(!s.error&&s.data) S.sessoes.push(s.data); } }
+      if(c.etapa==="indicado"&&(r.s||[]).length&&!opc.simular){ await sb.from("casos").update({etapa:"em_tratamento",etapa_desde:r.s[0],interesse:"fechado"}).eq("id",c.id); c.etapa="em_tratamento"; res.atualizados++; }
+    }
+  }
+  if(!opc.simular){ await sb.from("sincronizacoes").insert({origem:"planilhas",recebidos:res.lidos,inseridos:res.novosCasos+res.novasSessoes+res.atualizados,obs:arquivos.map(a=>a.nome).join(", ")}); await carregar(); render(); }
+  return res;
+};
+
 /* ===================== REPASSE ===================== */
 const CAT_LABEL={consulta:"Consultas",exame:"Exames",cirurgia:"Cirurgias",injecao:"Injeções",laser:"Laser",retorno:"Retornos"};
 const normNome=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toUpperCase().replace(/…|\.\.\./g,"").replace(/[^A-Z ]/g," ").replace(/\s+/g," ").trim();
