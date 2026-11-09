@@ -164,6 +164,7 @@ main{max-width:1480px;margin:0 auto;padding:16px 14px 24px}
 .acao-box.ok{background:var(--ok-soft);border-color:#bfe0cc;border-left-color:var(--ok);color:var(--ok);font-size:.9rem}
 .col-arq{background:#eef0f3}.col-arq h3 span:first-child{color:var(--soft)}.item.arq{opacity:.92;border-style:dashed}
 .pos-card{border-top:1px dashed var(--line);padding-top:8px;display:grid;gap:6px}.pos-card small{color:var(--soft);font-size:.78rem}.pos-t{width:100%;border-collapse:collapse;font-size:.82rem}.pos-t td{padding:3px 0;vertical-align:middle}.pos-t td:first-child{color:var(--soft);font-weight:600}.pos-t td:last-child{text-align:right}
+.agsem-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.agsem-nav b{font-size:.95rem;color:var(--ink)}.agsem-nav .rchip{padding:6px 12px}
 .filtros{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 14px;align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin:4px 0 16px}
 .fcampo{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:.8rem;color:var(--soft);margin:0}
 .fcampo select{width:100%;min-width:0;font:inherit;font-weight:600;font-size:.95rem;color:var(--ink);padding:9px 12px;border:1px solid var(--line);border-radius:11px;background:#fff}
@@ -1318,8 +1319,10 @@ function telaAgenda(){
     return `<div class="panel ag-dia"><div class="panel-h"><h3>${["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"][dt.getDay()]}, ${br(d).slice(0,5)}</h3><span class="sub">${nFin} atendido(s)${of?` · ⭐ dia oficial (${ofL.join(", ")})`:" · fora da agenda oficial"}</span></div>${linhas}</div>`; }).join("");
   const locs=[...new Set(at.map(a=>a.local))].sort();
   return `<div class="page-h"><div><h2>Agenda do prontuário</h2><p class="sub">EyecareBI (OA e OPUS) + Amigo (ICOG) · ${sinc} · cada paciente com horário e situação do repasse</p></div></div>
-  <div class="rep-bar"><div class="rb-row"><div class="rb-lab">🗓️ Semana</div><div class="rb-chips"><button class="rchip" data-agsem="${iso(new Date(seg.getTime()-7*864e5))}">◀</button><span class="ag-sem">${br(de).slice(0,5)} a ${br(ate).slice(0,5)}</span><button class="rchip" data-agsem="${iso(new Date(seg.getTime()+7*864e5))}">▶</button><button class="rchip" data-agsem="">Última</button></div></div>
-  <div class="rb-row"><div class="rb-lab">📍 Unidade</div><div class="rb-chips"><button class="rchip" data-agloc="" aria-pressed="${!loc}">Todas</button>${locs.map(l=>`<button class="rchip" data-agloc="${esc(l)}" aria-pressed="${loc===l}">${esc(l)}</button>`).join("")}</div></div></div>
+  <div class="filtros">
+    <div class="fcampo"><span>🗓️ Semana</span><div class="agsem-nav"><button class="rchip" data-agsem="${iso(new Date(seg.getTime()-7*864e5))}" aria-label="Semana anterior">◀</button><b>${br(de).slice(0,5)} a ${br(ate).slice(0,5)}</b><button class="rchip" data-agsem="${iso(new Date(seg.getTime()+7*864e5))}" aria-label="Próxima semana">▶</button><button class="linkbtn" data-agsem="">Hoje</button></div></div>
+    <label class="fcampo"><span>📍 Clínica</span><select id="selAgLoc"><option value="">Todas as clínicas (${at.filter(a=>a.data>=de&&a.data<=ate).length})</option>${locs.map(l=>`<option value="${esc(l)}" ${loc===l?"selected":""}>${esc(l)} (${at.filter(a=>a.data>=de&&a.data<=ate&&a.local===l).length})</option>`).join("")}</select></label>
+  </div>
   <div class="conf-kpis"><div class="kpi"><b>${tot.at}</b><span>atendidos na semana</span></div><div class="kpi"><b>${moeda0(tot.v)}</b><span>repasse identificado</span></div><div class="kpi ${tot.pend?"alerta":""}"><b>${tot.pend}</b><span>sem repasse ou R$ 0</span></div></div>
   <div class="ag-leg"><span class="ag-st ok">pago no dia</span><span class="ag-st outra">pago em outra data</span><span class="ag-st zero">R$ 0</span><span class="ag-st sem">sem repasse</span><span class="ag-st neutro">aguardando extrato / retorno</span></div>
   ${blocos||`<div class="empty">Nenhum atendimento nesta semana.</div>`}`;
@@ -2030,7 +2033,7 @@ document.addEventListener("click", e=>{
 });
 document.addEventListener("click",e=>{ const m=document.getElementById("menuTop"); if(m&&m.open&&(!m.contains(e.target)||e.target.closest(".menu-p button"))) setTimeout(()=>m.open=false,0); },true);
 document.addEventListener("change", e=>{ if(e.target.id==="selLocal"){ S.fLocal=e.target.value; S.fase=null; render(); }
-  if(e.target.id==="selProc"){ S.fProc=e.target.value; render(); } if(e.target.id==="selSub"){ S.fSub=e.target.value; render(); } if(e.target.id==="selPag"){ S.fPag=e.target.value; render(); } if(e.target.id==="selSit"){ S.fSit=e.target.value; render(); }
+  if(e.target.id==="selProc"){ S.fProc=e.target.value; render(); } if(e.target.id==="selSub"){ S.fSub=e.target.value; render(); } if(e.target.id==="selAgLoc"){ S.agLoc=e.target.value; render(); } if(e.target.id==="selPag"){ S.fPag=e.target.value; render(); } if(e.target.id==="selSit"){ S.fSit=e.target.value; render(); }
   if(e.target.id==="repSoOf"){ S.repSoOf=e.target.checked; render(); }
   if(e.target.id==="repDe"){ S.repDe=e.target.value; render(); }
   if(e.target.id==="repAte"){ S.repAte=e.target.value; render(); }
