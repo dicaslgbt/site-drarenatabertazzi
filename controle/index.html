@@ -1996,8 +1996,7 @@ const PIPE = {
     ["duvida","Em dúvida · aquecendo","Enviar um vídeo ou conteúdo por semana para dar segurança",AQUECER_DIAS],
     ["fechado","Fechado · agenda","Sem data = marcar no centro cirúrgico · com data = agendado",null,["fechado","agendado"]],
     ["realizado","Operado · fazer contato","Ligar ou mandar WhatsApp no dia seguinte",1,["realizado","pos_op"],c=>!posDe(c)?.contato_em],
-    ["pos_op","Em contato · pós-op","Contato feito · retornos 1, 7 e 30 dias",45,["realizado","pos_op"],c=>!!posDe(c)?.contato_em],
-    ["finalizado","Alta","Últimos 60 dias",null]]},
+    ["pos_op","Em contato · pós-op","Contato feito · retornos 1, 7 e 30 dias",45,["realizado","pos_op"],c=>!!posDe(c)?.contato_em]]},
   injecao:{titulo:"Injeções", sub:"Da indicação ao ciclo de aplicações · agendar a partir de D+14 · vence em D+30", cols:[
     ["indicado","Nova indicação","Enviar orçamento ou guia",3],
     ["orcamento","Orçamento / guia · aguardando","Esperando o paciente decidir ou o convênio autorizar",15,["orcamento","aguardando"]],
