@@ -176,7 +176,7 @@ function Hero() {
     <section id="inicio" className="relative overflow-clip bg-gradient-to-br from-[#FFFFFF] via-[#EEF5FD] to-[#E2F3EF]">
       <div className="pointer-events-none absolute -right-32 -top-24 h-[460px] w-[460px] rounded-full bg-[#79A9D2]/30 blur-3xl" />
       <div className="pointer-events-none absolute -left-40 top-[40%] h-[420px] w-[420px] rounded-full bg-[#7CCBB8]/25 blur-3xl" />
-      <div className="relative mx-auto grid max-w-6xl gap-12 px-5 pb-16 pt-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:px-8 lg:pb-24 lg:pt-16">
+      <div className="relative mx-auto grid max-w-6xl gap-12 px-5 pb-10 pt-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:px-8 lg:pb-24 lg:pt-16">
         {/* imagem */}
         <div className="relative mx-auto w-full max-w-[290px] sm:max-w-[340px] lg:order-2 lg:max-w-[420px]">
           <div className="absolute -right-3 -top-3 bottom-10 left-10 rounded-2xl border border-[#79A9D2]" aria-hidden="true" />
@@ -189,7 +189,7 @@ function Hero() {
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#004AAD]/15 via-transparent to-transparent" />
           </figure>
           <div className="absolute -bottom-5 -left-2 flex items-center gap-3 rounded-xl bg-white px-4 py-3 shadow-[0_18px_40px_-20px_rgba(0,74,173,0.5)] ring-1 ring-[#79A9D2]/40 sm:-left-5">
-            <span className="font-serif text-[32px] leading-none text-[#004AAD]">+500</span>
+            <span className="font-serif text-[32px] leading-none text-[#004AAD] [font-variant-numeric:lining-nums]">+500</span>
             <span className="border-l border-[#79A9D2] pl-3 text-[12.5px] font-medium leading-snug text-[#5F5F7C]">
               cirurgias<br />realizadas
             </span>
@@ -207,7 +207,7 @@ function Hero() {
           </p>
 
           {/* credenciais */}
-          <dl className="mt-8 grid grid-cols-3 divide-x divide-[#79A9D2]/45 rounded-2xl bg-white/85 py-4 shadow-[0_14px_34px_-24px_rgba(0,74,173,0.5)] ring-1 ring-[#79A9D2]/40 backdrop-blur">
+          <dl className="mt-7 grid grid-cols-3 divide-x divide-[#79A9D2]/45 rounded-2xl bg-white/85 py-3.5 shadow-[0_14px_34px_-24px_rgba(0,74,173,0.5)] ring-1 ring-[#79A9D2]/40 backdrop-blur">
             {[
               ["CRM-TO", "7132"],
               ["RQE", "3562"],
@@ -215,12 +215,12 @@ function Hero() {
             ].map(([k, v]) => (
               <div key={k} className="flex flex-col items-center justify-center px-2 text-center">
                 <dt className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#2F7FDC]">{k}</dt>
-                <dd className="mt-1 font-serif text-[24px] leading-none text-[#0E2A57]">{v}</dd>
+                <dd className="mt-1.5 text-[19px] font-semibold leading-none tabular-nums text-[#0E2A57]">{v}</dd>
               </div>
             ))}
           </dl>
 
-          <div id="hero-cta" className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div id="hero-cta" className="mt-7 flex flex-col gap-3 sm:flex-row">
             <PrimaryCTA />
             <a
               href="#tratamentos"
@@ -229,11 +229,11 @@ function Hero() {
               Conhecer Tratamentos
             </a>
           </div>
-          <a href="#fale" className="mt-5 inline-flex items-center gap-2 text-[16px] font-semibold text-[#004AAD] underline decoration-[#79A9D2] decoration-2 underline-offset-[6px] transition hover:decoration-[#004AAD]">
+          <a href="#fale" className="mt-6 inline-flex items-center gap-2 text-[16px] font-semibold text-[#004AAD] underline decoration-[#79A9D2] decoration-2 underline-offset-[6px] transition hover:decoration-[#004AAD]">
             <MessageSquareHeart className="h-5 w-5" strokeWidth={1.8} />
             Envie sua dúvida ou recado
           </a>
-          <p className="mt-4 text-[14px] text-[#33415C]/80">Atendimento em Palmas, Paraíso do Tocantins e Porto Nacional.</p>
+          <p className="mt-3 text-[14px] text-[#33415C]/80">Atendimento em Palmas, Paraíso do Tocantins e Porto Nacional.</p>
         </div>
       </div>
     </section>
@@ -297,7 +297,7 @@ function TreatmentCard({ t, open, onToggle }) {
 function Treatments() {
   const [open, setOpen] = useState("retina");
   return (
-    <section id="tratamentos" className="bg-gradient-to-b from-[#E6F2F2] via-[#F8FBFE] to-white py-20 lg:py-28">
+    <section id="tratamentos" className="bg-gradient-to-b from-[#E6F2F2] via-[#F8FBFE] to-white pb-20 pt-10 lg:py-28">
       <div className="mx-auto max-w-6xl px-5 lg:px-8">
         <div className="max-w-2xl">
           <Eyebrow>Áreas de tratamento</Eyebrow>
