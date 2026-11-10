@@ -672,7 +672,7 @@ function enviarParabens(k){
   let copia=null;
   try{ if(navigator.clipboard&&window.ClipboardItem) copia=navigator.clipboard.write([new ClipboardItem({"image/png":cartaoBlob()})]); }catch(e){}
   if(!copia) copia=Promise.reject(new Error("sem área de transferência"));
-  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(texto)}`,"_blank","noopener");
+  window.open(`https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(texto)}`,"_blank","noopener");
   copia.then(()=>toast("Cartão copiado! Na conversa, cole (Cmd+V ou Ctrl+V) e envie.")).catch(()=>toast("Texto pronto no WhatsApp. Para o cartão, use “Baixar cartão”."));
   marcar();
 }
