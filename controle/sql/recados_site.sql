@@ -30,15 +30,15 @@ create policy "site envia recado" on public.recados_site
 
 drop policy if exists "equipe le recados" on public.recados_site;
 create policy "equipe le recados" on public.recados_site
-  for select to authenticated using (true);
+  for select to authenticated using (public.autorizado());
 
 drop policy if exists "equipe atualiza recados" on public.recados_site;
 create policy "equipe atualiza recados" on public.recados_site
-  for update to authenticated using (true) with check (true);
+  for update to authenticated using (public.autorizado()) with check (public.autorizado());
 
 drop policy if exists "equipe apaga recados" on public.recados_site;
 create policy "equipe apaga recados" on public.recados_site
-  for delete to authenticated using (true);
+  for delete to authenticated using (public.autorizado());
 
 grant insert on public.recados_site to anon;
 grant select, insert, update, delete on public.recados_site to authenticated;
