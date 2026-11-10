@@ -137,21 +137,21 @@ function PrimaryCTA({ className = "", children = "Agendar Consulta via WhatsApp"
 /* ---------- header ---------- */
 function Header() {
   const [open, setOpen] = useState(false);
-  const links = [["#tratamentos", "Tratamentos"], ["#seguranca", "Segurança"], ["#sobre", "A médica"], ["#fale", "Recados e dúvidas"], ["#atendimento", "Onde atendo"]];
+  const links = [["#tratamentos", "Tratamentos"], ["#quiz-lente", "Quiz da lente"], ["#seguranca", "Segurança"], ["#sobre", "A médica"], ["#fale", "Recados e dúvidas"], ["#atendimento", "Onde atendo"]];
   return (
     <header className="sticky top-0 z-40 border-b border-[#0E2A57]/10 bg-[#F6F9FD]/90 backdrop-blur-md">
       <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between px-5 lg:px-8">
         <a href="#inicio" className="flex items-center" aria-label="Dra. Renata Bertazzi, Oftalmologia, Retina e Catarata. Início">
           <img src={LOGO} alt="Dra. Renata Bertazzi · Oftalmologia | Retina e Catarata" className="h-[34px] w-auto sm:h-[40px]" />
         </a>
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
+        <nav className="hidden items-center gap-6 lg:flex" aria-label="Principal">
           {links.map(([h, t]) => (
-            <a key={h} href={h} className="text-[15px] font-medium text-[#0E2A57]/75 transition hover:text-[#0E2A57]">{t}</a>
+            <a key={h} href={h} className="whitespace-nowrap text-[15px] font-medium text-[#0E2A57]/75 transition hover:text-[#0E2A57]">{t}</a>
           ))}
-          <a href={WA_URL} target="_blank" rel="noopener noreferrer" className="rounded-full bg-[#004AAD] px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-[#003C8F]">Agendar</a>
+          <a href={WA_URL} target="_blank" rel="noopener noreferrer" className="whitespace-nowrap rounded-full bg-[#004AAD] px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-[#003C8F]">Agendar</a>
         </nav>
         <button
-          className="grid h-11 w-11 place-items-center rounded-full border border-[#0E2A57]/15 md:hidden"
+          className="grid h-11 w-11 place-items-center rounded-full border border-[#0E2A57]/15 lg:hidden"
           onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-label={open ? "Fechar menu" : "Abrir menu"}
@@ -160,7 +160,7 @@ function Header() {
         </button>
       </div>
       {open && (
-        <nav className="border-t border-[#0E2A57]/10 bg-white px-5 pb-5 md:hidden" aria-label="Menu">
+        <nav className="border-t border-[#0E2A57]/10 bg-white px-5 pb-5 lg:hidden" aria-label="Menu">
           {links.map(([h, t]) => (
             <a key={h} href={h} onClick={() => setOpen(false)} className="flex items-center justify-between border-b border-[#0E2A57]/10 py-4 text-[17px] font-medium text-[#0E2A57]">
               {t}<ArrowRight className="h-4 w-4 text-[#2F7FDC]" />
@@ -321,6 +321,54 @@ function Treatments() {
           {TREATMENTS.map((t) => (
             <TreatmentCard key={t.id} t={t} open={open === t.id} onToggle={() => setOpen(open === t.id ? null : t.id)} />
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- quiz da lente (destaque) ---------- */
+const QUIZ_URL = "qual-lente-para-catarata.html#simulador";
+function LensQuiz() {
+  const opts = [
+    ["Dirijo à noite com frequência", true],
+    ["Uso computador ou tablet várias horas", false],
+    ["Leio muito ou uso muito o celular", true],
+    ["Quero ficar o mais livre possível dos óculos", false],
+  ];
+  return (
+    <section id="quiz-lente" className="bg-white py-16 lg:py-24">
+      <div className="mx-auto max-w-6xl px-5 lg:px-8">
+        <div className="relative overflow-clip rounded-[32px] bg-gradient-to-br from-[#0E2A57] via-[#123A75] to-[#0F5A6E] px-6 py-10 text-white shadow-[0_40px_80px_-40px_rgba(14,42,87,0.6)] sm:px-10 lg:grid lg:grid-cols-2 lg:items-center lg:gap-14 lg:px-14 lg:py-14">
+          <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[#7CCBB8]/25 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-[#79A9D2]/25 blur-3xl" />
+          <div className="relative">
+            <Eyebrow light>Catarata · quiz da lente</Eyebrow>
+            <h2 className="mt-5 font-serif text-[36px] leading-[1.1] sm:text-[46px]">Vai operar catarata? Descubra a lente ideal para você.</h2>
+            <p className="mt-5 text-[18px] leading-[1.7] text-white/85">Marque como é o seu dia a dia e veja, na hora, como você enxergaria de longe, no computador e de perto com cada tipo de lente.</p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <a href={QUIZ_URL} className="inline-flex flex-none items-center justify-center gap-2 whitespace-nowrap rounded-full bg-white px-7 py-4 text-[17px] font-semibold text-[#0E2A57] shadow-lg transition hover:bg-[#E6F2F2] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#7CCBB8]">
+                Fazer o quiz <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </a>
+              <span className="text-[15px] text-white/75">Leva menos de 1 minuto · resultado na hora</span>
+            </div>
+          </div>
+          <a href={QUIZ_URL} aria-label="Abrir o quiz da lente" className="relative mt-10 block rounded-3xl bg-white p-6 text-[#0E2A57] shadow-[0_30px_60px_-30px_rgba(0,0,0,0.5)] transition hover:-translate-y-1 lg:mt-0">
+            <p className="flex items-center gap-3 text-[13px] font-semibold uppercase tracking-[0.2em] text-[#004AAD]"><span className="grid h-7 w-7 place-items-center rounded-full bg-[#004AAD] text-[13px] text-white">1</span>Como é o seu dia a dia?</p>
+            <ul className="mt-5 grid gap-3">
+              {opts.map(([t, on]) => (
+                <li key={t} className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-[16px] ${on ? "border-[#004AAD] bg-[#EEF4FB] font-semibold" : "border-[#DCE6F2]"}`}>
+                  <span className={`grid h-6 w-6 flex-none place-items-center rounded-md border-2 ${on ? "border-[#004AAD] bg-[#004AAD] text-white" : "border-[#B9CBE0]"}`}>{on && <CircleCheck className="h-4 w-4" aria-hidden="true" />}</span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-5 grid grid-cols-3 gap-2 text-center text-[13px] font-semibold">
+              {[["Longe", "dirigir, TV"], ["Intermediário", "computador"], ["Perto", "celular, leitura"]].map(([a, b]) => (
+                <div key={a} className="rounded-xl bg-[#E2F3EF] px-2 py-3 text-[#0F5A4E]"><Eye className="mx-auto mb-1 h-5 w-5" aria-hidden="true" />{a}<span className="block text-[12px] font-normal text-[#33615A]">{b}</span></div>
+              ))}
+            </div>
+          </a>
         </div>
       </div>
     </section>
@@ -750,6 +798,7 @@ export default function LandingDraRenata() {
       <main>
         <Hero />
         <Treatments />
+        <LensQuiz />
         <Safety />
         <Journey />
         <DuringSurgery />
