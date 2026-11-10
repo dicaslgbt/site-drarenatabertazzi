@@ -168,8 +168,9 @@ function Header() {
 /* ---------- hero ---------- */
 function Hero() {
   return (
-    <section id="inicio" className="relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(70%_60%_at_80%_10%,rgba(121,169,210,0.22),transparent_70%)]" />
+    <section id="inicio" className="relative overflow-hidden bg-gradient-to-b from-[#FFFFFF] via-[#F2F7FD] to-[#E3EEFA]">
+      <div className="pointer-events-none absolute -right-32 -top-24 h-[460px] w-[460px] rounded-full bg-[#79A9D2]/30 blur-3xl" />
+      <div className="pointer-events-none absolute -left-40 top-[40%] h-[420px] w-[420px] rounded-full bg-[#2F7FDC]/12 blur-3xl" />
       <div className="relative mx-auto grid max-w-6xl gap-12 px-5 pb-16 pt-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:px-8 lg:pb-24 lg:pt-16">
         {/* imagem */}
         <div className="relative mx-auto w-full max-w-[290px] sm:max-w-[340px] lg:order-2 lg:max-w-[420px]">
@@ -289,7 +290,7 @@ function TreatmentCard({ t, open, onToggle }) {
 function Treatments() {
   const [open, setOpen] = useState("retina");
   return (
-    <section id="tratamentos" className="border-t border-[#0E2A57]/10 bg-white py-20 lg:py-28">
+    <section id="tratamentos" className="bg-gradient-to-b from-[#E3EEFA] via-[#F8FBFE] to-white py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-5 lg:px-8">
         <div className="max-w-2xl">
           <Eyebrow>Áreas de tratamento</Eyebrow>
@@ -349,7 +350,8 @@ function About() {
     [Stethoscope, "Acompanhamento próximo", "A mesma médica do primeiro exame ao último retorno do pós-operatório."],
   ];
   return (
-    <section id="sobre" className="relative overflow-hidden bg-[#EAF2FB] py-20 lg:py-28">
+    <section id="sobre" className="relative overflow-hidden bg-gradient-to-br from-[#E6F0FB] via-[#F1F6FD] to-[#DCE9F8] py-20 lg:py-28">
+      <div className="pointer-events-none absolute -bottom-40 -left-32 h-[420px] w-[420px] rounded-full bg-[#79A9D2]/25 blur-3xl" />
       <div className="pointer-events-none absolute -right-40 -top-40 h-[480px] w-[480px] rounded-full border border-[#79A9D2]/40" />
       <div className="pointer-events-none absolute -right-20 -top-20 h-[480px] w-[480px] rounded-full border border-[#79A9D2]/25" />
       <div className="relative mx-auto grid max-w-6xl gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16 lg:px-8">
@@ -401,7 +403,7 @@ function About() {
 /* ---------- atendimento ---------- */
 function Location() {
   return (
-    <section id="atendimento" className="border-t border-[#0E2A57]/10 bg-white py-20 lg:py-28">
+    <section id="atendimento" className="bg-gradient-to-b from-white to-[#EEF4FB] py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-5 lg:px-8">
         <div className="max-w-2xl">
           <Eyebrow>Localização e atendimento</Eyebrow>
@@ -467,7 +469,7 @@ function Location() {
 /* ---------- rodapé ---------- */
 function Footer() {
   return (
-    <footer className="border-t border-[#0E2A57]/10 bg-white pb-28 pt-14 md:pb-14">
+    <footer className="border-t border-[#79A9D2]/40 bg-gradient-to-b from-[#EEF4FB] to-[#DCE9F8] pb-28 pt-14 md:pb-14">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 lg:grid-cols-[1.2fr_1fr] lg:px-8">
         <div>
           <img src={LOGO} alt="Dra. Renata Bertazzi · Oftalmologia | Retina e Catarata" loading="lazy" className="h-[40px] w-auto" />
