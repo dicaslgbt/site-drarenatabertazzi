@@ -12,6 +12,7 @@ import {
 
 const IMG = "https://drarenatabertazzi.com.br/img/";
 const PHOTO = IMG + "dra-renata-bertazzi-oftalmologista-palmas.webp";
+const PHOTO_OFFICE = IMG + "dra-renata-consultorio.webp";
 
 const GALLERY = [
   { src: IMG + "rotina-consulta-lampada-de-fenda.webp", alt: "Dra. Renata examinando uma paciente na lâmpada de fenda", step: "01", title: "Consulta sem pressa", text: "Exame completo na lâmpada de fenda, com tempo para ouvir e explicar." },
@@ -356,10 +357,25 @@ function About() {
     <section id="sobre" className="relative overflow-hidden bg-[#0B1E36] py-20 text-white lg:py-28">
       <div className="pointer-events-none absolute -right-40 -top-40 h-[480px] w-[480px] rounded-full border border-[#D9C59A]/15" />
       <div className="pointer-events-none absolute -right-20 -top-20 h-[480px] w-[480px] rounded-full border border-[#D9C59A]/10" />
-      <div className="relative mx-auto grid max-w-6xl gap-14 px-5 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
+      <div className="relative mx-auto grid max-w-6xl gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16 lg:px-8">
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <div className="lg:hidden">
+            <Eyebrow light>Sobre a médica</Eyebrow>
+            <h2 className="mt-5 font-serif text-[36px] leading-[1.1] sm:text-[44px]">Experiência no centro cirúrgico. Escuta no consultório.</h2>
+          </div>
+          <figure className="mt-10 lg:mt-0">
+            <div className="relative">
+            <div className="absolute -bottom-3 -left-3 right-10 top-10 border border-[#D9C59A]/40" aria-hidden="true" />
+            <img src={PHOTO_OFFICE} alt="Dra. Renata Bertazzi em seu consultório" loading="lazy" className="relative aspect-[4/5] w-full rounded-[6px] object-cover object-top shadow-[0_40px_80px_-40px_rgba(0,0,0,0.7)] [filter:saturate(0.92)_contrast(1.03)]" />
+            </div>
+            <figcaption className="mt-6 text-[14px] tracking-wide text-white/60">Consultório · Palmas, Tocantins</figcaption>
+          </figure>
+        </div>
         <div>
-          <Eyebrow light>Sobre a médica</Eyebrow>
-          <h2 className="mt-5 font-serif text-[36px] leading-[1.1] sm:text-[44px]">Experiência no centro cirúrgico. Escuta no consultório.</h2>
+          <div className="hidden lg:block">
+            <Eyebrow light>Sobre a médica</Eyebrow>
+            <h2 className="mt-5 font-serif text-[44px] leading-[1.1]">Experiência no centro cirúrgico. Escuta no consultório.</h2>
+          </div>
           <div className="mt-6 grid gap-4 text-[18px] leading-[1.7] text-white/85">
             <p>A Dra. Renata Carneiro Bertazzi é médica oftalmologista com atuação dedicada à catarata e às doenças da retina. Formou-se em Medicina pela PUC Goiás e fez residência em Oftalmologia e fellowship no IPEPO, em São Paulo.</p>
             <p>Trabalhou seis anos no SUS em São Paulo, cuidando de pacientes de todas as idades e realidades. Desde 2024 atende em Palmas e na região, onde já soma mais de 500 cirurgias.</p>
@@ -368,8 +384,7 @@ function About() {
             <Award className="h-5 w-5 text-[#D9C59A]" strokeWidth={1.7} />
             <span className="text-[15px] font-medium">Membro titular da Sociedade Brasileira de Retina e Vítreo</span>
           </div>
-        </div>
-        <ul className="grid content-start gap-4">
+        <ul className="mt-10 grid content-start gap-4">
           {pillars.map(([Icon, title, text]) => (
             <li key={title} className="flex gap-5 rounded-[6px] border border-white/12 bg-white/[0.04] p-6">
               <Icon className="mt-1 h-6 w-6 flex-none text-[#D9C59A]" strokeWidth={1.6} />
@@ -380,6 +395,7 @@ function About() {
             </li>
           ))}
         </ul>
+        </div>
       </div>
     </section>
   );
