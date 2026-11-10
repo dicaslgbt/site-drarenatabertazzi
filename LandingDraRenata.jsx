@@ -202,17 +202,18 @@ function Hero() {
           </p>
 
           {/* credenciais */}
-          <dl className="mt-8 grid grid-cols-3 divide-x divide-[#0E2A57]/12 border-y border-[#0E2A57]/12 py-4">
+          <dl className="mt-8 grid grid-cols-3 gap-2.5 sm:gap-4">
             {[
               ["CRM-TO", "7132", BadgeCheck],
               ["RQE", "3562", ShieldCheck],
               ["SBRV", "Membro titular", Award],
             ].map(([k, v, Icon]) => (
-              <div key={k} className="px-3 first:pl-0">
-                <dt className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#004AAD]">
-                  <Icon className="h-3.5 w-3.5" strokeWidth={2} />{k}
-                </dt>
-                <dd className="mt-1 text-[15px] font-semibold text-[#0E2A57]">{v}</dd>
+              <div key={k} className="flex flex-col items-center rounded-2xl bg-white/90 px-2 py-4 text-center shadow-[0_14px_34px_-22px_rgba(0,74,173,0.55)] ring-1 ring-[#79A9D2]/40 sm:px-4 sm:py-5">
+                <span className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br from-[#EAF2FB] to-[#DDF1EC] ring-1 ring-[#79A9D2]/50">
+                  <Icon className="h-5 w-5 text-[#004AAD]" strokeWidth={1.9} />
+                </span>
+                <dt className="mt-3 text-[10.5px] font-bold uppercase tracking-[0.16em] text-[#004AAD]">{k}</dt>
+                <dd className="mt-1 text-[15px] font-semibold leading-tight text-[#0E2A57] sm:text-[16px]">{v}</dd>
               </div>
             ))}
           </dl>
