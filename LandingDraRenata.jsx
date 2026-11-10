@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   MessageCircle, ArrowRight, ArrowUpRight, ShieldCheck, BadgeCheck, Award, Eye, ScanEye,
   Crosshair, ChevronDown, MapPin, Phone, Clock, Stethoscope, HeartHandshake, ClipboardCheck,
-  CalendarDays, Menu, X, AtSign, MessageSquareHeart, Send, AlertTriangle,
+  CalendarDays, Menu, X, AtSign, MessageSquareHeart, Send, AlertTriangle, Building2, Users, Activity, CircleCheck,
 } from "lucide-react";
 
 /* ============================================================
@@ -14,6 +14,7 @@ const IMG = "https://drarenatabertazzi.com.br/img/";
 const LOGO = IMG + "logo-dra-renata-bertazzi-web.png";
 const HERO_PHOTO = IMG + "dra-renata-consultorio.webp";
 const ABOUT_PHOTO = IMG + "dra-renata-bertazzi-oftalmologista-palmas.webp";
+const CARE_PHOTO = IMG + "cirurgia-catarata-cuidado-paciente.webp";
 
 const GALLERY = [
   { src: IMG + "rotina-consulta-lampada-de-fenda.webp", alt: "Dra. Renata examinando uma paciente na lâmpada de fenda", step: "01", title: "Consulta sem pressa", text: "Exame completo na lâmpada de fenda, com tempo para ouvir e explicar." },
@@ -66,7 +67,7 @@ const TREATMENTS = [
       "Troca frequente do grau dos óculos",
     ],
     care: [
-      "Anestesia com colírio, às vezes com sedação leve",
+      "Médico anestesista na sala durante toda a cirurgia",
       "Procedimento de cerca de 15 a 30 minutos por olho",
       "Lentes monofocais, de foco estendido ou multifocais",
       "Alta no mesmo dia e retornos programados",
@@ -133,7 +134,7 @@ function PrimaryCTA({ className = "", children = "Agendar Consulta via WhatsApp"
 /* ---------- header ---------- */
 function Header() {
   const [open, setOpen] = useState(false);
-  const links = [["#tratamentos", "Tratamentos"], ["#sobre", "A médica"], ["#fale", "Recados e dúvidas"], ["#atendimento", "Onde atendo"]];
+  const links = [["#tratamentos", "Tratamentos"], ["#seguranca", "Segurança"], ["#sobre", "A médica"], ["#fale", "Recados e dúvidas"], ["#atendimento", "Onde atendo"]];
   return (
     <header className="sticky top-0 z-40 border-b border-[#0E2A57]/10 bg-[#F6F9FD]/90 backdrop-blur-md">
       <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between px-5 lg:px-8">
@@ -307,6 +308,107 @@ function Treatments() {
           {TREATMENTS.map((t) => (
             <TreatmentCard key={t.id} t={t} open={open === t.id} onToggle={() => setOpen(open === t.id ? null : t.id)} />
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- segurança ---------- */
+function Safety() {
+  const items = [
+    [ClipboardCheck, "Avaliação completa antes de operar", "Exames que medem cada detalhe do olho, como biometria, mapeamento de retina e tomografia (OCT), e uma revisão da sua saúde: pressão, glicemia, alergias e remédios em uso."],
+    [Building2, "Centro cirúrgico preparado", "Equipamentos modernos, material esterilizado e estrutura de apoio para qualquer imprevisto."],
+    [Users, "Equipe que trabalha junta", "Médico anestesista e enfermagem acostumados com cirurgia ocular. Todos sabem o que fazer em cada momento, e isso vira calma para você."],
+    [Activity, "Monitoramento contínuo", "Batimentos, pressão e oxigenação acompanhados em tempo real, do começo ao fim."],
+  ];
+  const check = [
+    "Sua identidade e o procedimento planejado",
+    "O olho a ser operado, marcado com antecedência",
+    "A lente intraocular certa, com o grau calculado nos exames",
+    "Alergias, remédios em uso e cuidados especiais",
+  ];
+  return (
+    <section id="seguranca" className="bg-gradient-to-b from-white to-[#F1F7FB] py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-5 lg:px-8">
+        <div className="max-w-2xl">
+          <Eyebrow>Como cuidamos da sua segurança</Eyebrow>
+          <h2 className="mt-5 font-serif text-[34px] leading-[1.12] text-[#0E2A57] sm:text-[42px]">Cada etapa é planejada para você operar tranquilo.</h2>
+          <p className="mt-4 text-[18px] leading-relaxed text-[#33415C]">Segurança não é um detalhe do dia da cirurgia. Ela começa na primeira consulta e segue até a sua alta.</p>
+        </div>
+        <div className="mt-12 grid gap-4 sm:grid-cols-2">
+          {items.map(([Icon, t, d], i) => (
+            <div key={t} className="flex gap-5 rounded-2xl bg-white p-6 shadow-[0_16px_40px_-30px_rgba(0,74,173,0.5)] ring-1 ring-[#79A9D2]/30">
+              <span className={`grid h-14 w-14 flex-none place-items-center rounded-2xl ${i % 2 ? "bg-[#DDF1EC] text-[#2C7A66]" : "bg-[#EAF2FB] text-[#004AAD]"}`}>
+                <Icon className="h-6 w-6" strokeWidth={1.7} />
+              </span>
+              <div>
+                <h3 className="text-[18px] font-semibold leading-snug text-[#0E2A57]">{t}</h3>
+                <p className="mt-1.5 text-[16px] leading-relaxed text-[#33415C]">{d}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="relative mt-6 overflow-clip rounded-3xl bg-gradient-to-br from-[#004AAD] via-[#1F63C4] to-[#2F7FDC] p-7 text-white shadow-[0_30px_60px_-36px_rgba(0,74,173,0.8)] sm:p-10">
+          <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#7CCBB8]/30 blur-3xl" />
+          <h3 className="relative font-serif text-[30px] leading-tight sm:text-[36px]">Checklist de cirurgia segura</h3>
+          <p className="relative mt-3 max-w-2xl text-[17px] leading-relaxed text-white/85">Antes de começar, a equipe para e confere, em voz alta, os pontos essenciais. É um protocolo recomendado pela Organização Mundial da Saúde.</p>
+          <ul className="relative mt-6 grid gap-3 sm:grid-cols-2">
+            {check.map((c) => (
+              <li key={c} className="flex gap-3 rounded-xl bg-white/10 px-4 py-3 text-[16.5px] leading-snug ring-1 ring-white/15">
+                <CircleCheck className="mt-0.5 h-5 w-5 flex-none text-[#A8E3D3]" strokeWidth={2} />{c}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- jornada ---------- */
+function Journey() {
+  const steps = [
+    ["Primeira consulta, sem pressa", "Exame completo e uma conversa de verdade: o que você sente, o que espera enxergar e quais são as opções. Você sai entendendo o seu caso.", "bg-[#004AAD]"],
+    ["Preparo e planejamento", "Exames específicos, escolha da lente ou da técnica junto com você e todas as orientações para o dia da cirurgia, por escrito.", "bg-[#3E9C86]"],
+    ["Dia do procedimento", "Você é recebido pela equipe, tem as dúvidas de última hora respondidas e é acompanhado do começo ao fim. Em geral, volta para casa no mesmo dia.", "bg-[#2F7FDC]"],
+    ["Pós-operatório próximo", "Retornos já programados e acompanhamento com a mesma médica até a alta, com canal direto com a equipe para dúvidas.", "bg-[#5F5F7C]"],
+  ];
+  return (
+    <section id="jornada" className="bg-[#F6F9FD] py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-5 lg:px-8">
+        <div className="max-w-2xl">
+          <Eyebrow>Sua jornada, passo a passo</Eyebrow>
+          <h2 className="mt-5 font-serif text-[34px] leading-[1.12] text-[#0E2A57] sm:text-[42px]">Você sabe o que vai acontecer em cada etapa.</h2>
+        </div>
+        <ol className="mt-12 grid gap-0 lg:grid-cols-4 lg:gap-6">
+          {steps.map(([t, d, c], i) => (
+            <li key={t} className="relative flex gap-5 pb-10 last:pb-0 lg:flex-col lg:gap-4 lg:pb-0">
+              {i < steps.length - 1 && <span className="absolute left-[27px] top-14 h-[calc(100%-56px)] w-0.5 bg-gradient-to-b from-[#79A9D2] to-[#79A9D2]/20 lg:left-14 lg:top-[27px] lg:h-0.5 lg:w-[calc(100%-32px)]" aria-hidden="true" />}
+              <span className={`relative grid h-14 w-14 flex-none place-items-center rounded-full font-serif text-[26px] text-white shadow-[0_12px_24px_-12px_rgba(0,74,173,0.7)] ${c}`}>{i + 1}</span>
+              <div>
+                <h3 className="text-[19px] font-semibold text-[#0E2A57]">{t}</h3>
+                <p className="mt-2 text-[16.5px] leading-relaxed text-[#33415C]">{d}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- durante a cirurgia ---------- */
+function DuringSurgery() {
+  return (
+    <section className="relative overflow-clip bg-gradient-to-br from-[#0E2A57] via-[#123A75] to-[#0F4C6E] py-20 text-white lg:py-28">
+      <div className="pointer-events-none absolute -left-24 bottom-0 h-80 w-80 rounded-full bg-[#7CCBB8]/20 blur-3xl" />
+      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 lg:grid-cols-2 lg:gap-16 lg:px-8">
+        <img src={CARE_PHOTO} alt="Durante a cirurgia de catarata, uma mão segura a mão do paciente" loading="lazy" className="aspect-[4/5] w-full rounded-3xl object-cover object-[50%_80%] shadow-[0_40px_80px_-40px_rgba(0,0,0,0.7)] [filter:grayscale(1)_contrast(1.05)] sm:aspect-[4/3]" />
+        <div>
+          <Eyebrow light>Durante a cirurgia</Eyebrow>
+          <h2 className="mt-5 font-serif text-[36px] leading-[1.1] sm:text-[46px]">Você fica acordado.<br />E não fica sozinho.</h2>
+          <p className="mt-6 text-[18px] leading-[1.7] text-white/85">Um médico anestesista acompanha você na sala durante toda a cirurgia, cuidando do seu conforto. A equipe conversa com você, explica o que está acontecendo e garante que você se sinta seguro do começo ao fim.</p>
         </div>
       </div>
     </section>
@@ -628,6 +730,9 @@ export default function LandingDraRenata() {
       <main>
         <Hero />
         <Treatments />
+        <Safety />
+        <Journey />
+        <DuringSurgery />
         <Routine />
         <About />
         <Messages />
