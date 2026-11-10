@@ -314,7 +314,7 @@ open(LENTE_SLUG + ".html", "w").write(head(lt, ld, LENTE_SLUG, lschema) + header
 # =================== página inicial ===================
 HOME_FAQ = [
     ("A primeira consulta já define a cirurgia?", "Não necessariamente. A primeira consulta serve para examinar seus olhos com calma, entender suas queixas e explicar as opções. Quando há indicação de cirurgia, os exames e o planejamento são feitos em seguida, sem pressa."),
-    ("A cirurgia de catarata dói?", "Na maioria dos casos a anestesia é feita com colírio, às vezes com sedação leve. O paciente fica acordado, tranquilo, e pode sentir apenas uma leve pressão no olho."),
+    ("A cirurgia de catarata dói?", "Não. Um médico anestesista fica na sala durante toda a cirurgia, cuidando do seu conforto. Você fica acordado e tranquilo, e pode sentir apenas uma leve pressão no olho."),
     ("Vou conseguir tirar dúvidas depois da cirurgia?", "Sim. Você sai com as orientações por escrito, os retornos já programados e um canal direto com a equipe para dúvidas no pós-operatório."),
     ("Tenho diabetes e enxergo bem. Preciso examinar a retina?", "Sim. A retinopatia diabética pode avançar sem sintomas. O exame anual de fundo de olho é a forma de encontrar alterações a tempo de tratar."),
     ("Como faço para agendar?", f"Envie uma mensagem pelo {BOOK_VIA} informando a cidade de sua preferência. A equipe responde e combina o melhor horário. Se preferir, ligue direto para a clínica mais perto de você."),
@@ -539,7 +539,7 @@ HOME = f"""<main id="inicio">
     <div class="stack">
       <span class="eyebrow">Durante a cirurgia</span>
       <h2>Você fica acordado. E não fica sozinho.</h2>
-      <p>Na cirurgia de catarata, a anestesia costuma ser feita com colírio. A equipe conversa com você, explica o que está acontecendo e garante que você se sinta seguro do começo ao fim.</p>
+      <p>Um médico anestesista acompanha você na sala durante toda a cirurgia, cuidando do seu conforto. A equipe conversa com você, explica o que está acontecendo e garante que você se sinta seguro do começo ao fim.</p>
     </div>
   </div>
 </section>
