@@ -71,6 +71,8 @@ main{max-width:1480px;margin:0 auto;padding:16px 14px 24px}
 .tabs button{background:none;border:0;display:grid;justify-items:center;gap:2px;font-size:.74rem;font-weight:700;color:var(--soft);padding:6px 2px;border-radius:12px}
 .tabs button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .tabs button[aria-current="page"]{color:var(--accent);background:#e8f0fa}
+.tabs button{position:relative}.tab-badge:empty{display:none}.tab-badge{position:absolute;top:2px;right:calc(50% - 22px);background:var(--late);color:#fff;border-radius:999px;font-size:.66rem;min-width:17px;height:17px;line-height:17px;padding:0 4px;text-align:center}
+@media(min-width:900px){.tab-badge{position:static;margin-left:2px}}
 @media (min-width:900px){
   .tabs{position:sticky;top:54px;bottom:auto;border:0;border-bottom:1px solid var(--line);grid-template-columns:repeat(4,max-content);gap:6px;justify-content:center;background:var(--paper);padding:8px}
   .tabs button{grid-auto-flow:column;gap:8px;font-size:.9rem;padding:8px 16px}
@@ -290,9 +292,9 @@ a.btn.bm{display:inline-block;cursor:grab;text-decoration:none}
 .footnote{font-size:.78rem;color:var(--soft);text-align:center;margin-top:24px}
 
 /* ===== v3: indicações, interesse, aplicações ===== */
-.tabs{grid-template-columns:repeat(6,1fr)}
+.tabs{grid-template-columns:repeat(7,1fr)}
 .tabs button{font-size:.66rem}
-@media(min-width:900px){.tabs{grid-template-columns:repeat(6,max-content)}.tabs button{font-size:.9rem}}
+@media(min-width:900px){.tabs{grid-template-columns:repeat(7,max-content)}.tabs button{font-size:.9rem}}
 .sec-head .btn{white-space:nowrap}
 .chip.conv{background:#efe6fb;color:#5b3a99}
 .chip.part{background:#e6f3ee;color:#2f6b52}
@@ -396,8 +398,6 @@ legend{font-size:.86rem;font-weight:700;color:var(--soft);padding:0;margin-botto
         <button data-tab="agenda">📅 Agenda do prontuário</button>
         <button data-tab="repasse">💰 Repasse das clínicas</button>
         <button data-act="sync">🔄 Sincronizar</button>
-        <small>Relacionamento</small>
-        <button data-tab="cont">📱 Contatos e aniversários</button>
         <small>Consulta</small>
         <button data-tab="lentes">👁 Simulador de lentes</button>
         <small>Site</small>
@@ -412,6 +412,7 @@ legend{font-size:.86rem;font-weight:700;color:var(--soft);padding:0;margin-botto
     <button data-tab="trat"><svg viewBox="0 0 24 24"><path d="M14 4l6 6M17 7l-9 9-3 1 1-3 9-9M11 8l5 5M4 20l2-2"/></svg>Injeções</button>
     <button data-tab="laser"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.5 2.5M16.5 16.5L19 19M19 5l-2.5 2.5M7.5 16.5L5 19"/></svg>Laser</button>
     <button data-tab="pac"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c.8-3.4 3.2-5.2 6-5.2s5.2 1.8 6 5.2"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.8c2.4.2 4.2 1.8 5 4.6"/></svg>Pacientes</button>
+    <button data-tab="cont"><svg viewBox="0 0 24 24"><path d="M4 20h16M5 20v-7h14v7M8 13V10M12 13V9M16 13V10"/><path d="M8 7.5c-.8-1-.2-2 0-2.5.2.5.8 1.5 0 2.5zM12 6.5c-.8-1-.2-2 0-2.5.2.5.8 1.5 0 2.5zM16 7.5c-.8-1-.2-2 0-2.5.2.5.8 1.5 0 2.5z"/></svg>Contatos<b class="tab-badge" id="nAniv"></b></button>
   </nav>
   <main id="main"></main>
   <button class="fab" id="fab">+ Nova indicação</button>
@@ -755,6 +756,7 @@ function render(){
   m.innerHTML = ({agenda:telaAgenda, repasse:telaRepasse, lentes:telaLentes, recados:telaRecados, painel:telaPainel, semana:telaSemana, cir:()=>telaPipe("cirurgia"), trat:()=>telaPipe("injecao"), laser:()=>telaPipe("laser"), pac:telaPac, cont:telaContatos}[S.tab])();
   if(S.tab==="repasse"&&$("#fRep")) $("#fRep").addEventListener("submit",async e=>{ e.preventDefault(); const v=$("#rVl").value.trim(); await salvar(sb.from("repasses").update({status:$("#rSt").value,recebido_em:$("#rDt").value||null,valor_recebido:v?parseFloat(v.replace(/\./g,"").replace(",",".")):null}).eq("id",S.repSel),"Repasse atualizado ✔"); });
   if(S.tab==="lentes"){ const f=$("#frLentes"); const envia=()=>{ try{ f.contentWindow.postMessage({tipo:"precos",rows:S.precos,tabela:(S.fLocal||"").startsWith("ICOG")||!S.fLocal?"ICOG":"padrao"},"*"); }catch(e){} }; f.addEventListener("load",envia); envia(); }
+  { const ano=anoAtual(), na=aniversariantes(0).filter(x=>!prefDe(x.c.k).nao_enviar&&prefDe(x.c.k).aniv_ano!==ano&&telIntl(x.c.tel)).length; const ba=$("#nAniv"); if(ba) ba.textContent=na||""; }
   const nr=(S.recados||[]).filter(r=>r.status==="novo").length; const nb=$("#nRec"); if(nb) nb.textContent=nr?`(${nr} novo${nr>1?"s":""})`:"";
   m.insertAdjacentHTML("beforeend", `<p class="footnote">Dados protegidos · acesso restrito à equipe · ${S.pacientes.length} pacientes cadastrados</p>`);
 }
@@ -964,6 +966,16 @@ function blocoDia(){
     ${tot?bloco("cirurgia","🔪 Cirurgias")+bloco("injecao","💉 Injeções")+bloco("laser","✨ Laser"):`<div class="empty">Nenhum procedimento finalizado no prontuário neste dia${off===0?" (a agenda de hoje atualiza na sincronização da noite)":""}.</div>`}</div>`;
 }
 function noLocalNome(l){ return !S.fLocal||S.fLocal===l; }
+function blocoAniversarios(){
+  const ano=anoAtual(), lst=aniversariantes(6).filter(x=>!S.fLocal||x.c.local===S.fLocal);
+  if(!lst.length) return "";
+  const hojeL=lst.filter(x=>x.em===0), falta=hojeL.filter(x=>!prefDe(x.c.k).nao_enviar&&prefDe(x.c.k).aniv_ano!==ano&&telIntl(x.c.tel));
+  const lin=x=>{ const c=x.c,p=prefDe(c.k),l=linkMsg(c,"aniversario"); const quando=x.em===0?"<b>hoje</b>":x.em===1?"amanhã":`${["dom","seg","ter","qua","qui","sex","sáb"][parse(x.dia).getDay()]} ${dm(x.dia)}`;
+    const ac=p.nao_enviar?`<span class="chip">não enviar</span>`:(p.aniv_ano===ano&&x.em===0)?`<span class="chip ok">✔ enviado</span>`:x.em>0?"":l?`<a class="btn small okb" href="${l}" target="_blank" rel="noopener" data-ctmsg="aniversario" data-k="${esc(c.k)}">🎉 Parabéns</a>`:`<span class="meta">sem telefone</span>`;
+    return `<div class="tk-row"><div class="inj-nome"><b>${esc(nomeTitulo(c.nome))}</b><small>${quando} · ${x.idade} anos · ${esc(c.local||"—")}</small></div><div class="inj-acts">${ac}</div></div>`; };
+  return `<div class="panel" style="margin-bottom:14px"><div class="panel-h"><h3>🎂 Aniversários da semana <span class="count">${lst.length}</span></h3><span class="sub">${hojeL.length?`${hojeL.length} hoje${falta.length?` · <b>${falta.length} para parabenizar</b>`:" · todos parabenizados ✔"}`:"nenhum hoje"}</span></div>
+    ${lst.slice(0,6).map(lin).join("")}${lst.length>6?`<button class="linkbtn" data-tab="cont" style="margin-top:6px">Ver todos os ${lst.length} →</button>`:`<button class="linkbtn" data-tab="cont" style="margin-top:6px">Contatos e aniversários →</button>`}</div>`;
+}
 function telaPainel(){
   const h=hoje(); const F=fasesPainel();
   const sel=S.fase?F.find(f=>f.id===S.fase):null;
@@ -978,6 +990,7 @@ function telaPainel(){
   return `<div class="sec-head"><div><h2>Painel</h2><div class="sub">${d}</div></div><button class="btn" data-act="novo">+ Nova indicação</button></div>
   ${selLocal()}
   ${blocoDia()}
+  ${blocoAniversarios()}
   ${blocoAcaoImediata()}
   <div class="trilha-t">Fases · toque para ver os pacientes</div>
   <div class="trilha-t sm">💉 Injeção e laser · ciclo de 3 aplicações</div>
