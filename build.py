@@ -9,7 +9,7 @@ IG = "https://www.instagram.com/dra.renatabertazzi/"
 DM = "https://ig.me/m/dra.renatabertazzi"   # abre conversa direta no Instagram
 # WhatsApp da equipe para agendamento: preencha só com números, com DDI e DDD (ex.: "5563999999999").
 # Vazio = os botões continuam abrindo a conversa no Instagram.
-WHATSAPP = ""
+WHATSAPP = "5511978806444"
 _WA_MSG = "Olá! Vim pelo site da Dra. Renata Bertazzi e gostaria de agendar uma consulta."
 from urllib.parse import quote as _q
 BOOK = f"https://wa.me/{WHATSAPP}?text={_q(_WA_MSG)}" if WHATSAPP else DM
