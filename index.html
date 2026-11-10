@@ -444,6 +444,65 @@
   </div>
 </section>
 
+<section class="band sand" id="fale-com-a-dra">
+  <div class="wrap grid-2 fale">
+    <div class="stack">
+      <span class="eyebrow">Fale com a Dra. Renata</span>
+      <h2>Deixe um recado ou envie a sua dúvida</h2>
+      <p class="muted">Foi paciente e quer contar como foi? Ficou com alguma pergunta sobre catarata, retina ou cirurgia? Escreva aqui. A mensagem chega direto para a Dra. Renata e a equipe, e ninguém mais vê.</p>
+      <p class="muted">As dúvidas que mais aparecem viram vídeos e orientações na página de <a href="conteudos.html">Conteúdos</a>, sempre sem o nome de quem perguntou.</p>
+      <div class="alert" role="note" style="margin-top:6px">
+        <h3>Não use este espaço para urgências</h3>
+        <p>Dor forte, perda súbita de visão, clarões ou uma sombra na visão pedem atendimento no mesmo dia. <a href="https://wa.me/5511978806444?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Dra.%20Renata%20Bertazzi%20e%20gostaria%20de%20agendar%20uma%20consulta." target="_blank" rel="noopener">Fale com a equipe pelo WhatsApp</a>.</p>
+      </div>
+    </div>
+    <form class="card fale-form" id="fFale" novalidate>
+      <fieldset class="seg">
+        <legend class="sr">O que você quer enviar?</legend>
+        <label><input type="radio" name="tipo" value="recado" checked><span>Deixar um recado</span></label>
+        <label><input type="radio" name="tipo" value="duvida"><span>Enviar uma dúvida</span></label>
+      </fieldset>
+      <label class="fld">Seu nome<input name="nome" required maxlength="80" autocomplete="name"></label>
+      <div class="two">
+        <label class="fld">Cidade<input name="cidade" maxlength="60" autocomplete="address-level2"></label>
+        <label class="fld">WhatsApp <small>(opcional, para resposta)</small><input name="contato" maxlength="30" inputmode="tel" autocomplete="tel"></label>
+      </div>
+      <label class="fld"><span data-lbl>Seu recado</span><textarea name="mensagem" required minlength="5" maxlength="1500" rows="5"></textarea></label>
+      <p class="hint">Não envie exames, documentos ou dados de saúde que não sejam necessários para a sua pergunta.</p>
+      <label class="hp" aria-hidden="true">Não preencha<input name="site" tabindex="-1" autocomplete="off"></label>
+      <label class="chk"><input type="checkbox" name="publicar"><span data-pub>Autorizo que meu recado seja publicado no site, só com o meu primeiro nome.</span></label>
+      <label class="chk"><input type="checkbox" name="consentimento" required><span>Concordo que a equipe da Dra. Renata use estes dados apenas para ler e responder a minha mensagem.</span></label>
+      <button class="btn" type="submit">Enviar</button>
+      <p class="fale-msg" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+<script>
+(function(){
+  var f=document.getElementById('fFale'); if(!f) return;
+  var msg=f.querySelector('.fale-msg'), btn=f.querySelector('button[type=submit]');
+  var TXT={recado:['Seu recado','Autorizo que meu recado seja publicado no site, só com o meu primeiro nome.'],
+            duvida:['Sua dúvida','Autorizo que minha dúvida seja respondida em vídeos ou textos, sem o meu nome.']};
+  f.addEventListener('change',function(e){ if(e.target.name==='tipo'){ var t=TXT[e.target.value]; f.querySelector('[data-lbl]').textContent=t[0]; f.querySelector('[data-pub]').textContent=t[1]; } });
+  function wa(d){ return 'https://wa.me/5511978806444'+('?text='+encodeURIComponent((d.tipo==='duvida'?'Dúvida':'Recado')+' pelo site, de '+d.nome+(d.cidade?' ('+d.cidade+')':'')+': '+d.mensagem)); }
+  f.addEventListener('submit',function(e){
+    e.preventDefault(); msg.className='fale-msg';
+    var d={tipo:f.tipo.value,nome:f.nome.value.trim(),cidade:f.cidade.value.trim()||null,contato:f.contato.value.trim()||null,
+           mensagem:f.mensagem.value.trim(),autoriza_publicar:f.publicar.checked,consentimento:f.consentimento.checked};
+    if(f.site.value) return;
+    if(d.nome.length<2){ msg.textContent='Escreva o seu nome.'; f.nome.focus(); return; }
+    if(d.mensagem.length<5){ msg.textContent='Escreva a sua mensagem.'; f.mensagem.focus(); return; }
+    if(!d.consentimento){ msg.textContent='Para enviar, marque a autorização de uso dos dados.'; return; }
+    btn.disabled=true; btn.textContent='Enviando…';
+    fetch('https://avbmtrvxieetoptmzere.supabase.co/rest/v1/recados_site',{method:'POST',headers:{'apikey':'sb_publishable_Ohqe8a6rhGEwOImU302jjw_69V8kcJ7','Authorization':'Bearer sb_publishable_Ohqe8a6rhGEwOImU302jjw_69V8kcJ7','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(d)})
+      .then(function(r){ if(!r.ok) throw r; f.reset(); f.dispatchEvent(new Event('change')); msg.className='fale-msg ok';
+        msg.textContent=d.tipo==='duvida'?'Obrigada! Sua dúvida chegou para a Dra. Renata.'+(d.contato?' A equipe pode responder pelo WhatsApp.':''):'Obrigada pelo carinho! Seu recado chegou para a Dra. Renata.'; })
+      .catch(function(){ msg.className='fale-msg erro'; msg.innerHTML='Não conseguimos enviar agora. <a href="'+wa(d)+'" target="_blank" rel="noopener">Envie pelo WhatsApp</a>, a mensagem já vai escrita.'; })
+      .finally(function(){ btn.disabled=false; btn.textContent='Enviar'; });
+  });
+})();
+</script>
+
 <section class="band" id="duvidas">
   <div class="wrap">
     <div class="head"><span class="eyebrow">Dúvidas frequentes</span><h2>Perguntas que os pacientes costumam fazer.</h2></div>
@@ -512,6 +571,7 @@
         <li><a href="injecao-intravitrea-e-laser-palmas.html">Injeção intravítrea e laser</a></li>
         <li><a href="qual-lente-para-catarata.html">Qual lente para catarata? Simulador</a></li>
         <li><a href="conteudos.html">Conteúdos: vídeos e orientações</a></li>
+        <li><a href="index.html#fale-com-a-dra">Deixe um recado ou envie sua dúvida</a></li>
       </ul>
     </div>
     <div class="stack">

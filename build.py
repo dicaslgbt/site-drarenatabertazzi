@@ -16,6 +16,10 @@ BOOK = f"https://wa.me/{WHATSAPP}?text={_q(_WA_MSG)}" if WHATSAPP else DM
 BOOK_VIA = "WhatsApp" if WHATSAPP else "Instagram"
 BYSLUG = {p["slug"]: p for p in PAGES}
 
+# Banco do portal /controle (Supabase). A chave publicável só permite ENVIAR recados (ver controle/sql/recados_site.sql).
+SUPABASE_URL = "https://avbmtrvxieetoptmzere.supabase.co"
+SUPABASE_KEY = "sb_publishable_Ohqe8a6rhGEwOImU302jjw_69V8kcJ7"
+
 # Agenda semanal da Dra. Renata (aparece em "Onde atendo"). Atualize aqui se mudar.
 AGENDA = [
     ("Segunda", [("Manhã e tarde", "Oftalmologia Avançada", "Palmas")]),
@@ -127,7 +131,7 @@ MBAR = f"""<div class="mbar" role="region" aria-label="Contato rápido">
 
 def footer():
     names = {"cirurgia-de-catarata-palmas": "Cirurgia de catarata", "cirurgia-de-retina-palmas": "Cirurgia de retina"}
-    pages = "\n".join(f'        <li><a href="{p["slug"]}.html">{names.get(p["slug"], p["nav"])}</a></li>' for p in PAGES) + '\n        <li><a href="qual-lente-para-catarata.html">Qual lente para catarata? Simulador</a></li>\n        <li><a href="conteudos.html">Conteúdos: vídeos e orientações</a></li>'
+    pages = "\n".join(f'        <li><a href="{p["slug"]}.html">{names.get(p["slug"], p["nav"])}</a></li>' for p in PAGES) + '\n        <li><a href="qual-lente-para-catarata.html">Qual lente para catarata? Simulador</a></li>\n        <li><a href="conteudos.html">Conteúdos: vídeos e orientações</a></li>\n        <li><a href="index.html#fale-com-a-dra">Deixe um recado ou envie sua dúvida</a></li>'
     cl = "\n".join(f'        <li><b>{c["name"]}</b><br>{c["street"]} · {c["city"]} (TO){" · " + c["phone_txt"] if c["phone_txt"] else ""}</li>' for c in CLINICS)
     return f"""<footer class="site-foot">
   <div class="wrap foot-grid">
@@ -364,6 +368,65 @@ agenda_html = "\n".join(
     for d, slots in AGENDA)
 
 from conteudos import conteudos_home, build_conteudos
+
+FALE = f"""<section class="band sand" id="fale-com-a-dra">
+  <div class="wrap grid-2 fale">
+    <div class="stack">
+      <span class="eyebrow">Fale com a Dra. Renata</span>
+      <h2>Deixe um recado ou envie a sua dúvida</h2>
+      <p class="muted">Foi paciente e quer contar como foi? Ficou com alguma pergunta sobre catarata, retina ou cirurgia? Escreva aqui. A mensagem chega direto para a Dra. Renata e a equipe, e ninguém mais vê.</p>
+      <p class="muted">As dúvidas que mais aparecem viram vídeos e orientações na página de <a href="conteudos.html">Conteúdos</a>, sempre sem o nome de quem perguntou.</p>
+      <div class="alert" role="note" style="margin-top:6px">
+        <h3>Não use este espaço para urgências</h3>
+        <p>Dor forte, perda súbita de visão, clarões ou uma sombra na visão pedem atendimento no mesmo dia. <a href="{BOOK}" target="_blank" rel="noopener">Fale com a equipe pelo WhatsApp</a>.</p>
+      </div>
+    </div>
+    <form class="card fale-form" id="fFale" novalidate>
+      <fieldset class="seg">
+        <legend class="sr">O que você quer enviar?</legend>
+        <label><input type="radio" name="tipo" value="recado" checked><span>Deixar um recado</span></label>
+        <label><input type="radio" name="tipo" value="duvida"><span>Enviar uma dúvida</span></label>
+      </fieldset>
+      <label class="fld">Seu nome<input name="nome" required maxlength="80" autocomplete="name"></label>
+      <div class="two">
+        <label class="fld">Cidade<input name="cidade" maxlength="60" autocomplete="address-level2"></label>
+        <label class="fld">WhatsApp <small>(opcional, para resposta)</small><input name="contato" maxlength="30" inputmode="tel" autocomplete="tel"></label>
+      </div>
+      <label class="fld"><span data-lbl>Seu recado</span><textarea name="mensagem" required minlength="5" maxlength="1500" rows="5"></textarea></label>
+      <p class="hint">Não envie exames, documentos ou dados de saúde que não sejam necessários para a sua pergunta.</p>
+      <label class="hp" aria-hidden="true">Não preencha<input name="site" tabindex="-1" autocomplete="off"></label>
+      <label class="chk"><input type="checkbox" name="publicar"><span data-pub>Autorizo que meu recado seja publicado no site, só com o meu primeiro nome.</span></label>
+      <label class="chk"><input type="checkbox" name="consentimento" required><span>Concordo que a equipe da Dra. Renata use estes dados apenas para ler e responder a minha mensagem.</span></label>
+      <button class="btn" type="submit">Enviar</button>
+      <p class="fale-msg" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+<script>
+(function(){{
+  var f=document.getElementById('fFale'); if(!f) return;
+  var msg=f.querySelector('.fale-msg'), btn=f.querySelector('button[type=submit]');
+  var TXT={{recado:['Seu recado','Autorizo que meu recado seja publicado no site, só com o meu primeiro nome.'],
+            duvida:['Sua dúvida','Autorizo que minha dúvida seja respondida em vídeos ou textos, sem o meu nome.']}};
+  f.addEventListener('change',function(e){{ if(e.target.name==='tipo'){{ var t=TXT[e.target.value]; f.querySelector('[data-lbl]').textContent=t[0]; f.querySelector('[data-pub]').textContent=t[1]; }} }});
+  function wa(d){{ return '{"https://wa.me/" + WHATSAPP if WHATSAPP else DM}'+({"'?text='+encodeURIComponent((d.tipo==='duvida'?'Dúvida':'Recado')+' pelo site, de '+d.nome+(d.cidade?' ('+d.cidade+')':'')+': '+d.mensagem)" if WHATSAPP else "''"}); }}
+  f.addEventListener('submit',function(e){{
+    e.preventDefault(); msg.className='fale-msg';
+    var d={{tipo:f.tipo.value,nome:f.nome.value.trim(),cidade:f.cidade.value.trim()||null,contato:f.contato.value.trim()||null,
+           mensagem:f.mensagem.value.trim(),autoriza_publicar:f.publicar.checked,consentimento:f.consentimento.checked}};
+    if(f.site.value) return;
+    if(d.nome.length<2){{ msg.textContent='Escreva o seu nome.'; f.nome.focus(); return; }}
+    if(d.mensagem.length<5){{ msg.textContent='Escreva a sua mensagem.'; f.mensagem.focus(); return; }}
+    if(!d.consentimento){{ msg.textContent='Para enviar, marque a autorização de uso dos dados.'; return; }}
+    btn.disabled=true; btn.textContent='Enviando…';
+    fetch('{SUPABASE_URL}/rest/v1/recados_site',{{method:'POST',headers:{{'apikey':'{SUPABASE_KEY}','Authorization':'Bearer {SUPABASE_KEY}','Content-Type':'application/json','Prefer':'return=minimal'}},body:JSON.stringify(d)}})
+      .then(function(r){{ if(!r.ok) throw r; f.reset(); f.dispatchEvent(new Event('change')); msg.className='fale-msg ok';
+        msg.textContent=d.tipo==='duvida'?'Obrigada! Sua dúvida chegou para a Dra. Renata.'+(d.contato?' A equipe pode responder pelo WhatsApp.':''):'Obrigada pelo carinho! Seu recado chegou para a Dra. Renata.'; }})
+      .catch(function(){{ msg.className='fale-msg erro'; msg.innerHTML='Não conseguimos enviar agora. <a href="'+wa(d)+'" target="_blank" rel="noopener">Envie pelo WhatsApp</a>, a mensagem já vai escrita.'; }})
+      .finally(function(){{ btn.disabled=false; btn.textContent='Enviar'; }});
+  }});
+}})();
+</script>"""
 CONTEUDOS_HOME = conteudos_home(svg)
 
 HOME = f"""<main id="inicio">
@@ -539,6 +602,8 @@ HOME = f"""<main id="inicio">
 </section>
 
 {CONTEUDOS_HOME}
+
+{FALE}
 
 <section class="band" id="duvidas">
   <div class="wrap">

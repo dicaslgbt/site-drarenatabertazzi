@@ -337,3 +337,31 @@ section.band.alt .c-card { background: var(--paper); }
 .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 .c-body .tag { font-size: 0.74rem; font-weight: 700; color: var(--sage); letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ---------- Fale com a Dra. (recados e dúvidas) ---------- */
+.fale { align-items: start !important; }
+.fale-form { gap: 14px; padding: 24px; }
+.fale-form .seg { border: 0; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: var(--paper); border-radius: 999px; padding: 5px; }
+.fale-form .seg label { position: relative; }
+.fale-form .seg input { position: absolute; opacity: 0; inset: 0; }
+.fale-form .seg span { display: block; text-align: center; padding: 11px 8px; border-radius: 999px; font-weight: 700; font-size: 0.95rem; cursor: pointer; color: var(--ink-soft); }
+.fale-form .seg input:checked + span { background: var(--accent); color: #fff; }
+.fale-form .seg input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+.fld { display: grid; gap: 6px; font-weight: 700; font-size: 0.95rem; }
+.fld small { font-weight: 400; color: var(--ink-soft); }
+.fld input, .fld textarea { font: inherit; font-weight: 400; font-size: 1.05rem; color: var(--ink); background: var(--paper); border: 1.5px solid var(--line); border-radius: 14px; padding: 13px 14px; min-height: 50px; width: 100%; }
+.fld textarea { resize: vertical; min-height: 130px; }
+.fld input:focus, .fld textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+.fale-form .two { display: grid; gap: 14px; }
+@media (min-width: 560px) { .fale-form .two { grid-template-columns: 1fr 1fr; } }
+.chk { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; font-size: 0.93rem; color: var(--ink-soft); cursor: pointer; }
+.chk input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); }
+.hint { font-size: 0.86rem; color: var(--ink-soft); }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.fale-form .btn { width: 100%; }
+.fale-form .btn[disabled] { opacity: .6; }
+.fale-msg { font-weight: 700; min-height: 1.2em; }
+.fale-msg.ok { color: #2f6f55; }
+.fale-msg.erro { color: #a4603a; }
+.fale-msg a, .fale a, .alert a { color: var(--accent); }
