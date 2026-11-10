@@ -206,18 +206,15 @@ function Hero() {
           </p>
 
           {/* credenciais */}
-          <dl className="mt-8 grid grid-cols-3 gap-2.5 sm:gap-4">
+          <dl className="mt-8 grid grid-cols-3 divide-x divide-[#79A9D2]/45 rounded-2xl bg-white/85 py-4 shadow-[0_14px_34px_-24px_rgba(0,74,173,0.5)] ring-1 ring-[#79A9D2]/40 backdrop-blur">
             {[
-              ["CRM-TO", "7132", BadgeCheck],
-              ["RQE", "3562", ShieldCheck],
-              ["SBRV", "Membro titular", Award],
-            ].map(([k, v, Icon]) => (
-              <div key={k} className="flex flex-col items-center rounded-2xl bg-white/90 px-2 py-4 text-center shadow-[0_14px_34px_-22px_rgba(0,74,173,0.55)] ring-1 ring-[#79A9D2]/40 sm:px-4 sm:py-5">
-                <span className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br from-[#EAF2FB] to-[#DDF1EC] ring-1 ring-[#79A9D2]/50">
-                  <Icon className="h-5 w-5 text-[#004AAD]" strokeWidth={1.9} />
-                </span>
-                <dt className="mt-3 text-[10.5px] font-bold uppercase tracking-[0.16em] text-[#004AAD]">{k}</dt>
-                <dd className="mt-1 text-[15px] font-semibold leading-tight text-[#0E2A57] sm:text-[16px]">{v}</dd>
+              ["CRM-TO", "7132"],
+              ["RQE", "3562"],
+              ["SBRV", "Titular"],
+            ].map(([k, v]) => (
+              <div key={k} className="flex flex-col items-center justify-center px-2 text-center">
+                <dt className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#2F7FDC]">{k}</dt>
+                <dd className="mt-1 font-serif text-[24px] leading-none text-[#0E2A57]">{v}</dd>
               </div>
             ))}
           </dl>
@@ -231,9 +228,9 @@ function Hero() {
               Conhecer Tratamentos
             </a>
           </div>
-          <a href="#fale" className="mt-4 inline-flex min-h-[48px] w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-[#EAF2FB] to-[#DDF1EC] px-6 text-[15.5px] font-semibold text-[#004AAD] ring-1 ring-[#79A9D2]/60 transition hover:ring-[#004AAD] sm:w-auto">
+          <a href="#fale" className="mt-5 inline-flex items-center gap-2 text-[16px] font-semibold text-[#004AAD] underline decoration-[#79A9D2] decoration-2 underline-offset-[6px] transition hover:decoration-[#004AAD]">
             <MessageSquareHeart className="h-5 w-5" strokeWidth={1.8} />
-            Envie sua dúvida ou deixe um recado
+            Envie sua dúvida ou recado
           </a>
           <p className="mt-4 text-[14px] text-[#33415C]/80">Atendimento em Palmas, Paraíso do Tocantins e Porto Nacional.</p>
         </div>
