@@ -654,7 +654,9 @@ async function marcaPref(k,campos){ const row=Object.assign({paciente_id:k,atual
 
 // Parabéns: texto com o nome + cartão (celular: compartilhar direto; computador: cartão copiado para colar)
 const CARTAO_ANIV="../img/cartao-aniversario.png";
-let _cartaoBlob=null; const cartaoBlob=()=>_cartaoBlob||(_cartaoBlob=fetch(CARTAO_ANIV).then(r=>{ if(!r.ok) throw new Error("cartão"); return r.blob(); }));
+const CARTAO_ANIV_ALT="https://raw.githubusercontent.com/dicaslgbt/site-drarenatabertazzi/main/img/cartao-aniversario.png";
+const _pega=u=>fetch(u).then(r=>{ if(!r.ok||!/image/.test(r.headers.get("content-type")||"")) throw new Error("cartão"); return r.blob(); });
+let _cartaoBlob=null; const cartaoBlob=()=>_cartaoBlob||(_cartaoBlob=_pega(CARTAO_ANIV).catch(()=>_pega(CARTAO_ANIV_ALT)).then(b=>b.type==="image/png"?b:new Blob([b],{type:"image/png"})));
 function enviarParabens(k){
   const c=listaContatos().find(x=>x.k===k); const tel=c&&telIntl(c.tel); if(!tel){ toast("Paciente sem telefone"); return; }
   const texto=msgDe("aniversario").replace(/\{nome\}/g,primeiroNome(c.nome));
@@ -685,7 +687,7 @@ function telaContatos(){
     const quando=x.em===0?"<b>hoje</b>":x.em===1?"amanhã":`${["dom","seg","ter","qua","qui","sex","sáb"][parse(x.dia).getDay()]} ${dm(x.dia)}`;
     const acao=p.nao_enviar?`<span class="chip">não enviar</span>`:env?`<span class="chip ok">✔ enviado</span>`:l?`<button class="btn small okb" data-ctaniv="${esc(c.k)}">🎉 Parabéns</button>`:`<span class="meta">sem telefone</span>`;
     return `<div class="tk-row"><div class="inj-nome"><b>${esc(nomeTitulo(c.nome))}</b><small>${quando} · faz ${x.idade} anos · ${esc(c.local||"—")}</small></div><div class="inj-acts">${acao}</div></div>`; };
-  const pAniv=`<div class="panel"><div class="panel-h"><h3>🎂 Aniversariantes</h3><span><a class="linkbtn" href="${CARTAO_ANIV}" download="feliz-aniversario.png">Baixar cartão</a> · <button class="linkbtn" data-act="ct-msg" data-tipo="aniversario">Editar mensagem →</button></span></div>
+  const pAniv=`<div class="panel"><div class="panel-h"><h3>🎂 Aniversariantes</h3><span><button class="linkbtn" data-act="ct-cartao">Baixar cartão</button> · <button class="linkbtn" data-act="ct-msg" data-tipo="aniversario">Editar mensagem →</button></span></div>
     <div class="seg">${[["hoje","Hoje"],["7","Próximos 7 dias"],["30","Próximos 30 dias"]].map(([k,t])=>`<button data-anivper="${k}" aria-pressed="${per===k}">${t} (${aniversariantes({hoje:0,"7":7,"30":30}[k]).length})</button>`).join("")}</div>
     ${anv.length?anv.map(linhaAniv).join(""):`<div class="empty">Nenhum aniversariante ${per==="hoje"?"hoje":"no período"}.</div>`}
     <p class="sub" style="margin-top:8px">No celular, o 🎉 Parabéns abre o compartilhamento com o cartão e o texto: escolha o WhatsApp Business e envie. No computador, abre a conversa com o texto e copia o cartão: é só colar (Cmd+V) e enviar.</p></div>`;
@@ -764,6 +766,7 @@ document.addEventListener("click",async e=>{
   if(a==="ct-msg") return folhaMsgContato(t.dataset.tipo);
   if(a==="ct-natal-abrir"){ S.natalAberto=true; render(); return; }
   if(a==="ct-vcf") return exportarVcf();
+  if(a==="ct-cartao"){ cartaoBlob().then(b=>{ const x=document.createElement("a"); x.href=URL.createObjectURL(b); x.download="feliz-aniversario.png"; document.body.appendChild(x); x.click(); x.remove(); }).catch(()=>toast("Não consegui carregar o cartão")); return; }
   if(a==="ct-copiar"){ const tx=msgDe(t.dataset.tipo).replace(/\{nome\}/g,"").replace(/Olá, !/,"Olá!"); (navigator.clipboard?navigator.clipboard.writeText(tx):Promise.reject()).then(()=>toast("Texto copiado")).catch(()=>prompt("Copie o texto:",tx)); return; }
 },true);
 document.addEventListener("change",e=>{
