@@ -168,9 +168,9 @@ function Header() {
 /* ---------- hero ---------- */
 function Hero() {
   return (
-    <section id="inicio" className="relative overflow-hidden bg-gradient-to-b from-[#FFFFFF] via-[#F2F7FD] to-[#E3EEFA]">
+    <section id="inicio" className="relative overflow-hidden bg-gradient-to-br from-[#FFFFFF] via-[#EEF5FD] to-[#E2F3EF]">
       <div className="pointer-events-none absolute -right-32 -top-24 h-[460px] w-[460px] rounded-full bg-[#79A9D2]/30 blur-3xl" />
-      <div className="pointer-events-none absolute -left-40 top-[40%] h-[420px] w-[420px] rounded-full bg-[#2F7FDC]/12 blur-3xl" />
+      <div className="pointer-events-none absolute -left-40 top-[40%] h-[420px] w-[420px] rounded-full bg-[#7CCBB8]/25 blur-3xl" />
       <div className="relative mx-auto grid max-w-6xl gap-12 px-5 pb-16 pt-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:px-8 lg:pb-24 lg:pt-16">
         {/* imagem */}
         <div className="relative mx-auto w-full max-w-[290px] sm:max-w-[340px] lg:order-2 lg:max-w-[420px]">
@@ -194,11 +194,11 @@ function Hero() {
         {/* texto */}
         <div className="pt-4 lg:order-1 lg:pt-0">
           <Eyebrow>Oftalmologia · Palmas, TO</Eyebrow>
-          <h1 className="mt-5 font-serif text-[36px] leading-[1.1] tracking-[-0.01em] text-[#0E2A57] sm:text-[52px] lg:text-[60px]">
-            Cuidado especializado e precisão cirúrgica para a saúde da sua visão.
+          <h1 className="mt-5 font-serif text-[40px] leading-[1.08] tracking-[-0.01em] text-[#0E2A57] sm:text-[54px] lg:text-[64px]">
+            Cuidar da sua visão começa por ouvir você.
           </h1>
           <p className="mt-6 max-w-[34rem] text-[18px] leading-[1.65] text-[#33415C]">
-            Doenças da retina e catarata tratadas com técnica, calma e explicação clara. Da primeira consulta ao último retorno, você é acompanhado pela mesma médica.
+            Retina e catarata tratadas com precisão cirúrgica e acolhimento. Da primeira consulta ao último retorno, você e sua família têm a mesma médica ao lado, com tempo para cada dúvida.
           </p>
 
           {/* credenciais */}
@@ -217,7 +217,7 @@ function Hero() {
             ))}
           </dl>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div id="hero-cta" className="mt-8 flex flex-col gap-3 sm:flex-row">
             <PrimaryCTA />
             <a
               href="#tratamentos"
@@ -290,7 +290,7 @@ function TreatmentCard({ t, open, onToggle }) {
 function Treatments() {
   const [open, setOpen] = useState("retina");
   return (
-    <section id="tratamentos" className="bg-gradient-to-b from-[#E3EEFA] via-[#F8FBFE] to-white py-20 lg:py-28">
+    <section id="tratamentos" className="bg-gradient-to-b from-[#E6F2F2] via-[#F8FBFE] to-white py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-5 lg:px-8">
         <div className="max-w-2xl">
           <Eyebrow>Áreas de tratamento</Eyebrow>
@@ -350,8 +350,8 @@ function About() {
     [Stethoscope, "Acompanhamento próximo", "A mesma médica do primeiro exame ao último retorno do pós-operatório."],
   ];
   return (
-    <section id="sobre" className="relative overflow-hidden bg-gradient-to-br from-[#E6F0FB] via-[#F1F6FD] to-[#DCE9F8] py-20 lg:py-28">
-      <div className="pointer-events-none absolute -bottom-40 -left-32 h-[420px] w-[420px] rounded-full bg-[#79A9D2]/25 blur-3xl" />
+    <section id="sobre" className="relative overflow-hidden bg-gradient-to-br from-[#E6F0FB] via-[#F1F7FB] to-[#DDF1EC] py-20 lg:py-28">
+      <div className="pointer-events-none absolute -bottom-40 -left-32 h-[420px] w-[420px] rounded-full bg-[#7CCBB8]/25 blur-3xl" />
       <div className="pointer-events-none absolute -right-40 -top-40 h-[480px] w-[480px] rounded-full border border-[#79A9D2]/40" />
       <div className="pointer-events-none absolute -right-20 -top-20 h-[480px] w-[480px] rounded-full border border-[#79A9D2]/25" />
       <div className="relative mx-auto grid max-w-6xl gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16 lg:px-8">
@@ -469,7 +469,7 @@ function Location() {
 /* ---------- rodapé ---------- */
 function Footer() {
   return (
-    <footer className="border-t border-[#79A9D2]/40 bg-gradient-to-b from-[#EEF4FB] to-[#DCE9F8] pb-28 pt-14 md:pb-14">
+    <footer className="border-t border-[#79A9D2]/40 bg-gradient-to-br from-[#EEF4FB] to-[#DDF1EC] pb-28 pt-14 md:pb-14">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 lg:grid-cols-[1.2fr_1fr] lg:px-8">
         <div>
           <img src={LOGO} alt="Dra. Renata Bertazzi · Oftalmologia | Retina e Catarata" loading="lazy" className="h-[40px] w-auto" />
@@ -494,8 +494,16 @@ function Footer() {
 
 /* ---------- barra fixa (celular) ---------- */
 function MobileBar() {
+  const [show, setShow] = React.useState(false);
+  React.useEffect(() => {
+    const el = document.getElementById("hero-cta");
+    if (!el || !("IntersectionObserver" in window)) { setShow(true); return; }
+    const io = new IntersectionObserver(([e]) => setShow(!e.isIntersecting && e.boundingClientRect.top < 0));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#0E2A57]/10 bg-white/95 px-4 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3 backdrop-blur md:hidden">
+    <div className={`fixed inset-x-0 bottom-0 z-40 transition-transform duration-300 ${show ? "translate-y-0" : "translate-y-full"} border-t border-[#0E2A57]/10 bg-white/95 px-4 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3 backdrop-blur md:hidden`}>
       <PrimaryCTA className="w-full" />
     </div>
   );
