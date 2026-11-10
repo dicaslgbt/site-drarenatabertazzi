@@ -223,15 +223,15 @@ function Hero() {
           <div id="hero-cta" className="mt-7 flex flex-col gap-3 sm:flex-row">
             <PrimaryCTA />
             <a
-              href="#tratamentos"
-              className="inline-flex min-h-[56px] items-center justify-center gap-2 whitespace-nowrap rounded-full border border-[#0E2A57]/25 bg-white px-7 text-[16px] font-semibold text-[#0E2A57] transition hover:border-[#0E2A57]"
+              href="#fale"
+              className="inline-flex min-h-[56px] items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-[#79A9D2] bg-white px-7 text-[16px] font-semibold text-[#004AAD] transition hover:border-[#004AAD]"
             >
-              Conhecer Tratamentos
+              <MessageSquareHeart className="h-5 w-5" strokeWidth={1.8} />
+              Envie sua dúvida ou recado
             </a>
           </div>
-          <a href="#fale" className="mt-6 inline-flex items-center gap-2 text-[16px] font-semibold text-[#004AAD] underline decoration-[#79A9D2] decoration-2 underline-offset-[6px] transition hover:decoration-[#004AAD]">
-            <MessageSquareHeart className="h-5 w-5" strokeWidth={1.8} />
-            Envie sua dúvida ou recado
+          <a href="#tratamentos" className="mt-5 inline-flex items-center gap-1.5 text-[15.5px] font-semibold text-[#0E2A57] underline decoration-[#79A9D2] decoration-2 underline-offset-[6px] transition hover:decoration-[#004AAD]">
+            Conhecer os tratamentos <ArrowRight className="h-4 w-4" />
           </a>
           <p className="mt-3 text-[14px] text-[#33415C]/80">Atendimento em Palmas, Paraíso do Tocantins e Porto Nacional.</p>
         </div>
