@@ -10,7 +10,7 @@ import {
    Landing page mobile-first · React + Tailwind + lucide-react
    ============================================================ */
 
-const IMG = "https://drarenatabertazzi.com.br/img/";
+const IMG = "img/";
 const LOGO = IMG + "logo-dra-renata-bertazzi-web.png";
 const HERO_PHOTO = IMG + "dra-renata-consultorio.webp";
 const ABOUT_PHOTO = IMG + "dra-renata-bertazzi-oftalmologista-palmas.webp";
@@ -37,6 +37,7 @@ const BLUE = "#004AAD";
 const TREATMENTS = [
   {
     id: "retina",
+    links: [["Cirurgia de retina", "cirurgia-de-retina-palmas.html"], ["Retinopatia diabética", "retinopatia-diabetica.html"], ["Degeneração macular (DMRI)", "degeneracao-macular.html"], ["Descolamento de retina", "descolamento-de-retina.html"]],
     icon: ScanEye,
     tag: "Retina e Vítreo",
     title: "Doenças da Retina e Vítreo",
@@ -56,6 +57,7 @@ const TREATMENTS = [
   },
   {
     id: "catarata",
+    links: [["Cirurgia de catarata: guia completo", "cirurgia-de-catarata-palmas.html"], ["Qual lente escolher? Faça o simulador", "qual-lente-para-catarata.html"]],
     icon: Eye,
     tag: "Cirurgia",
     title: "Catarata",
@@ -75,6 +77,7 @@ const TREATMENTS = [
   },
   {
     id: "exames",
+    links: [["Injeção intravítrea e laser", "injecao-intravitrea-e-laser-palmas.html"]],
     icon: Crosshair,
     tag: "Diagnóstico e Laser",
     title: "Exames Diagnósticos e Laser",
@@ -285,6 +288,16 @@ function TreatmentCard({ t, open, onToggle }) {
               ))}
             </ul>
           </div>
+          {t.links && (
+            <div className="rounded-xl bg-[#F1F7FB] p-4">
+              <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#0E2A57]">Saiba mais</p>
+              <ul className="mt-2 grid gap-1.5">
+                {t.links.map(([l, h]) => (
+                  <li key={h}><a href={h} className="inline-flex items-center gap-1.5 text-[16px] font-semibold text-[#004AAD] underline decoration-[#79A9D2] underline-offset-4 hover:decoration-[#004AAD]">{l}<ArrowRight className="h-4 w-4" /></a></li>
+                ))}
+              </ul>
+            </div>
+          )}
           {t.urgent && (
             <p className="rounded-xl border-l-4 border-[#9B3D2E] bg-[#FBF1EE] px-4 py-3 text-[15px] font-semibold leading-snug text-[#6E2A1F]">{t.urgent}</p>
           )}
@@ -673,7 +686,7 @@ function Location() {
 function Footer() {
   return (
     <footer className="border-t border-[#79A9D2]/40 bg-gradient-to-br from-[#EEF4FB] to-[#DDF1EC] pb-28 pt-14 md:pb-14">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 lg:grid-cols-[1.2fr_1fr] lg:px-8">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 lg:grid-cols-[1.1fr_0.8fr_1fr] lg:px-8">
         <div>
           <img src={LOGO} alt="Dra. Renata Bertazzi · Oftalmologia | Retina e Catarata" loading="lazy" className="h-[40px] w-auto" />
           <p className="mt-5 text-[17px] font-semibold text-[#0E2A57]">Dra. Renata Carneiro Bertazzi</p>
@@ -685,6 +698,14 @@ function Footer() {
             <AtSign className="h-4 w-4" />@dra.renatabertazzi
           </a>
         </div>
+        <nav aria-label="Guias e conteúdos">
+          <p className="text-[13px] font-bold uppercase tracking-[0.18em] text-[#0E2A57]">Guias e conteúdos</p>
+          <ul className="mt-3 grid gap-2 text-[15.5px]">
+            {[["Cirurgia de retina", "cirurgia-de-retina-palmas.html"], ["Cirurgia de catarata", "cirurgia-de-catarata-palmas.html"], ["Qual lente para catarata? Simulador", "qual-lente-para-catarata.html"], ["Injeção intravítrea e laser", "injecao-intravitrea-e-laser-palmas.html"], ["Retinopatia diabética", "retinopatia-diabetica.html"], ["Degeneração macular", "degeneracao-macular.html"], ["Descolamento de retina", "descolamento-de-retina.html"], ["Vídeos e orientações", "conteudos.html"]].map(([l, h]) => (
+              <li key={h}><a href={h} className="text-[#33415C] hover:text-[#004AAD] hover:underline">{l}</a></li>
+            ))}
+          </ul>
+        </nav>
         <div className="text-[13.5px] leading-relaxed text-[#33415C]/85">
           <p><b className="text-[#0E2A57]">Responsável técnica:</b> Dra. Renata Carneiro Bertazzi · CRM-TO 7132 · RQE 3562 (Oftalmologia).</p>
           <p className="mt-3">Conteúdo de caráter exclusivamente informativo e educativo, em conformidade com as normas de publicidade médica do Conselho Federal de Medicina. Não substitui a consulta: diagnóstico e tratamento dependem de avaliação individual, e os resultados variam de pessoa para pessoa.</p>
@@ -719,13 +740,12 @@ function MobileBar() {
 export default function LandingDraRenata() {
   return (
     <div className="min-h-screen bg-[#F6F9FD] text-[#0E2A57] antialiased [font-family:'Inter',system-ui,-apple-system,'Segoe_UI',sans-serif]">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap');
+      <style dangerouslySetInnerHTML={{ __html: `
         .font-serif { font-family: 'Cormorant Garamond', 'Times New Roman', Georgia, serif; font-weight: 600; }
         html { scroll-behavior: smooth; }
         @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
         ::selection { background: ${BLUE}; color: #fff; }
-      `}</style>
+      ` }} />
       <Header />
       <main>
         <Hero />

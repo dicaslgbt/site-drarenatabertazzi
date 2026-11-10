@@ -107,7 +107,7 @@ def header(current):
              ("cirurgia-de-retina-palmas.html", "Retina", "cirurgia-de-retina-palmas"),
              ("index.html#seguranca", "Segurança", "seguranca"),
              ("conteudos.html", "Conteúdos", "conteudos"),
-             ("index.html#onde-atendo", "Onde atendo", "onde")]
+             ("index.html#atendimento", "Onde atendo", "onde")]
     nav = "\n".join(f'      <a href="{h}"{" aria-current=\"page\"" if k == current else ""}>{t}</a>' for h, t, k in links)
     return f"""<header class="top">
   <div class="wrap">
@@ -131,7 +131,7 @@ MBAR = f"""<div class="mbar" role="region" aria-label="Contato rápido">
 
 def footer():
     names = {"cirurgia-de-catarata-palmas": "Cirurgia de catarata", "cirurgia-de-retina-palmas": "Cirurgia de retina"}
-    pages = "\n".join(f'        <li><a href="{p["slug"]}.html">{names.get(p["slug"], p["nav"])}</a></li>' for p in PAGES) + '\n        <li><a href="qual-lente-para-catarata.html">Qual lente para catarata? Simulador</a></li>\n        <li><a href="conteudos.html">Conteúdos: vídeos e orientações</a></li>\n        <li><a href="index.html#fale-com-a-dra">Deixe um recado ou envie sua dúvida</a></li>'
+    pages = "\n".join(f'        <li><a href="{p["slug"]}.html">{names.get(p["slug"], p["nav"])}</a></li>' for p in PAGES) + '\n        <li><a href="qual-lente-para-catarata.html">Qual lente para catarata? Simulador</a></li>\n        <li><a href="conteudos.html">Conteúdos: vídeos e orientações</a></li>\n        <li><a href="index.html#fale">Deixe um recado ou envie sua dúvida</a></li>'
     cl = "\n".join(f'        <li><b>{c["name"]}</b><br>{c["street"]} · {c["city"]} (TO){" · " + c["phone_txt"] if c["phone_txt"] else ""}</li>' for c in CLINICS)
     return f"""<footer class="site-foot">
   <div class="wrap foot-grid">
@@ -621,7 +621,49 @@ home_schema = {"@context": "https://schema.org", "@graph": [
     physician_schema(), faq_schema(HOME_FAQ)]}
 home_title = "Oftalmologista em Palmas (TO) | Catarata e Retina | Dra. Renata Bertazzi"
 home_desc = "Dra. Renata Bertazzi, oftalmologista em Palmas (TO): cirurgia de catarata, cirurgia de retina, injeção intravítrea e laser. CRM-TO 7132, RQE 3562, membro da SBRV."
-open("index.html", "w").write(head(home_title, home_desc, "index", home_schema) + header("index") + "\n" + HOME + "\n" + footer())
+# A página inicial agora é a landing em React (pasta landing/). Para mudar o visual ou os textos dela,
+# edite landing/App.jsx e rode:  cd landing && npm install && npm run build   e depois  python3 build.py
+import hashlib
+_body = open("landing/body.html", encoding="utf-8").read()
+_ver = hashlib.md5((open("assets/landing.js", "rb").read() + open("assets/landing.css", "rb").read())).hexdigest()[:8]
+_lschema = {"@context": "https://schema.org", "@graph": [
+    {"@type": "WebSite", "@id": SITE + "/#site", "url": SITE + "/", "name": "Dra. Renata Bertazzi · Oftalmologista em Palmas", "inLanguage": "pt-BR"},
+    physician_schema()]}
+_ltitle = "Oftalmologista em Palmas (TO) | Retina e Catarata | Dra. Renata Bertazzi"
+_ldesc = "Dra. Renata Bertazzi, oftalmologista em Palmas, Paraíso do Tocantins e Porto Nacional: retina, catarata, injeção intravítrea e laser. CRM-TO 7132, RQE 3562, membro da SBRV."
+open("index.html", "w").write(f"""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{html.escape(_ltitle)}</title>
+<meta name="description" content="{html.escape(_ldesc)}">
+<link rel="canonical" href="{SITE}/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Dra. Renata Bertazzi">
+<meta property="og:title" content="{html.escape(_ltitle)}">
+<meta property="og:description" content="{html.escape(_ldesc)}">
+<meta property="og:url" content="{SITE}/">
+<meta property="og:image" content="{SITE}/img/dra-renata-consultorio.webp">
+<meta name="theme-color" content="#F6F9FD">
+<link rel="icon" type="image/png" href="img/simbolo.png">
+<link rel="apple-touch-icon" href="img/simbolo-grande.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/landing.css?v={_ver}">
+<link rel="preload" as="image" href="img/dra-renata-consultorio.webp">
+<script type="application/ld+json">
+{json.dumps(_lschema, ensure_ascii=False, indent=1)}
+</script>
+</head>
+<body>
+<div id="root">{_body}</div>
+<script src="assets/landing.js?v={_ver}" defer></script>
+</body>
+</html>
+""")
 
 # =================== conteúdos ===================
 build_conteudos(head=head, header=header, footer=footer, url=url, SITE=SITE, physician_schema=physician_schema, CTA=CTA)
