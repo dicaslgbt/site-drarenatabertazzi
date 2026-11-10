@@ -36,7 +36,7 @@ CLINICS = [
      "phone": "+55-63-3215-3335", "phone_txt": "(63) 3215-3335",
      "maps": "https://www.google.com/maps/search/?api=1&query=Oftalmologia+Avan%C3%A7ada+104+Norte+Palmas+TO"},
     {"name": "OPUS", "street": "Quadra 702 Sul, Av. Joaquim Teotônio Segurado, 15, Conj. 01, Sala 02 · Plano Diretor Sul", "city": "Palmas", "zip": None,
-     "phone": None, "phone_txt": None,
+     "phone": "+55-63-3028-1483", "phone_txt": "(63) 3028-1483",
      "maps": "https://www.google.com/maps/search/?api=1&query=OPUS+702+Sul+Avenida+Joaquim+Teot%C3%B4nio+Segurado+Palmas+TO"},
 ]
 
