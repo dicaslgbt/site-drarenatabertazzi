@@ -11,8 +11,9 @@ import {
    ============================================================ */
 
 const IMG = "https://drarenatabertazzi.com.br/img/";
-const PHOTO = IMG + "dra-renata-bertazzi-oftalmologista-palmas.webp";
-const PHOTO_OFFICE = IMG + "dra-renata-consultorio.webp";
+const LOGO = IMG + "logo-dra-renata-bertazzi-web.png";
+const HERO_PHOTO = IMG + "dra-renata-consultorio.webp";
+const ABOUT_PHOTO = IMG + "dra-renata-bertazzi-oftalmologista-palmas.webp";
 
 const GALLERY = [
   { src: IMG + "rotina-consulta-lampada-de-fenda.webp", alt: "Dra. Renata examinando uma paciente na lâmpada de fenda", step: "01", title: "Consulta sem pressa", text: "Exame completo na lâmpada de fenda, com tempo para ouvir e explicar." },
@@ -132,14 +133,8 @@ function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-[#0B1E36]/10 bg-[#F8FAFC]/90 backdrop-blur-md">
       <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between px-5 lg:px-8">
-        <a href="#inicio" className="flex items-center gap-3" aria-label="Dra. Renata Bertazzi, início">
-          <span className="grid h-10 w-10 place-items-center rounded-full border border-[#B8975A]/50">
-            <Eye className="h-[18px] w-[18px] text-[#0B1E36]" strokeWidth={1.6} />
-          </span>
-          <span className="leading-tight">
-            <span className="block font-serif text-[19px] tracking-[0.02em] text-[#0B1E36]">Dra. Renata Bertazzi</span>
-            <span className="block text-[10.5px] font-semibold uppercase tracking-[0.22em] text-[#0B1E36]/60">Catarata e Retina</span>
-          </span>
+        <a href="#inicio" className="flex items-center" aria-label="Dra. Renata Bertazzi, Oftalmologia, Retina e Catarata. Início">
+          <img src={LOGO} alt="Dra. Renata Bertazzi · Oftalmologia | Retina e Catarata" className="h-[34px] w-auto sm:h-[40px]" />
         </a>
         <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
           {links.map(([h, t]) => (
@@ -181,9 +176,9 @@ function Hero() {
           <div className="absolute -right-3 -top-3 bottom-10 left-10 border border-[#B8975A]/45" aria-hidden="true" />
           <figure className="relative overflow-hidden rounded-[6px] bg-[#E9ECF1] shadow-[0_40px_80px_-40px_rgba(11,30,54,0.55)]">
             <img
-              src={PHOTO}
+              src={HERO_PHOTO}
               alt="Dra. Renata Bertazzi, médica oftalmologista em Palmas, em seu consultório"
-              className="aspect-[4/5] w-full object-cover object-[50%_22%] [filter:contrast(1.04)_saturate(0.92)]"
+              className="aspect-[4/5] w-full object-cover object-[50%_15%] [filter:contrast(1.03)_saturate(0.94)]"
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0B1E36]/35 via-transparent to-transparent" />
           </figure>
@@ -256,9 +251,9 @@ function TreatmentCard({ t, open, onToggle }) {
           <h3 className="mt-2 font-serif text-[27px] leading-tight text-[#0B1E36]">{t.title}</h3>
           <p className="mt-3 text-[16.5px] leading-relaxed text-[#24364F]">{t.summary}</p>
         </div>
-        <span className="text-[14px] font-semibold text-[#0B1E36] underline decoration-[#B8975A] decoration-2 underline-offset-4">
-          {open ? "Fechar detalhes" : "Ver sinais e tratamento"}
-        </span>
+        {!open && (
+          <span className="text-[14px] font-semibold text-[#0B1E36] underline decoration-[#B8975A] decoration-2 underline-offset-4">Ver sinais e tratamento</span>
+        )}
       </button>
       {open && (
         <div className="grid gap-6 border-t border-[#0B1E36]/10 px-6 pb-7 pt-6 sm:px-7">
@@ -366,9 +361,9 @@ function About() {
           <figure className="mt-10 lg:mt-0">
             <div className="relative">
             <div className="absolute -bottom-3 -left-3 right-10 top-10 border border-[#D9C59A]/40" aria-hidden="true" />
-            <img src={PHOTO_OFFICE} alt="Dra. Renata Bertazzi em seu consultório" loading="lazy" className="relative aspect-[4/5] w-full rounded-[6px] object-cover object-top shadow-[0_40px_80px_-40px_rgba(0,0,0,0.7)] [filter:saturate(0.92)_contrast(1.03)]" />
+            <img src={ABOUT_PHOTO} alt="Retrato da Dra. Renata Bertazzi" loading="lazy" className="relative aspect-[4/5] w-full rounded-[6px] object-cover object-[50%_20%] shadow-[0_40px_80px_-40px_rgba(0,0,0,0.7)] [filter:saturate(0.92)_contrast(1.03)]" />
             </div>
-            <figcaption className="mt-6 text-[14px] tracking-wide text-white/60">Consultório · Palmas, Tocantins</figcaption>
+            <figcaption className="mt-6 text-[14px] tracking-wide text-white/60">Dra. Renata Carneiro Bertazzi · CRM-TO 7132</figcaption>
           </figure>
         </div>
         <div>
@@ -473,8 +468,9 @@ function Footer() {
     <footer className="border-t border-[#0B1E36]/10 bg-white pb-28 pt-14 md:pb-14">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 lg:grid-cols-[1.2fr_1fr] lg:px-8">
         <div>
-          <p className="font-serif text-[24px] text-[#0B1E36]">Dra. Renata Carneiro Bertazzi</p>
-          <p className="mt-2 text-[15.5px] leading-relaxed text-[#24364F]">
+          <img src={LOGO} alt="Dra. Renata Bertazzi · Oftalmologia | Retina e Catarata" loading="lazy" className="h-[40px] w-auto" />
+          <p className="mt-5 text-[17px] font-semibold text-[#0B1E36]">Dra. Renata Carneiro Bertazzi</p>
+          <p className="mt-1 text-[15.5px] leading-relaxed text-[#24364F]">
             Médica Oftalmologista · CRM-TO 7132 · RQE 3562<br />
             Membro titular da Sociedade Brasileira de Retina e Vítreo (SBRV)
           </p>
