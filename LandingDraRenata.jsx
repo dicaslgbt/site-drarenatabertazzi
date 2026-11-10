@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   MessageCircle, ArrowRight, ArrowUpRight, ShieldCheck, BadgeCheck, Award, Eye, ScanEye,
   Crosshair, ChevronDown, MapPin, Phone, Clock, Stethoscope, HeartHandshake, ClipboardCheck,
-  CalendarDays, Menu, X, AtSign,
+  CalendarDays, Menu, X, AtSign, MessageSquareHeart, Send, AlertTriangle,
 } from "lucide-react";
 
 /* ============================================================
@@ -26,6 +26,10 @@ const WA_URL = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
   "Olá! Vim pelo site da Dra. Renata Bertazzi e gostaria de agendar uma consulta."
 )}`;
 const INSTAGRAM = "https://www.instagram.com/dra.renatabertazzi/";
+
+/* Recados e dúvidas: chegam ao portal /controle (Supabase). A chave publicável só permite ENVIAR. */
+const SUPABASE_URL = "https://avbmtrvxieetoptmzere.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Ohqe8a6rhGEwOImU302jjw_69V8kcJ7";
 
 const BLUE = "#004AAD";
 
@@ -129,7 +133,7 @@ function PrimaryCTA({ className = "", children = "Agendar Consulta via WhatsApp"
 /* ---------- header ---------- */
 function Header() {
   const [open, setOpen] = useState(false);
-  const links = [["#tratamentos", "Tratamentos"], ["#rotina", "Rotina"], ["#sobre", "A médica"], ["#atendimento", "Onde atendo"]];
+  const links = [["#tratamentos", "Tratamentos"], ["#sobre", "A médica"], ["#fale", "Recados e dúvidas"], ["#atendimento", "Onde atendo"]];
   return (
     <header className="sticky top-0 z-40 border-b border-[#0E2A57]/10 bg-[#F6F9FD]/90 backdrop-blur-md">
       <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between px-5 lg:px-8">
@@ -168,14 +172,14 @@ function Header() {
 /* ---------- hero ---------- */
 function Hero() {
   return (
-    <section id="inicio" className="relative overflow-hidden bg-gradient-to-br from-[#FFFFFF] via-[#EEF5FD] to-[#E2F3EF]">
+    <section id="inicio" className="relative overflow-clip bg-gradient-to-br from-[#FFFFFF] via-[#EEF5FD] to-[#E2F3EF]">
       <div className="pointer-events-none absolute -right-32 -top-24 h-[460px] w-[460px] rounded-full bg-[#79A9D2]/30 blur-3xl" />
       <div className="pointer-events-none absolute -left-40 top-[40%] h-[420px] w-[420px] rounded-full bg-[#7CCBB8]/25 blur-3xl" />
       <div className="relative mx-auto grid max-w-6xl gap-12 px-5 pb-16 pt-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:px-8 lg:pb-24 lg:pt-16">
         {/* imagem */}
         <div className="relative mx-auto w-full max-w-[290px] sm:max-w-[340px] lg:order-2 lg:max-w-[420px]">
           <div className="absolute -right-3 -top-3 bottom-10 left-10 rounded-2xl border border-[#79A9D2]" aria-hidden="true" />
-          <figure className="relative overflow-hidden rounded-2xl bg-[#E9EFF7] shadow-[0_30px_60px_-34px_rgba(0,74,173,0.45)]">
+          <figure className="relative overflow-clip rounded-2xl bg-[#E9EFF7] shadow-[0_30px_60px_-34px_rgba(0,74,173,0.45)]">
             <img
               src={HERO_PHOTO}
               alt="Dra. Renata Bertazzi, médica oftalmologista em Palmas, em seu consultório"
@@ -227,6 +231,10 @@ function Hero() {
               Conhecer Tratamentos
             </a>
           </div>
+          <a href="#fale" className="mt-4 inline-flex min-h-[48px] w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-[#EAF2FB] to-[#DDF1EC] px-6 text-[15.5px] font-semibold text-[#004AAD] ring-1 ring-[#79A9D2]/60 transition hover:ring-[#004AAD] sm:w-auto">
+            <MessageSquareHeart className="h-5 w-5" strokeWidth={1.8} />
+            Envie sua dúvida ou deixe um recado
+          </a>
           <p className="mt-4 text-[14px] text-[#33415C]/80">Atendimento em Palmas, Paraíso do Tocantins e Porto Nacional.</p>
         </div>
       </div>
@@ -324,7 +332,7 @@ function Routine() {
       <div className="mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 [scrollbar-width:none] lg:mx-auto lg:grid lg:max-w-6xl lg:grid-cols-4 lg:overflow-visible lg:px-8">
         {GALLERY.map((g) => (
           <figure key={g.step} className="w-[78%] flex-none snap-start sm:w-[44%] lg:w-auto">
-            <div className="relative overflow-hidden rounded-2xl bg-[#E9EFF7] shadow-[0_30px_60px_-40px_rgba(11,30,54,0.6)]">
+            <div className="relative overflow-clip rounded-2xl bg-[#E9EFF7] shadow-[0_30px_60px_-40px_rgba(11,30,54,0.6)]">
               {g.video ? (
                 <video src={g.video} poster={g.poster} autoPlay muted loop playsInline preload="metadata" aria-label={g.alt} className="aspect-[3/4] w-full object-cover" />
               ) : (
@@ -351,7 +359,7 @@ function About() {
     [Stethoscope, "Acompanhamento próximo", "A mesma médica do primeiro exame ao último retorno do pós-operatório."],
   ];
   return (
-    <section id="sobre" className="relative overflow-hidden bg-gradient-to-br from-[#E6F0FB] via-[#F1F7FB] to-[#DDF1EC] py-20 lg:py-28">
+    <section id="sobre" className="relative overflow-clip bg-gradient-to-br from-[#E6F0FB] via-[#F1F7FB] to-[#DDF1EC] py-20 lg:py-28">
       <div className="pointer-events-none absolute -bottom-40 -left-32 h-[420px] w-[420px] rounded-full bg-[#7CCBB8]/25 blur-3xl" />
       <div className="pointer-events-none absolute -right-40 -top-40 h-[480px] w-[480px] rounded-full border border-[#79A9D2]/40" />
       <div className="pointer-events-none absolute -right-20 -top-20 h-[480px] w-[480px] rounded-full border border-[#79A9D2]/25" />
@@ -396,6 +404,101 @@ function About() {
             ))}
           </ul>
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- recados e dúvidas ---------- */
+function Field({ label, hint, children }) {
+  return (
+    <label className="grid gap-1.5 text-[15px] font-semibold text-[#0E2A57]">
+      <span>{label}{hint && <span className="ml-1 font-normal text-[#5F5F7C]">{hint}</span>}</span>
+      {children}
+    </label>
+  );
+}
+const inputCls = "min-h-[52px] w-full rounded-xl border border-[#79A9D2]/60 bg-[#F6F9FD] px-4 text-[17px] font-normal text-[#0E2A57] outline-none transition focus:border-[#004AAD] focus:bg-white focus:ring-4 focus:ring-[#79A9D2]/30";
+
+function Messages() {
+  const [tipo, setTipo] = useState("duvida");
+  const [f, setF] = useState({ nome: "", cidade: "", contato: "", mensagem: "", publicar: false, consentimento: false, site: "" });
+  const [st, setSt] = useState({ state: "idle", msg: "" });
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value });
+  const waText = () => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`${tipo === "duvida" ? "Dúvida" : "Recado"} pelo site, de ${f.nome}${f.cidade ? " (" + f.cidade + ")" : ""}: ${f.mensagem}`)}`;
+
+  async function enviar(e) {
+    e.preventDefault();
+    if (f.site) return;
+    if (f.nome.trim().length < 2) return setSt({ state: "erro", msg: "Escreva o seu nome." });
+    if (f.mensagem.trim().length < 5) return setSt({ state: "erro", msg: "Escreva a sua mensagem." });
+    if (!f.consentimento) return setSt({ state: "erro", msg: "Para enviar, marque a autorização de uso dos dados." });
+    setSt({ state: "enviando", msg: "" });
+    try {
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/recados_site`, {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+        body: JSON.stringify({ tipo, nome: f.nome.trim(), cidade: f.cidade.trim() || null, contato: f.contato.trim() || null, mensagem: f.mensagem.trim(), autoriza_publicar: f.publicar, consentimento: true }),
+      });
+      if (!r.ok) throw new Error(String(r.status));
+      setF({ nome: "", cidade: "", contato: "", mensagem: "", publicar: false, consentimento: false, site: "" });
+      setSt({ state: "ok", msg: tipo === "duvida" ? "Obrigada! Sua dúvida chegou para a Dra. Renata." : "Obrigada pelo carinho! Seu recado chegou para a Dra. Renata." });
+    } catch {
+      setSt({ state: "falha", msg: "" });
+    }
+  }
+
+  return (
+    <section id="fale" className="relative overflow-clip bg-gradient-to-br from-white via-[#F1F7FB] to-[#E2F3EF] py-20 lg:py-28">
+      <div className="pointer-events-none absolute -right-32 top-10 h-[380px] w-[380px] rounded-full bg-[#79A9D2]/20 blur-3xl" />
+      <div className="relative mx-auto grid max-w-6xl gap-12 px-5 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 lg:px-8">
+        <div>
+          <Eyebrow>Fale com a Dra. Renata</Eyebrow>
+          <h2 className="mt-5 font-serif text-[34px] leading-[1.12] text-[#0E2A57] sm:text-[42px]">Envie sua dúvida ou deixe um recado.</h2>
+          <p className="mt-5 text-[18px] leading-[1.7] text-[#33415C]">Ficou com alguma pergunta sobre retina, catarata ou cirurgia? Foi paciente e quer contar como foi? A mensagem chega direto para a Dra. Renata e a equipe, e ninguém mais vê.</p>
+          <p className="mt-4 text-[16px] leading-relaxed text-[#33415C]">As dúvidas que mais aparecem viram vídeos e orientações, sempre sem o nome de quem perguntou.</p>
+          <div className="mt-7 flex gap-3 rounded-2xl bg-[#FBF1EE] p-5 ring-1 ring-[#E9C7BE]">
+            <AlertTriangle className="mt-0.5 h-5 w-5 flex-none text-[#9B3D2E]" strokeWidth={2} />
+            <p className="text-[15.5px] leading-relaxed text-[#6E2A1F]"><b>Não use este espaço para urgências.</b> Dor forte, perda súbita de visão, clarões ou sombra na visão pedem atendimento no mesmo dia: <a href={WA_URL} target="_blank" rel="noopener noreferrer" className="font-semibold underline underline-offset-2">fale com a equipe pelo WhatsApp</a>.</p>
+          </div>
+        </div>
+
+        <form onSubmit={enviar} noValidate className="grid gap-5 rounded-2xl bg-white p-6 shadow-[0_30px_60px_-40px_rgba(0,74,173,0.55)] ring-1 ring-[#79A9D2]/40 sm:p-8">
+          <div role="radiogroup" aria-label="O que você quer enviar?" className="grid grid-cols-2 gap-1.5 rounded-full bg-[#EEF4FB] p-1.5">
+            {[["duvida", "Enviar dúvida"], ["recado", "Deixar recado"]].map(([k, t]) => (
+              <button key={k} type="button" role="radio" aria-checked={tipo === k} onClick={() => setTipo(k)}
+                className={`min-h-[46px] rounded-full px-3 text-[15px] font-semibold transition ${tipo === k ? "bg-[#004AAD] text-white shadow" : "text-[#33415C] hover:text-[#004AAD]"}`}>{t}</button>
+            ))}
+          </div>
+          <Field label="Seu nome"><input className={inputCls} value={f.nome} onChange={set("nome")} maxLength={80} autoComplete="name" required /></Field>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Cidade"><input className={inputCls} value={f.cidade} onChange={set("cidade")} maxLength={60} autoComplete="address-level2" /></Field>
+            <Field label="WhatsApp" hint="(opcional)"><input className={inputCls} value={f.contato} onChange={set("contato")} maxLength={30} inputMode="tel" autoComplete="tel" /></Field>
+          </div>
+          <Field label={tipo === "duvida" ? "Sua dúvida" : "Seu recado"}>
+            <textarea className={`${inputCls} min-h-[140px] resize-y py-3`} value={f.mensagem} onChange={set("mensagem")} maxLength={1500} required />
+          </Field>
+          <p className="-mt-2 text-[14px] text-[#5F5F7C]">Não envie exames, documentos ou dados de saúde que não sejam necessários.</p>
+          <input tabIndex={-1} aria-hidden="true" autoComplete="off" value={f.site} onChange={set("site")} className="hidden" />
+          <label className="flex gap-3 text-[15px] leading-snug text-[#33415C]">
+            <input type="checkbox" checked={f.publicar} onChange={set("publicar")} className="mt-0.5 h-5 w-5 flex-none accent-[#004AAD]" />
+            {tipo === "duvida" ? "Autorizo que minha dúvida seja respondida em vídeos ou textos, sem o meu nome." : "Autorizo que meu recado seja publicado no site, só com o meu primeiro nome."}
+          </label>
+          <label className="flex gap-3 text-[15px] leading-snug text-[#33415C]">
+            <input type="checkbox" checked={f.consentimento} onChange={set("consentimento")} className="mt-0.5 h-5 w-5 flex-none accent-[#004AAD]" />
+            Concordo que a equipe da Dra. Renata use estes dados apenas para ler e responder a minha mensagem.
+          </label>
+          <button type="submit" disabled={st.state === "enviando"} className="inline-flex min-h-[56px] items-center justify-center gap-2.5 rounded-full bg-[#004AAD] px-6 text-[16px] font-semibold text-white shadow-[0_16px_34px_-16px_rgba(0,74,173,0.6)] transition hover:bg-[#003C8F] disabled:opacity-60">
+            <Send className="h-5 w-5" strokeWidth={1.9} />{st.state === "enviando" ? "Enviando…" : "Enviar mensagem"}
+          </button>
+          <div role="status" aria-live="polite" className="text-[15.5px] font-semibold">
+            {st.state === "ok" && <p className="text-[#1F7A55]">{st.msg}</p>}
+            {st.state === "erro" && <p className="text-[#9B3D2E]">{st.msg}</p>}
+            {st.state === "falha" && (
+              <p className="text-[#9B3D2E]">Não conseguimos enviar agora. <a href={waText()} target="_blank" rel="noopener noreferrer" className="text-[#004AAD] underline underline-offset-2">Envie pelo WhatsApp</a>, a mensagem já vai escrita.</p>
+            )}
+          </div>
+        </form>
       </div>
     </section>
   );
@@ -495,14 +598,18 @@ function Footer() {
 
 /* ---------- barra fixa (celular) ---------- */
 function MobileBar() {
-  const [show, setShow] = React.useState(false);
+  const [past, setPast] = React.useState(false);
+  const [inForm, setInForm] = React.useState(false);
   React.useEffect(() => {
-    const el = document.getElementById("hero-cta");
-    if (!el || !("IntersectionObserver" in window)) { setShow(true); return; }
-    const io = new IntersectionObserver(([e]) => setShow(!e.isIntersecting && e.boundingClientRect.top < 0));
-    io.observe(el);
-    return () => io.disconnect();
+    const cta = document.getElementById("hero-cta"), form = document.getElementById("fale");
+    if (!("IntersectionObserver" in window)) { setPast(true); return; }
+    const a = new IntersectionObserver(([e]) => setPast(!e.isIntersecting && e.boundingClientRect.top < 0));
+    const b = new IntersectionObserver(([e]) => setInForm(e.isIntersecting), { threshold: 0.15 });
+    if (cta) a.observe(cta);
+    if (form) b.observe(form);
+    return () => { a.disconnect(); b.disconnect(); };
   }, []);
+  const show = past && !inForm;
   return (
     <div className={`fixed inset-x-0 bottom-0 z-40 transition-transform duration-300 ${show ? "translate-y-0" : "translate-y-full"} border-t border-[#0E2A57]/10 bg-white/95 px-4 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3 backdrop-blur md:hidden`}>
       <PrimaryCTA className="w-full" />
@@ -526,6 +633,7 @@ export default function LandingDraRenata() {
         <Treatments />
         <Routine />
         <About />
+        <Messages />
         <Location />
       </main>
       <Footer />
