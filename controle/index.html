@@ -299,9 +299,9 @@ a.btn.bm{display:inline-block;cursor:grab;text-decoration:none}
 .footnote{font-size:.78rem;color:var(--soft);text-align:center;margin-top:24px}
 
 /* ===== v3: indicações, interesse, aplicações ===== */
-.tabs{grid-template-columns:repeat(8,1fr)}
-.tabs button{font-size:.62rem}
-@media(min-width:900px){.tabs{grid-template-columns:repeat(8,max-content)}.tabs button{font-size:.9rem}}
+.tabs{grid-template-columns:repeat(5,1fr)}
+.tabs button{font-size:.7rem}
+@media(min-width:900px){.tabs{grid-template-columns:repeat(5,max-content)}.tabs button{font-size:.9rem}}
 .pr-ico{margin-right:4px}
 .pr-row.pr-ok{opacity:.72}
 .pr-row.pr-late{background:var(--late-soft);border-radius:10px;padding-left:8px;padding-right:8px}
@@ -419,9 +419,6 @@ legend{font-size:.86rem;font-weight:700;color:var(--soft);padding:0;margin-botto
     <button data-tab="painel" aria-current="page"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="7" height="7" rx="2"/><rect x="13.5" y="4" width="7" height="4" rx="2"/><rect x="13.5" y="11" width="7" height="9" rx="2"/><rect x="3.5" y="14" width="7" height="6" rx="2"/></svg>Painel</button>
     <button data-tab="semana"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Semana</button>
     <button data-tab="proc"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M8.5 12.5l2.2 2.2 4.8-4.8"/></svg>Procedimentos<b class="tab-badge" id="nProc"></b></button>
-    <button data-tab="cir"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M6 12c2-2.5 10-2.5 12 0"/></svg>Cirurgias</button>
-    <button data-tab="trat"><svg viewBox="0 0 24 24"><path d="M14 4l6 6M17 7l-9 9-3 1 1-3 9-9M11 8l5 5M4 20l2-2"/></svg>Injeções</button>
-    <button data-tab="laser"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.5 2.5M16.5 16.5L19 19M19 5l-2.5 2.5M7.5 16.5L5 19"/></svg>Laser</button>
     <button data-tab="pac"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c.8-3.4 3.2-5.2 6-5.2s5.2 1.8 6 5.2"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.8c2.4.2 4.2 1.8 5 4.6"/></svg>Pacientes</button>
     <button data-tab="cont"><svg viewBox="0 0 24 24"><path d="M4 20h16M5 20v-7h14v7M8 13V10M12 13V9M16 13V10"/><path d="M8 7.5c-.8-1-.2-2 0-2.5.2.5.8 1.5 0 2.5zM12 6.5c-.8-1-.2-2 0-2.5.2.5.8 1.5 0 2.5zM16 7.5c-.8-1-.2-2 0-2.5.2.5.8 1.5 0 2.5z"/></svg>Contatos<b class="tab-badge" id="nAniv"></b></button>
   </nav>
@@ -816,7 +813,9 @@ document.addEventListener("input",e=>{ if(e.target.id==="ctBusca"){ S.ctBusca=e.
 
 /* ================= Telas ================= */
 function render(){
-  if(S.tab==="ind"||!["agenda","repasse","lentes","painel","semana","proc","cir","trat","laser","pac","recados","cont"].includes(S.tab)) S.tab=tabDoFiltro();
+  if(S.tab==="ind") S.tab=tabDoFiltro();
+  if({cir:1,trat:1,laser:1}[S.tab]){ S.procTipo={cir:"cirurgia",trat:"injecao",laser:"laser"}[S.tab]; S.procVista="quadro"; S.tab="proc"; }
+  if(!["agenda","repasse","lentes","painel","semana","proc","cir","trat","laser","pac","recados","cont"].includes(S.tab)) S.tab=tabDoFiltro();
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-current", b.dataset.tab===S.tab?"page":"false"));
   const m=$("#main");
   m.innerHTML = ({agenda:telaAgenda, repasse:telaRepasse, lentes:telaLentes, recados:telaRecados, painel:telaPainel, semana:telaSemana, proc:telaProcs, cir:()=>telaPipe("cirurgia"), trat:()=>telaPipe("injecao"), laser:()=>telaPipe("laser"), pac:telaPac, cont:telaContatos}[S.tab])();
@@ -1226,15 +1225,18 @@ function linhaAgendado(x){
 }
 
 function telaProcs(){
-  const vista=S.procVista||"feitos", dias=S.procDias||15, st=S.procSt||"";
+  const vista=S.procVista||"quadro", dias=S.procDias||15, st=S.procSt||"";
   const R=procsRealizados(dias), A=procsAgendados();
   const base=vista==="feitos"?R:A;
   const nT=t=>base.filter(x=>tipoDe(x)===t).length;
   const pset=(k,v,tx,n,on)=>`<button class="lchip ${on?"on":""}" data-pset="${k}=${v}">${tx}${n!==undefined?` <small>${n}</small>`:""}</button>`;
   const tipos=`<div class="loc-chips">${pset("procTipo","","Todos",base.length,!S.procTipo)}${["cirurgia","injecao","laser"].map(t=>pset("procTipo",t,TIPO_ICO[t]+" "+({cirurgia:"Cirurgias",injecao:"Injeções",laser:"Laser"})[t],nT(t),S.procTipo===t)).join("")}</div>`;
-  const seg=`<div class="seg"><button data-pset="procVista=feitos" aria-pressed="${vista==="feitos"}">✅ Realizados · contato</button><button data-pset="procVista=agenda" aria-pressed="${vista==="agenda"}">📅 Agendados</button></div>`;
+  const seg=`<div class="seg"><button data-pset="procVista=quadro" aria-pressed="${vista==="quadro"}">📋 Quadro (indicação → alta)</button><button data-pset="procVista=feitos" aria-pressed="${vista==="feitos"}">✅ Realizados · contato</button><button data-pset="procVista=agenda" aria-pressed="${vista==="agenda"}">📅 Agendados</button></div>`;
   let corpo="";
-  if(vista==="feitos"){
+  if(vista==="quadro"){
+    const tq=S.procTipo||"cirurgia"; const tot=t=>S.casos.filter(c=>c.tipo===t&&!["desistiu","finalizado"].includes(c.etapa)&&noLocal(c)).length;
+    corpo=`<div class="loc-chips">${["cirurgia","injecao","laser"].map(t=>pset("procTipo",t,TIPO_ICO[t]+" "+({cirurgia:"Cirurgias",injecao:"Injeções",laser:"Laser"})[t],tot(t),tq===t)).join("")}</div>${telaPipe(tq,true)}`;
+  } else if(vista==="feitos"){
     const T=R.filter(x=>passaTipo(tipoDe(x)));
     const pend=T.filter(x=>x.k==="portal"&&!posOk(x)), ok=T.filter(posOk), nl=T.filter(x=>x.k==="pront"), sev=T.filter(x=>x.k==="portal"&&!x.pront&&ultSyncData()&&x.data<=ultSyncData());
     const L= st==="pend"?pend : st==="ok"?ok : st==="nl"?nl : st==="sev"?sev : T;
@@ -1258,7 +1260,7 @@ function telaProcs(){
     ${S.nr===null?`<div class="empty">Para guardar os motivos de "não realizado", rode uma vez o arquivo <b>controle/sql/2026-11-12-procedimentos.sql</b> no SQL Editor do Supabase. Enquanto isso o motivo vai para a observação da indicação.</div>`:
       nrs.length?`<details class="panel resumo"><summary><b>✖ Não realizados</b> · ${nrs.length} nos últimos 60 dias</summary>${nrs.map(r=>{ const c=S.casos.find(x=>x.id===r.caso_id),p=pacOf(c); return `<div class="tk-row"><div class="inj-nome"><button class="linklike" data-pac="${p.id}">${esc(nomeCurto(p.nome))}</button><small>${TIPO_ICO[c.tipo]} ${TIPO_LABEL[c.tipo]}${c.olho?" "+esc(c.olho):""} · marcado ${br(r.data_prevista)}${c.local?" · "+esc(c.local):""}</small><div class="pos-st"><span class="fl warn">${esc(r.motivo)}</span>${r.remarcado_para?`<span class="fl ok">Remarcado ${br(r.remarcado_para)}</span>`:`<span class="fl">Voltou para agendar</span>`}</div>${r.obs?`<small>📝 ${esc(r.obs)}</small>`:""}</div></div>`; }).join("")}</details>`:""}`;
   }
-  return `<div class="sec-head"><div><h2>Procedimentos</h2><div class="sub">Cirurgias, injeções e laser juntos · realizados para o contato e agenda do que está marcado</div></div><button class="btn" data-act="novo">+ Nova indicação</button></div>
+  return `<div class="sec-head"><div><h2>Procedimentos</h2><div class="sub">Cirurgias, injeções e laser num lugar só · escolha a visão e filtre pelo tipo</div></div><button class="btn" data-act="novo">+ Nova indicação</button></div>
   ${seg}${corpo}`;
 }
 function blocoProcResumo(){
@@ -2259,7 +2261,7 @@ function blocoPosCard(c){
     <table class="pos-t"><tr><td>Contato</td><td>${po?.contato_em?`<span class="fl ok">✔ ${dm(po.contato_em)}</span>`:`<button class="btn small ghost" data-act="pos-contato" data-key="${key}">Contato feito</button>`}</td></tr>
     <tr><td>WhatsApp pós</td><td>${po?.whatsapp_em?`<span class="fl ok">✔ ${dm(po.whatsapp_em)}</span>`:`<button class="btn small okb" data-act="pos-whats" data-key="${key}">Enviar</button>`}</td></tr></table></div>`;
 }
-function telaPipe(tipo){
+function telaPipe(tipo,semCab){
   const P=PIPE[tipo]; if(S.fSubTipo!==tipo){ S.fSub=""; S.fSubTipo=tipo; }
   const todos=S.casos.filter(c=>c.tipo===tipo&&!["desistiu"].includes(c.etapa));
   const base=todos.filter(noLocal).filter(c=>passaSub(c)&&passaPag(c,S.fPag)&&passaSitP(c,S.fSit));
@@ -2282,7 +2284,7 @@ function telaPipe(tipo){
   }).join("");
   const colArq=`<section class="col col-arq"><h3><span>🗄 Arquivadas</span><span class="count">${arqs.length}</span></h3><div class="col-desc">Sem movimento há mais de ${DIAS_ARQ} dias. Continuam guardadas para ações futuras (campanha, retorno). Use ↺ Reativar ou arraste para uma etapa.</div>${arqs.sort((a,b)=>(ultAtiv(b)||"").localeCompare(ultAtiv(a)||"")).map(cardArq).join("")||'<div class="empty">Nenhuma arquivada.</div>'}</section>`;
   const perdidos=S.casos.filter(c=>c.tipo===tipo&&c.etapa==="desistiu"&&noLocal(c)).length;
-  return `<div class="sec-head"><div><h2>${P.titulo}</h2><div class="sub">${P.sub}</div></div><button class="btn" data-act="novo">+ Nova indicação</button></div>
+  return `${semCab?`<div class="sub" style="margin-bottom:8px">${P.sub}</div>`:`<div class="sec-head"><div><h2>${P.titulo}</h2><div class="sub">${P.sub}</div></div><button class="btn" data-act="novo">+ Nova indicação</button></div>`}
   ${tipo!=="cirurgia"?`<div class="legend"><span class="chip late">D+30 vencida</span><span class="chip warn">D+14 agendar</span><span class="chip ok">em dia / agendada</span><span class="chip blue">ciclo completo</span></div>`:""}
   ${barraFiltrosPipe(todos,tipo)}
   <div class="board" id="board">${cols}${colArq}</div>
