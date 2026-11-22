@@ -12,7 +12,7 @@ import {
 
 const IMG = "img/";
 const LOGO = IMG + "logo-dra-renata-bertazzi-web.png";
-const HERO_PHOTO = IMG + "dra-renata-consultorio.webp";
+const HERO_PHOTO = IMG + "dra-renata-bertazzi-oftalmologista-palmas.webp";
 const ABOUT_PHOTO = IMG + "dra-renata-bertazzi-oftalmologista-palmas.webp";
 const CARE_PHOTO = IMG + "cirurgia-catarata-cuidado-paciente.webp";
 
@@ -187,7 +187,7 @@ function Hero() {
             <img
               src={HERO_PHOTO}
               alt="Dra. Renata Bertazzi, médica oftalmologista em Palmas, em seu consultório"
-              className="aspect-[4/5] w-full object-cover object-[50%_15%] [filter:contrast(1.03)_saturate(0.94)]"
+              className="aspect-[4/5] w-full object-cover object-[50%_20%]"
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#004AAD]/15 via-transparent to-transparent" />
           </figure>
