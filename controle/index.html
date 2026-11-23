@@ -292,6 +292,9 @@ a.btn.bm{display:inline-block;cursor:grab;text-decoration:none}
 .close{background:#f0ece5;border:0;border-radius:50%;width:36px;height:36px;font-size:1.2rem;line-height:1}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .box{border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:8px}
+.ex-prev{margin-top:6px} .ex-prev summary{cursor:pointer;color:var(--accent);font-size:.82rem}
+.ex-prev-t{white-space:pre-wrap;font-size:.84rem;line-height:1.45;background:#e9f6ee;border:1px solid #cfe8d8;border-radius:12px;padding:10px 12px;margin-top:6px;color:var(--ink)}
+.ex-ed{display:grid;gap:12px} @media(min-width:760px){.ex-ed{grid-template-columns:1fr 1fr;align-items:start}}
 .sesslist{display:grid;gap:6px}
 .sess{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;border-bottom:1px dashed var(--line);padding-bottom:6px}
 .fab{position:fixed;right:16px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:11;border:0;border-radius:999px;background:var(--accent);color:#fff;font-weight:700;padding:14px 18px;box-shadow:0 14px 30px -12px rgba(24,41,74,.6)}
@@ -2577,14 +2580,14 @@ const EX_CID=[["ret_diab",/H36\.?0|RETINOPATIA DIAB|EDEMA MACULAR DIAB|\bRDNP\b|
 // Tom: humano e sério, sem emojis, sem diagnóstico e sem lista de exames; com a data e o tempo desde a última consulta.
 const EX_MSG_TIT={retina:"Retina tratada / DMRI / retinopatia já tratada (3 meses)",diabetes:"Diabetes / retinopatia sem tratamento (6 meses)",glaucoma:"Glaucoma e suspeita (6 meses)",catarata:"Catarata a operar (6 meses)",poscir:"Pós-catarata (6 meses no 1º ano, depois 12)",anual:"Checkup anual · 65+ · 70+ · hipertensão/miopia (12 meses)",incompleto:"Checkup · exames incompletos",nunca:"Checkup · nunca fez exames"};
 const EX_MSG={
-  retina:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\nA sua última consulta com a Dra. foi em {data_consulta}, há {tempo}. Pelo seu histórico de tratamento da retina, o acompanhamento precisa ser frequente para confirmar que tudo segue estável. Alterações podem voltar sem dar sintomas, por isso a reavaliação no prazo faz diferença.\n\n{contato}",
-  diabetes:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\nA sua última consulta com a Dra. foi em {data_consulta}, há {tempo}. Pelo seu histórico, a retina precisa ser avaliada a cada 6 meses. As alterações costumam começar sem sintomas, e identificar cedo é o que protege a visão.\n\n{contato}",
-  glaucoma:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\nA sua última consulta com a Dra. foi em {data_consulta}, há {tempo}. No acompanhamento da pressão e do nervo do olho, as reavaliações regulares são o que mantém a visão protegida, mesmo quando não há nenhum sintoma.\n\n{contato}",
-  catarata:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\nA sua última consulta com a Dra. foi em {data_consulta}, há {tempo}. Na sua última avaliação, a Dra. acompanhou a transparência do cristalino, a lente natural do olho, e gostaria de reavaliar. Se ler, ver televisão ou dirigir à noite ficou mais difícil, vale comentar na consulta.\n\nSe {pronome} já fez cirurgia de catarata, mesmo em outro lugar, por favor nos avise para ajustarmos o seu acompanhamento.\n\n{contato}",
+  retina:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Pelo seu histórico de tratamento da retina, o acompanhamento precisa ser frequente para confirmar que tudo segue estável. Alterações podem voltar sem dar sintomas, por isso a reavaliação no prazo faz diferença.\n\n{contato}",
+  diabetes:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Pelo seu histórico, a retina precisa ser avaliada a cada 6 meses. As alterações costumam começar sem sintomas, e identificar cedo é o que protege a visão.\n\n{contato}",
+  glaucoma:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} No acompanhamento da pressão e do nervo do olho, as reavaliações regulares são o que mantém a visão protegida, mesmo quando não há nenhum sintoma.\n\n{contato}",
+  catarata:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Na sua última avaliação, a Dra. acompanhou a transparência do cristalino, a lente natural do olho, e gostaria de reavaliar. Se ler, ver televisão ou dirigir à noite ficou mais difícil, vale comentar na consulta.\n\nSe {pronome} já fez cirurgia de catarata, mesmo em outro lugar, por favor nos avise para ajustarmos o seu acompanhamento.\n\n{contato}",
   poscir:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{cirurgia} A Dra. gostaria de ver {pronome} para a revisão {revisao} da lente intraocular e da retina.\n\n{contato}",
-  anual:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\nA sua última consulta com a Dra. foi em {data_consulta}, há {tempo}. Mesmo sem queixas, a recomendação é avaliar os olhos uma vez por ano, porque alterações como glaucoma, catarata e problemas de retina podem começar sem sintomas.{ano_novo}{aviso_catarata}\n\n{contato}",
-  incompleto:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\nA sua última consulta com a Dra. foi em {data_consulta}, há {tempo}. Na ocasião, ficaram faltando alguns exames complementares para concluir a sua avaliação. Mesmo sem queixas, a recomendação é avaliar os olhos uma vez por ano, porque alterações como glaucoma, catarata e problemas de retina podem começar sem sintomas.{ano_novo}\n\n{contato}",
-  nunca:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\nA sua última consulta com a Dra. foi em {data_consulta}, há {tempo}. Ainda não constam no seu cadastro os exames do checkup ocular anual. Mesmo sem queixas, a recomendação é avaliar os olhos uma vez por ano, porque alterações como glaucoma, catarata e problemas de retina podem começar sem sintomas.{ano_novo}\n\n{contato}"};
+  anual:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Mesmo sem queixas, a recomendação é avaliar os olhos uma vez por ano, porque alterações como glaucoma, catarata e problemas de retina podem começar sem sintomas.{ano_novo}{aviso_catarata}\n\n{contato}",
+  incompleto:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Na ocasião, ficaram faltando alguns exames complementares para concluir a sua avaliação. Mesmo sem queixas, a recomendação é avaliar os olhos uma vez por ano, porque alterações como glaucoma, catarata e problemas de retina podem começar sem sintomas.{ano_novo}\n\n{contato}",
+  nunca:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Ainda não constam no seu cadastro os exames do checkup ocular anual. Mesmo sem queixas, a recomendação é avaliar os olhos uma vez por ano, porque alterações como glaucoma, catarata e problemas de retina podem começar sem sintomas.{ano_novo}\n\n{contato}"};
 function exMsgDe(k){ try{ return localStorage.getItem("exMsg3_"+k)||EX_MSG[k]; }catch(e){ return EX_MSG[k]; } }
 const EX_NOMES=[[/OCT[^+,]*(PAPILA|NERVO|GLAUC)|PAPILA|CAMADA DE FIBRAS/,"OCT de nervo óptico"],[/MAPEAMENTO|\bMAP\b/,"Mapeamento de retina"],[/RETINOGRAF|\bRETINO\b/,"Retinografia"],[/TOMOGRAFIA DE COER|\bOCT\b/,"OCT de mácula"],[/CAMPIMETR|CAMPO VISUAL|\bCAM\b|\bCAMPO\b/,"Campimetria"],[/MICROSCOPIA ESPEC|\bMICRO\b|\bMICR\b/,"Microscopia especular"],[/CERATOSCOP|\bCERA\b/,"Ceratoscopia"],[/PAQUIMETR|\bPAQUI\b/,"Paquimetria"],[/BIOMETRIA|\bBIO\b/,"Biometria"],[/TOPOGRAF/,"Topografia"],[/GONIOSCOP/,"Gonioscopia"],[/TONOMETR|\bTONO\b/,"Tonometria"],[/FUNDOSCOP/,"Fundoscopia"],[/MOTILIDADE|\bMOT\b/,"Motilidade ocular"],[/ULTRASSON/,"Ultrassom"]];
 function nomesExames(a){ const t=(String(a.itens||"")+" "+String(a.descricao||"").replace(/#.*$/,"")).toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g,""); const out=[]; EX_NOMES.forEach(([re,n])=>{ if(re.test(t)&&!out.includes(n)) out.push(n); }); if(out.includes("OCT de nervo óptico")&&!/OCT[^+,]*MACUL/.test(t)) return out.filter(x=>x!=="OCT de mácula"); return out; }
@@ -2699,7 +2702,8 @@ function telaExames(){
       <small><span class="ttag ${P.conv?"t-injecao":"t-cirurgia"}">${esc(P.plano)}</span> ${esc(P.local||"")}${P.idade!=null?` · ${P.idade} anos`:""} · último atendimento ${br(P.base)}</small>
       <div class="ex-hist"><span class="ex-lab">Por quê</span><span class="ex-por">${esc(P.sinais.filter(x=>!/ anos$/.test(x)).join(" · ")||G.por)}</span><button class="linkbtn ex-cond" data-act="ex-cond" data-k="${esc(P.k)}">${exCond(P.k).length?"editar condições":"+ condição (diabetes, glaucoma…)"}</button></div>
       <div class="ex-hist"><span class="ex-lab">Últimos exames${P.exData?" "+dm(P.exData):""}</span>${P.exames.length?P.exames.map(e=>`<span class="fl ex-tag">${esc(e)}</span>`).join(""):`<span class="ex-por">nenhum exame registrado</span>`}</div>
-      <div class="ex-hist"><span class="ex-lab">Sugeridos</span>${P.sug.map(s=>`<span class="fl ex-sug">${esc(s.e)}${s.novo?` <i>novo</i>`:""}</span>`).join("")}</div></div>
+      <div class="ex-hist"><span class="ex-lab">Sugeridos</span>${P.sug.map(s=>`<span class="fl ex-sug">${esc(s.e)}${s.novo?` <i>novo</i>`:""}</span>`).join("")}</div>
+      ${["marcado","ciclo"].includes(P.sit)?"":`<details class="ex-prev"><summary>Ver a mensagem</summary><div class="ex-prev-t">${esc(textoExMsg(P))}</div></details>`}</div>
       <div class="inj-acts">${acts}</div></div>`; };
   return `<div class="sec-head"><div><h2>Exames</h2><div class="sub">Triagem por risco para chamar o paciente de volta e completar os exames</div></div><span class="actions"><button class="btn ghost" data-act="ex-import">Importar diagnósticos</button><button class="btn ghost" data-act="ex-msg">Mensagens por grupo</button></span></div>
   <details class="panel resumo ex-como"><summary><b>Como funciona a triagem</b> · grupos, prazos e exames</summary>
@@ -2742,7 +2746,7 @@ function contatoAgenda(local){ return /^OA\b/.test(local||"")?"Para agendar, res
   : /^OPUS/.test(local||"")?"Para agendar, responda esta mensagem ou chame no WhatsApp (63) 3028-1483.":"Para agendar, é só responder esta mensagem."; }
 function tempoDesde(iso0){ const a=parse(iso0), b=hoje(); let m=(b.getFullYear()-a.getFullYear())*12+(b.getMonth()-a.getMonth()); if(b.getDate()<a.getDate()) m--;
   if(m<1) return "menos de um mês"; if(m<12) return m===1?"1 mês":m+" meses"; const y=Math.floor(m/12), r=m%12; return (y===1?"1 ano":y+" anos")+(r?` e ${r===1?"1 mês":r+" meses"}`:""); }
-function textoExMsg(P){
+function textoExMsg(P,modelo){
   const sx=sexoDe(P), key=chaveExMsg(P), d=parse(P.base);
   const mesAno=x=>x.toLocaleDateString("pt-BR",{month:"long"})+" de "+x.getFullYear();
   const mes=hoje().getMonth(), anoNovo=[10,11,0].includes(mes), proxAno=mes===0?hoje().getFullYear():hoje().getFullYear()+1;
@@ -2751,11 +2755,12 @@ function textoExMsg(P){
   const cirurgia=fc?`${Pron} fez a sua cirurgia de catarata com a Dra. Renata em ${mesAno(fc)}.`:`${Pron} já fez cirurgia de catarata, e a sua última consulta com a Dra. foi em ${d.toLocaleDateString("pt-BR",{day:"numeric",month:"long",year:"numeric"})}, há ${tempoDesde(P.base)}.`;
   const V={trat:sx==="f"?"Sra.":"Sr.",nome:primeiroNome(P.nome),pronome:pron,Pronome:Pron,
     data_consulta:d.toLocaleDateString("pt-BR",{day:"numeric",month:"long",year:"numeric"}),tempo:tempoDesde(P.base),
+    ultima:(P.exData&&key!=="nunca")?`Os seus últimos exames com a Dra. foram em ${parse(P.exData).toLocaleDateString("pt-BR",{day:"numeric",month:"long",year:"numeric"})}, há ${tempoDesde(P.exData)}.`:`A sua última consulta com a Dra. foi em ${d.toLocaleDateString("pt-BR",{day:"numeric",month:"long",year:"numeric"})}, há ${tempoDesde(P.base)}.`,
     contato:contatoAgenda(P.local),cirurgia,revisao:fc&&desde(P.facoData)<=365?"de 6 meses":"anual",
     ano_novo:anoNovo?` Que tal já começar ${proxAno} com o checkup ocular em dia?`:"",
     aviso_catarata:P.g==="cat70"?`\n\nSe ${pron} já fez cirurgia de catarata, mesmo em outro lugar, por favor nos avise para ajustarmos o seu acompanhamento.`:"",
     ano:String(proxAno),meses:String(Math.floor((P.diasAt||0)/30)),data_mes:mesAno(d),data_atend:br(P.base)};
-  return exMsgDe(key).replace(/\{(\w+)\}/g,(m,k)=>V[k]!==undefined?V[k]:m).replace(/\n{3,}/g,"\n\n").trim();
+  return (modelo||exMsgDe(key)).replace(/\{(\w+)\}/g,(m,k)=>V[k]!==undefined?V[k]:m).replace(/\n{3,}/g,"\n\n").trim();
 }
 function folhaExWhats(P){
   const f=telIntl(P.tel), G=EX_G[P.g];
@@ -2765,8 +2770,11 @@ function folhaExWhats(P){
 }
 function folhaExMsg(){
   const g=EX_MSG[S.exMsgG]?S.exMsgG:"anual";
-  abrir(`<header><div><h2>Mensagens por grupo</h2><div class="sub">Use {trat} (Sr./Sra.), {nome}, {pronome}/{Pronome} (o senhor/a senhora), {data_consulta} (12 de março de 2026), {tempo} (há quanto tempo), {cirurgia}, {revisao}, {ano_novo} (só de nov a jan), {aviso_catarata} e {contato} (telefones da clínica do paciente)</div></div><button class="close" data-close aria-label="Fechar">×</button></header>
-  <form id="fexm" class="form"><label>Grupo<select id="exMsgG">${Object.entries(EX_MSG_TIT).map(([k,t])=>`<option value="${k}" ${k===g?"selected":""}>${t}</option>`).join("")}</select></label><label>Texto<textarea id="exMsgTx" rows="10">${esc(exMsgDe(g))}</textarea></label><button class="btn" type="submit">Salvar</button><button class="btn ghost" type="button" id="exMsgPad">Voltar ao padrão</button></form>`);
+  abrir(`<header><div><h2>Mensagens por grupo</h2><div class="sub">Use {trat} (Sr./Sra.), {nome}, {ultima} (últimos exames ou última consulta, com a data e há quanto tempo), {pronome}/{Pronome} (o senhor/a senhora), {data_consulta} (12 de março de 2026), {tempo} (há quanto tempo), {cirurgia}, {revisao}, {ano_novo} (só de nov a jan), {aviso_catarata} e {contato} (telefones da clínica do paciente)</div></div><button class="close" data-close aria-label="Fechar">×</button></header>
+  <form id="fexm" class="form"><label>Grupo<select id="exMsgG">${Object.entries(EX_MSG_TIT).map(([k,t])=>`<option value="${k}" ${k===g?"selected":""}>${t}</option>`).join("")}</select></label><div class="ex-ed"><label>Texto<textarea id="exMsgTx" rows="12">${esc(exMsgDe(g))}</textarea></label><div><span class="rb-lab">Como fica (exemplo de um paciente do grupo)</span><div class="ex-prev-t" id="exMsgPrev"></div></div></div><button class="btn" type="submit">Salvar</button><button class="btn ghost" type="button" id="exMsgPad">Voltar ao padrão</button></form>`);
+  const ex=pacientesExames().find(P=>chaveExMsg(P)===g&&P.sit==="enviar")||pacientesExames().find(P=>chaveExMsg(P)===g);
+  const prev=()=>{ const el=$("#exMsgPrev"); if(el) el.textContent=ex?textoExMsg(ex,$("#exMsgTx").value):"Nenhum paciente neste grupo agora."; };
+  $("#exMsgTx").addEventListener("input",prev); prev();
   $("#exMsgG").addEventListener("change",e=>{ S.exMsgG=e.target.value; folhaExMsg(); });
   $("#fexm").addEventListener("submit",e=>{ e.preventDefault(); try{ localStorage.setItem("exMsg3_"+g,$("#exMsgTx").value); }catch(err){} fechar(); toast("Mensagem salva ✔"); });
   $("#exMsgPad").addEventListener("click",()=>{ $("#exMsgTx").value=EX_MSG[g]; });
