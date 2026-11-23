@@ -2565,6 +2565,8 @@ const EX_GRUPOS=[
   {k:"glaucoma",nome:"Glaucoma",cor:"late",dias:180,ex:["Campimetria","OCT de nervo óptico","Tonometria","Gonioscopia"],por:"glaucoma (H40.1–H40.9): AAO recomenda campo visual e OCT de nervo periodicamente; regra da clínica 6 meses"},
   {k:"diabetes",nome:"Diabetes sem retinopatia",cor:"warn",dias:180,ex:["Mapeamento de retina","Retinografia","OCT de mácula"],por:"diabetes (E10–E14) sem retinopatia registrada: AAO pede exame de retina dilatado ao menos 1x/ano; regra da clínica 6 meses"},
   {k:"suspglauc",nome:"Suspeita de glaucoma",cor:"warn",dias:180,ex:["Campimetria","OCT de nervo óptico","Tonometria","Paquimetria"],por:"suspeita de glaucoma (H40.0), glaucoma na família ou exames de investigação no histórico: reavaliar nervo e pressão a cada 6–12 meses"},
+  {k:"uveite",nome:"Uveíte / inflamação ocular",cor:"warn",dias:180,ex:["Mapeamento de retina","Tonometria","OCT de mácula"],por:"uveíte (H20, H30, H44.1): pode voltar e alterar a pressão do olho e a mácula; reavaliar a cada 6 meses"},
+  {k:"ceratocone",nome:"Ceratocone",cor:"warn",dias:180,ex:["Topografia","Paquimetria","Ceratoscopia"],por:"ceratocone (H18.6): acompanhar a progressão da córnea com topografia a cada 6 meses"},
   {k:"catarata",nome:"Catarata a operar",cor:"warn",dias:180,ex:["Biometria","Microscopia especular","Ceratoscopia","Mapeamento de retina"],por:"catarata diagnosticada (H25–H26) e ainda não operada: reavaliar e deixar os exames pré-operatórios prontos"},
   {k:"poscir",nome:"Pós-cirurgia de catarata",cor:"blue",dias:365,ex:["Mapeamento de retina","Tonometria","Microscopia especular"],por:"pseudofacia (Z96.1) ou cirurgia de catarata no histórico: revisão da retina e da pressão do olho"},
   {k:"idoso",nome:"65 anos ou mais",cor:"blue",dias:365,ex:["Tonometria","Mapeamento de retina","Retinografia","Microscopia especular"],por:"65+: mais risco de glaucoma, DMRI e catarata (AAO: avaliação a cada 1–2 anos; aqui anual, com lembrete aos 11 meses). A partir dos 70 a mensagem pede para avisar se já operou catarata em outro lugar"},
@@ -2573,11 +2575,11 @@ const EX_GRUPOS=[
 const EX_PART=["retdiab","retina"]; // grupos que também incluem particular (e 65+ a partir dos 70)
 const EX_LEVE=["checkup","idoso","has","poscir"]; // grupos de checkup: abordagem por tempo sem retorno
 const EX_G=Object.fromEntries(EX_GRUPOS.map(g=>[g.k,g]));
-const EX_COND=[["diabetes","Diabetes (E10–E14)"],["ret_diab","Retinopatia diabética (H36.0)"],["glaucoma","Glaucoma (H40.1–H40.9)"],["susp_glauc","Suspeita de glaucoma (H40.0)"],["fam_glaucoma","Glaucoma na família"],["dmri","DMRI (H35.3)"],["descol","Descolamento / retina operada (H33)"],["retina_vasc","Oclusão vascular da retina (H34)"],["catarata","Catarata não operada (H25–H26)"],["pseudo","Já operou catarata (Z96.1)"],["has","Hipertensão (I10)"],["miopia","Alta miopia (−6,00 ou mais)"]];
+const EX_COND=[["diabetes","Diabetes (E10–E14)"],["ret_diab","Retinopatia diabética (H36.0)"],["glaucoma","Glaucoma (H40.1–H40.9)"],["susp_glauc","Suspeita de glaucoma (H40.0)"],["fam_glaucoma","Glaucoma na família"],["dmri","DMRI (H35.3)"],["descol","Descolamento / retina operada (H33)"],["retina_vasc","Oclusão vascular da retina (H34)"],["uveite","Uveíte (H20, H30, H44.1)"],["ceratocone","Ceratocone (H18.6)"],["catarata","Catarata não operada (H25–H26)"],["pseudo","Já operou catarata (Z96.1)"],["has","Hipertensão (I10)"],["miopia","Alta miopia (−6,00 ou mais)"]];
 // CID / texto do diagnóstico -> condição (para importar planilha do prontuário)
-const EX_CID=[["ret_diab",/H36\.?0|\bE1[0-4]\.?3|RETINOPATIA DIAB|EDEMA MACULAR DIAB|\bRDNP\b|\bRDP\b|\bEMD\b/],["diabetes",/\bE1[0-4]|DIABET|\bDM ?(I|II|1|2)?\b/],["susp_glauc",/H40\.?0|SUSPEIT[AO] DE GLAUC|HIPERTENSAO OCULAR/],["glaucoma",/H40\.?[1-9]|H42|(?<!SUSPEITA DE |SUSPEITO DE )GLAUCOMA/],["dmri",/H35\.?3|DMRI|DEGENERACAO MACULAR/],["descol",/H33|DESCOLAMENTO DE RETINA|BURACO MACULAR/],["pseudo",/Z96\.?1|PSEUDOFAC/],["catarata",/H2[5-6]|CATARATA/],["has",/\bI10\b|HIPERTENSAO ARTERIAL|\bHAS\b/],["retina_vasc",/\bH34|OCLUS[AÃ]O (DE )?(VEIA|ARTERIA|VASCULAR)|\bOVCR\b|\bORVR\b|\bOACR\b/],["miopia",/ALTA MIOPIA/]];
+const EX_CID=[["ret_diab",/H36\.?0|\bE1[0-4]\.?3|RETINOPATIA DIAB|EDEMA MACULAR DIAB|\bRDNP\b|\bRDP\b|\bEMD\b/],["diabetes",/\bE1[0-4]|DIABET|\bDM ?(I|II|1|2)?\b/],["susp_glauc",/H40\.?0|SUSPEIT[AO] DE GLAUC|HIPERTENSAO OCULAR/],["glaucoma",/H40\.?[1-9]|H42|(?<!SUSPEITA DE |SUSPEITO DE )GLAUCOMA/],["dmri",/H35\.?3|DMRI|DEGENERACAO MACULAR/],["descol",/H33|DESCOLAMENTO DE RETINA|BURACO MACULAR/],["pseudo",/Z96\.?1|PSEUDOFAC/],["catarata",/H2[5-6]|CATARATA/],["has",/\bI10\b|HIPERTENSAO ARTERIAL|\bHAS\b/],["retina_vasc",/\bH34|OCLUS[AÃ]O (DE )?(VEIA|ARTERIA|VASCULAR)|\bOVCR\b|\bORVR\b|\bOACR\b/],["miopia",/ALTA MIOPIA/],["ceratocone",/H18\.?6|CERATOCONE/],["uveite",/\bH20|\bH30|H44\.?1|UVEITE|IRIDOCICLITE|CORIORRETINITE|PARS PLANITE/]];
 // Tom: humano e sério, sem emojis, sem diagnóstico e sem lista de exames; com a data e o tempo desde a última consulta.
-const EX_MSG_TIT={onze:"Checkup anual · 11 meses (sem fator de risco)",retina:"Retina tratada / DMRI / retinopatia já tratada (3 meses)",diabetes:"Diabetes / retinopatia sem tratamento (6 meses)",glaucoma:"Glaucoma e suspeita (6 meses)",catarata:"Catarata a operar (6 meses)",poscir:"Pós-catarata (6 meses no 1º ano, depois 12)",anual:"Checkup anual · 65+ · 70+ · hipertensão/miopia (12 meses)",incompleto:"Checkup · exames incompletos",nunca:"Checkup · nunca fez exames"};
+const EX_MSG_TIT={onze:"Checkup anual · 11 meses (sem fator de risco)",retina:"Retina tratada / DMRI / retinopatia já tratada (3 meses)",diabetes:"Diabetes / retinopatia sem tratamento (6 meses)",glaucoma:"Glaucoma, suspeita, uveíte e ceratocone (6 meses)",catarata:"Catarata a operar (6 meses)",poscir:"Pós-catarata (6 meses no 1º ano, depois 12)",anual:"Checkup anual · 65+ · 70+ · hipertensão/miopia (12 meses)",incompleto:"Checkup · exames incompletos",nunca:"Checkup · nunca fez exames"};
 const EX_MSG={
   onze:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Está chegando a hora do seu checkup ocular anual. Mesmo sem sintomas, é importante avaliar os olhos uma vez por ano.{ano_novo}\n\n{contato}\n\nVamos cuidar juntos da sua visão.",
   retina:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} É importante manter o acompanhamento em dia, mesmo sem sintomas.\n\n{contato}\n\nVamos cuidar juntos da sua visão.",
@@ -2620,6 +2622,8 @@ function classificaEx(P){
   if(cond.includes("miopia")) sinais.push("alta miopia"+((S.pacCid||{})[P.k]?.esf!=null&&(S.pacCid||{})[P.k].esf<=-6?` (${String((S.pacCid||{})[P.k].esf).replace(".",",")})`:""));
   if(cond.includes("descol")) sinais.push("descolamento / retina operada");
   if(cond.includes("retina_vasc")) sinais.push("oclusão vascular da retina");
+  if(cond.includes("uveite")) sinais.push("uveíte");
+  if(cond.includes("ceratocone")) sinais.push("ceratocone");
   if(cidTxt) sinais.push("CID no prontuário: "+cidTxt);
   if(cond.includes("ret_diab")) sinais.push("retinopatia diabética");
   if(cond.includes("catarata")&&!pos) sinais.push("catarata diagnosticada");
@@ -2632,6 +2636,8 @@ function classificaEx(P){
     : tem("glaucoma") ? "glaucoma"
     : diab ? "diabetes"
     : (gl||tem("susp_glauc")) ? "suspglauc"
+    : tem("uveite") ? "uveite"
+    : tem("ceratocone") ? "ceratocone"
     : (tem("catarata")&&!pos&&!tem("pseudo")) ? "catarata"
     : (pos||tem("pseudo")) ? "poscir"
     : (id!=null&&id>=65) ? "idoso"
@@ -2694,7 +2700,7 @@ function telaExames(){
   const st=S.exSt||"enviar", gr=S.exGr||"";
   const T=todos.filter(P=>!gr||P.g===gr);
   const n=k=>T.filter(P=>P.sit===k).length;
-  const PRIO=["retdiab","retina","diabetes","poscir","glaucoma","suspglauc","catarata","idoso","has","checkup"];
+  const PRIO=["retdiab","retina","diabetes","poscir","glaucoma","suspglauc","uveite","ceratocone","catarata","idoso","has","checkup"];
   const L=T.filter(P=>st==="todos"?!["emdia","ciclo"].includes(P.sit):P.sit===st).sort((a,b)=>PRIO.indexOf(a.g)-PRIO.indexOf(b.g)||a.falta-b.falta);
   const ch=(k,cls,t)=>`<button class="stat ${cls} ${st===k?"on":""}" data-pset="exSt=${k}" aria-pressed="${st===k}"><b>${n(k)}</b><span>${t}</span></button>`;
   const planos=[...new Set(pacientesExames().map(P=>P.plano.toUpperCase()))].sort();
@@ -2715,7 +2721,7 @@ function telaExames(){
     <ol><li><b>Quem entra:</b> pacientes de <b>convênio</b> atendidos (agenda do EyecareBI + Amigo, desde fev/26). <b>Particular</b> também entra nos grupos de cuidado de <b>retina grave</b> (retinopatia diabética, retina tratada/DMRI) e no <b>70+ sem catarata</b>. Use o filtro Pagamento para separar. Quem está em ciclo de injeção fica de fora.</li>
     <li><b>Checkup anual da visão (grupos sem doença grave)</b>, separado pela ação da equipe: <b>nunca fez exames</b> → convidar para o checkup; <b>exames incompletos</b> → faltam exames complementares; <b>exames vencidos</b> → último exame passou do prazo do grupo, repetir; <b>checkup anual · 11 meses</b> → veio há 11 meses e não tem fator de risco, lembrar do checkup anual; <b>sem retorno há 12+ meses</b> → reconvidar.</li>
     <li><b>Mapeamos o histórico:</b> exames já feitos, procedimentos (injeção, laser, cirurgias), idade e <b>diagnósticos (CID)</b>. Os CIDs e o grau de miopia vêm <b>sozinhos do prontuário do EyecareBI</b> (leitura noturna); também dá para marcar na mão em "+ condição" (vale junto com o automático). Alta miopia = grau de −6,00 ou mais. Suspeita de glaucoma só com CID H40.0 ou glaucoma na família (tonometria e campimetria de rotina não contam).</li>
-    <li><b>Árvore de decisão</b> (o primeiro ramo que se aplica): Retinopatia diabética → Retina (tratada, DMRI, oclusão vascular, descolamento) → Glaucoma → Diabetes sem retinopatia → Suspeita de glaucoma → Catarata a operar → Pós-catarata → 65+ → Hipertensão/alta miopia → Checkup.</li>
+    <li><b>Árvore de decisão</b> (o primeiro ramo que se aplica): Retinopatia diabética → Retina (tratada, DMRI, oclusão vascular, descolamento) → Glaucoma → Diabetes sem retinopatia → Suspeita de glaucoma → Uveíte → Ceratocone → Catarata a operar → Pós-catarata → 65+ → Hipertensão/alta miopia → Checkup.</li>
     <li><b>Prazo:</b> conta a partir dos últimos exames (ou do último atendimento, se não fez exame). Retina tratada 3 meses; diabetes, glaucoma e catarata a operar 6 meses; pós-catarata 6 meses no 1º ano e depois 12; sem fator de risco 12 meses. Entra em "Enviar agora" quando vence; aparece em "Vence em até 30 dias" antes.</li>
     <li><b>Mensagem:</b> tom humano e sério, sem emojis e sem detalhar exames nem diagnósticos (a indicação é feita na consulta). Na tela, os exames que o paciente <b>nunca fez</b> aparecem marcados como NOVO, para a equipe.</li>
     <li><b>Sai da lista sozinho</b> quando marca retorno na agenda. Lembrete enviado, adiado (30 dias) ou "não enviar" ficam registrados.</li></ol>
@@ -2748,7 +2754,7 @@ function sexoDe(P){ const c=exCond(P.k); if(c.includes("sexo_f")) return "f"; if
 const exMin=e=>/^OCT/.test(e)?e:e.charAt(0).toLowerCase()+e.slice(1);
 const listaPt=a=>a.length<=1?(a[0]||""):a.slice(0,-1).join(", ")+" e "+a.at(-1);
 // Qual mensagem: pelo grupo de risco; no checkup, pela ação (nunca fez / incompletos / anual)
-function chaveExMsg(P){ return P.g==="poscir"?"poscir":P.g==="retdiab"?(P.tratada?"retina":"diabetes"):P.g==="retina"?"retina":P.g==="diabetes"?"diabetes":["glaucoma","suspglauc"].includes(P.g)?"glaucoma":P.g==="catarata"?"catarata":P.abord==="nunca"?"nunca":P.abord==="onze"?"onze":P.abord==="incompleto"?"incompleto":"anual"; }
+function chaveExMsg(P){ return P.g==="poscir"?"poscir":P.g==="retdiab"?(P.tratada?"retina":"diabetes"):P.g==="retina"?"retina":P.g==="diabetes"?"diabetes":["glaucoma","suspglauc"].includes(P.g)?"glaucoma":["uveite","ceratocone"].includes(P.g)?"glaucoma":P.g==="catarata"?"catarata":P.abord==="nunca"?"nunca":P.abord==="onze"?"onze":P.abord==="incompleto"?"incompleto":"anual"; }
 function contatoAgenda(local){ return /^OA\b/.test(local||"")?"Para agendar, responda esta mensagem ou chame no WhatsApp: https://wa.me/5563984951184\nSe preferir ligar: (63) 3215-3335."
   : /^OPUS/.test(local||"")?"Para agendar, responda esta mensagem ou chame no WhatsApp: https://wa.me/556330281483":"Para agendar, é só responder esta mensagem."; }
 function tempoDesde(iso0){ const a=parse(iso0), b=hoje(); let m=(b.getFullYear()-a.getFullYear())*12+(b.getMonth()-a.getMonth()); if(b.getDate()<a.getDate()) m--;
