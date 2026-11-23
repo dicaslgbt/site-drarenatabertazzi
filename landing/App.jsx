@@ -120,7 +120,7 @@ const CLINICS = [
 /* ---------- primitives ---------- */
 function Eyebrow({ children, light = false }) {
   return (
-    <p className={`flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.28em] ${light ? "text-[#CFE0F3]" : "text-[#004AAD]"}`}>
+    <p className={`flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] ${light ? "text-[#CFE0F3]" : "text-[#004AAD]"}`}>
       <span className={`h-px w-8 ${light ? "bg-[#CFE0F3]" : "bg-[#79A9D2]"}`} />
       {children}
     </p>
@@ -251,13 +251,13 @@ function TreatmentCard({ t, open, onToggle }) {
     <article className={`flex flex-col rounded-2xl border bg-white transition ${open ? "border-[#0E2A57]/30 shadow-[0_30px_60px_-36px_rgba(11,30,54,0.5)]" : "border-[#0E2A57]/10 hover:border-[#0E2A57]/25"}`}>
       {t.img && <img src={t.img} alt={t.imgAlt} loading="lazy" className="aspect-[16/9] w-full rounded-t-2xl object-cover" />}
       <button onClick={onToggle} aria-expanded={open} className="flex w-full flex-col gap-5 p-6 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-[#79A9D2] sm:p-7">
-        <div className="flex items-start justify-end">
-          <span className={`grid h-9 w-9 place-items-center rounded-full border border-[#0E2A57]/15 transition ${open ? "rotate-180 bg-[#004AAD] text-white border-[#004AAD]" : "text-[#004AAD]"}`}>
+        <div>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#004AAD]">{t.tag}</p>
+            <span className={`grid h-9 w-9 place-items-center rounded-full border border-[#0E2A57]/15 transition ${open ? "rotate-180 bg-[#004AAD] text-white border-[#004AAD]" : "text-[#004AAD]"}`}>
             <ChevronDown className="h-4 w-4" />
           </span>
-        </div>
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#004AAD]">{t.tag}</p>
+          </div>
           <h3 className="mt-2 font-serif text-[27px] leading-tight text-[#0E2A57]">{t.title}</h3>
           <p className="mt-3 text-[16.5px] leading-relaxed text-[#33415C]">{t.summary}</p>
         </div>
@@ -344,7 +344,7 @@ function LensQuiz() {
   return (
     <section id="quiz-lente" className="bg-white py-16 lg:py-24">
       <div className="mx-auto max-w-6xl px-5 lg:px-8">
-        <div className="relative overflow-clip rounded-[32px] bg-gradient-to-br from-[#0E2A57] via-[#123A75] to-[#0F5A6E] px-6 py-10 text-white shadow-[0_40px_80px_-40px_rgba(14,42,87,0.6)] sm:px-10 lg:grid lg:grid-cols-2 lg:items-center lg:gap-14 lg:px-14 lg:py-14">
+        <div className="relative overflow-clip rounded-2xl bg-gradient-to-br from-[#0E2A57] via-[#123A75] to-[#0F5A6E] px-6 py-10 text-white shadow-[0_40px_80px_-40px_rgba(14,42,87,0.6)] sm:px-10 lg:grid lg:grid-cols-2 lg:items-center lg:gap-14 lg:px-14 lg:py-14">
           <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[#7CCBB8]/25 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-[#79A9D2]/25 blur-3xl" />
           <div className="relative">
@@ -358,11 +358,11 @@ function LensQuiz() {
               <span className="text-[15px] text-white/75">Leva menos de 1 minuto · resultado na hora</span>
             </div>
           </div>
-          <a href={QUIZ_URL} aria-label="Abrir o quiz da lente" className="relative mt-10 block rounded-3xl bg-white p-6 text-[#0E2A57] shadow-[0_30px_60px_-30px_rgba(0,0,0,0.5)] transition hover:-translate-y-1 lg:mt-0">
+          <a href={QUIZ_URL} aria-label="Abrir o quiz da lente" className="relative mt-10 block rounded-xl bg-white p-6 text-[#0E2A57] shadow-[0_30px_60px_-30px_rgba(0,0,0,0.5)] transition hover:-translate-y-1 lg:mt-0">
             <p className="flex items-center gap-3 text-[13px] font-semibold uppercase tracking-[0.2em] text-[#004AAD]"><span className="grid h-7 w-7 place-items-center rounded-full bg-[#004AAD] text-[13px] text-white">1</span>Como é o seu dia a dia?</p>
             <ul className="mt-5 grid gap-3">
               {opts.map(([t, on]) => (
-                <li key={t} className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-[16px] ${on ? "border-[#004AAD] bg-[#EEF4FB] font-semibold" : "border-[#DCE6F2]"}`}>
+                <li key={t} className={`flex items-center gap-3 rounded-lg border px-4 py-3 text-[16px] ${on ? "border-[#004AAD] bg-[#EEF4FB] font-semibold" : "border-[#DCE6F2]"}`}>
                   <span className={`grid h-6 w-6 flex-none place-items-center rounded-md border-2 ${on ? "border-[#004AAD] bg-[#004AAD] text-white" : "border-[#B9CBE0]"}`}>{on && <CircleCheck className="h-4 w-4" aria-hidden="true" />}</span>
                   {t}
                 </li>
@@ -370,7 +370,7 @@ function LensQuiz() {
             </ul>
             <div className="mt-5 grid grid-cols-3 gap-2 text-center text-[12px] font-semibold tracking-[-0.01em] min-[400px]:text-[13px]">
               {[["Longe", "dirigir, TV"], ["Intermediário", "computador"], ["Perto", "celular, leitura"]].map(([a, b]) => (
-                <div key={a} className="min-w-0 rounded-lg bg-[#E2F3EF] px-1 py-3 text-[#0F5A4E]"><Eye className="mx-auto mb-1 h-5 w-5" aria-hidden="true" />{a}<span className="block text-[11.5px] font-normal text-[#33615A] min-[400px]:text-[12px]">{b}</span></div>
+                <div key={a} className="min-w-0 rounded-lg bg-[#E2F3EF] px-1 py-3 text-[#0F5A4E]">{a}<span className="block text-[11.5px] font-normal text-[#33615A] min-[400px]:text-[12px]">{b}</span></div>
               ))}
             </div>
           </a>
@@ -405,9 +405,7 @@ function Safety() {
         <div className="mt-12 grid gap-4 sm:grid-cols-2">
           {items.map(([Icon, t, d], i) => (
             <div key={t} className="flex gap-5 rounded-2xl bg-white p-6 shadow-[0_16px_40px_-30px_rgba(0,74,173,0.5)] ring-1 ring-[#79A9D2]/30">
-              <span className={`grid h-14 w-14 flex-none place-items-center rounded-2xl ${i % 2 ? "bg-[#DDF1EC] text-[#2C7A66]" : "bg-[#EAF2FB] text-[#004AAD]"}`}>
-                <Icon className="h-6 w-6" strokeWidth={1.7} />
-              </span>
+              <span className="w-9 flex-none pt-0.5 font-serif text-[26px] leading-none text-[#004AAD] [font-variant-numeric:lining-nums]">{"0" + (i + 1)}</span>
               <div>
                 <h3 className="text-[18px] font-semibold leading-snug text-[#0E2A57]">{t}</h3>
                 <p className="mt-1.5 text-[16px] leading-relaxed text-[#33415C]">{d}</p>
@@ -415,7 +413,7 @@ function Safety() {
             </div>
           ))}
         </div>
-        <div className="relative mt-6 overflow-clip rounded-3xl bg-gradient-to-br from-[#004AAD] via-[#1F63C4] to-[#2F7FDC] p-7 text-white shadow-[0_30px_60px_-36px_rgba(0,74,173,0.8)] sm:p-10">
+        <div className="relative mt-6 overflow-clip rounded-2xl bg-gradient-to-br from-[#004AAD] via-[#1F63C4] to-[#2F7FDC] p-7 text-white shadow-[0_30px_60px_-36px_rgba(0,74,173,0.8)] sm:p-10">
           <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#7CCBB8]/30 blur-3xl" />
           <h3 className="relative font-serif text-[30px] leading-tight sm:text-[36px]">Checklist de cirurgia segura</h3>
           <p className="relative mt-3 max-w-2xl text-[17px] leading-relaxed text-white/85">Antes de começar, a equipe para e confere, em voz alta, os pontos essenciais. É um protocolo recomendado pela Organização Mundial da Saúde.</p>
@@ -489,7 +487,7 @@ function Routine() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <Eyebrow>Por dentro da rotina</Eyebrow>
-            <h2 className="mt-5 font-serif text-[36px] leading-[1.1] text-[#0E2A57] sm:text-[44px]">Cada etapa conferida, para você operar tranquilo.</h2>
+            <h2 className="mt-5 font-serif text-[36px] leading-[1.1] text-[#0E2A57] sm:text-[44px]">Cada detalhe conferido, da consulta à cirurgia.</h2>
           </div>
           <p className="max-w-sm text-[16px] leading-relaxed text-[#33415C] lg:text-right">Do consultório ao centro cirúrgico, a mesma médica cuida de cada detalhe.</p>
         </div>
@@ -557,10 +555,7 @@ function About() {
           </div>
           <ul className="mt-10 grid content-start gap-4">
             {pillars.map(([Icon, title, text]) => (
-              <li key={title} className="flex gap-5 rounded-2xl bg-white p-6 shadow-[0_16px_40px_-30px_rgba(0,74,173,0.5)]">
-                <span className="grid h-11 w-11 flex-none place-items-center rounded-full bg-[#EAF2FB]">
-                  <Icon className="h-5 w-5 text-[#004AAD]" strokeWidth={1.7} />
-                </span>
+              <li key={title} className="rounded-xl border-l-2 border-[#004AAD] bg-white p-6 shadow-[0_16px_40px_-30px_rgba(0,74,173,0.5)]">
                 <div>
                   <h3 className="text-[18px] font-semibold text-[#0E2A57]">{title}</h3>
                   <p className="mt-1.5 text-[16px] leading-relaxed text-[#33415C]">{text}</p>
