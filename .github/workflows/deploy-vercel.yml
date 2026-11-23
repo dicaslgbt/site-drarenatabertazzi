@@ -1,0 +1,23 @@
+# Publica o site na Vercel a cada push na main deste repositório (dicaslgbt/site-drarenatabertazzi).
+# Precisa do secret VERCEL_TOKEN (Settings → Secrets and variables → Actions).
+name: Publicar na Vercel
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: vercel-prod
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: team_V1enOzsxBGjKdnbwQvq6nIwj
+      VERCEL_PROJECT_ID: prj_NPJK05lySybcis8wkfpFl1dcofiZ
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publicar
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then echo "Falta o secret VERCEL_TOKEN"; exit 1; fi
+          npx --yes vercel@39.1.0 deploy --prod --yes --token "$VERCEL_TOKEN"
