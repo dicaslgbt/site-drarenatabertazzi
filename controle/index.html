@@ -2167,8 +2167,9 @@ window.completarTelefones=async function(itens){
 // pacote (gzip+base64): {fonte, pacientes:[{nome, cirurgias:[{data,olho,status}], trechos:[{data,origem,texto,olho?}]}]}
 // Prioridade: prontuário > planilha. Caso editado à mão (lente_fonte='manual') nunca é tocado.
 // Olho e data da cirurgia: só preenche o que está vazio.
+const colunasLente=()=>!S.casos.length||Object.prototype.hasOwnProperty.call(S.casos[0],"lente_fonte");
 const ehFaco=c=>c.tipo==="cirurgia"&&(/FACO|FACECT|CATARAT|LIO|LENTE/i.test(c.procedimento||"")||!c.procedimento);
-window.receberLentes=async function(pacote,opc){ opc=opc||{};
+window.receberLentes=async function(pacote,opc){ opc=opc||{}; if(!colunasLente()) return {erro:"faltam as colunas de lente no banco: rode controle/sql/2026-11-23-lentes.sql"};
   const bin=Uint8Array.from(atob(pacote),c=>c.charCodeAt(0));
   const p=JSON.parse(await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"))).text());
   const res={fonte:p.fonte,pacientes:(p.pacientes||[]).length,semCaso:0,atualizados:0,conferir:0,datas:0,manuais:0,detalhes:[]};
@@ -2222,12 +2223,12 @@ function txtLente(c){
   return [c.lente_modelo||"modelo não informado", c.lente_torica===true?"tórica":c.lente_torica===false?"não tórica":null, ds.join(" · ")||null].filter(Boolean).join(" · ");
 }
 function linhaLenteCard(c){
-  if(!ehFaco(c)) return "";
+  if(!ehFaco(c)||!colunasLente()) return "";
   if(!temLente(c)) return ["fechado","agendado"].includes(c.etapa)?`<div class="meta">👁 Lente: <i>não informada</i></div>`:"";
   return `<div class="meta">👁 <b style="color:var(--ink)">${esc(txtLente(c))}</b>${c.lente_conferir?` <span class="chip warn" title="${esc(((c.lente_trechos||{}).motivos||[]).join(" · "))}">conferir lente</span>`:""}</div>`;
 }
 function blocoLentePac(c){
-  if(!ehFaco(c)) return "";
+  if(!ehFaco(c)||!colunasLente()) return "";
   const T=c.lente_trechos||{}; const quando=c.lente_em?new Date(c.lente_em).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"}):"";
   const fonte=c.lente_fonte?`${FONTE_LENTE[c.lente_fonte]||c.lente_fonte}${c.lente_fonte==="prontuario"&&T.fonte?` (${T.fonte==="amigo"?"Amigo":"EyecareBI"})`:""}${quando?" · "+quando:""}`:"";
   const itens=(T.itens||[]).map(x=>`<li${x.usado?' style="font-weight:600"':""}>${x.data?br(x.data)+" · ":""}${esc(x.origem||"")}${x.olho?" "+esc(x.olho):""} — ${esc(x.texto)}</li>`).join("");
@@ -2261,6 +2262,7 @@ function folhaLente(c){
 }
 // Planilha: coluna LIO → lente (só quando o prontuário ainda não informou e ninguém editou à mão)
 function lenteDaPlanilha(txt,olho,data){
+  if(!colunasLente()) return null; // banco ainda sem as colunas de lente (controle/sql/2026-11-23-lentes.sql)
   const r=LENTE.resumoCaso([{data:data||hojeISO(),origem:"planilha",texto:txt,olho:/^(OD|OE)$/.test(olho||"")?olho:null}],/^(OD|OE|AO)$/.test(olho||"")?olho:null);
   if(!r||!(r.modelo||r.torica!==null||r.dioptria_od||r.dioptria_oe)) return null;
   return {lente_modelo:r.modelo,lente_torica:r.torica,lente_dioptria_od:r.dioptria_od,lente_dioptria_oe:r.dioptria_oe,lente_conferir:r.conferir,
