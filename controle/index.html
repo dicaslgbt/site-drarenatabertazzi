@@ -1571,7 +1571,7 @@ function telaProcs(){
     ${S.nr===null?`<div class="empty">Para guardar os motivos de "não realizado", rode uma vez o arquivo <b>controle/sql/2026-11-12-procedimentos.sql</b> no SQL Editor do Supabase. Enquanto isso o motivo vai para a observação da indicação.</div>`:
       nrs.length?`<details class="panel resumo"><summary><b>Não realizados</b> · ${nrs.length} nos últimos 60 dias</summary>${nrs.map(r=>{ const c=S.casos.find(x=>x.id===r.caso_id),p=pacOf(c); return `<div class="tk-row"><div class="inj-nome"><button class="linklike" data-pac="${p.id}">${esc(nomeCurto(p.nome))}</button><small>${tipoTag(c.tipo)}${c.olho?" "+esc(c.olho):""} · marcado ${br(r.data_prevista)}${c.local?" · "+esc(c.local):""}</small><div class="pos-st"><span class="fl warn">${esc(r.motivo)}</span>${r.remarcado_para?`<span class="fl ok">Remarcado ${br(r.remarcado_para)}</span>`:`<span class="fl">Voltou para agendar</span>`}</div>${r.obs?`<small>📝 ${esc(r.obs)}</small>`:""}</div></div>`; }).join("")}</details>`:""}`;
   }
-  return `<div class="sec-head"><div><h2>Procedimentos</h2><div class="sub">Cirurgias, injeções e laser</div></div><div class="row" style="gap:8px"><button class="btn ghost" data-act="rel-agend">📲 Relatório do agendamento</button><button class="btn" data-act="novo">+ Nova indicação</button></div></div>
+  return `<div class="sec-head"><div><h2>Procedimentos</h2><div class="sub">Cirurgias, injeções e laser</div></div><div class="row" style="gap:8px"><button class="btn ghost" data-act="rel-agend">📲 Enviar relatório</button><button class="btn" data-act="novo">+ Nova indicação</button></div></div>
   ${barra}${corpo}`;
 }
 function blocoProcResumo(){
@@ -2313,7 +2313,7 @@ window.relatorioAgendamento=function(opc){
 };
 function folhaRelAgendamento(){
   const r=relatorioAgendamento(); const url=`https://wa.me/${EQUIPE_AGENDAMENTO.fone}?text=${encodeURIComponent(r.texto)}`;
-  abrir(`<header><div><h2>Relatório do agendamento</h2><div class="sub">Para o ${esc(EQUIPE_AGENDAMENTO.nome)} · enviado automaticamente toda manhã (seg a sáb)</div></div><button class="close" data-close aria-label="Fechar">×</button></header>
+  abrir(`<header><div><h2>Relatório do agendamento</h2><div class="sub">Para o ${esc(EQUIPE_AGENDAMENTO.nome)} · confira e toque em enviar</div></div><button class="close" data-close aria-label="Fechar">×</button></header>
   <pre style="white-space:pre-wrap;font:inherit;font-size:.85rem;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px;max-height:55vh;overflow:auto">${esc(r.texto)}</pre>
   <div class="actions"><a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Enviar ao ${esc(EQUIPE_AGENDAMENTO.nome)} no WhatsApp</a><button class="btn ghost" type="button" id="relCopiar">Copiar texto</button></div>`);
   $("#relCopiar").addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText(r.texto); toast("Copiado ✔"); }catch(e){ toast("Não consegui copiar"); } });
