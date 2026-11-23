@@ -2279,43 +2279,66 @@ function folhaLente(c){
 // ===== Relatório do agendamento (WhatsApp do Gerlinton) =====
 // Injeção/laser vencidos e a vencer, convênio a conferir e lente a conferir nos próximos 7 dias.
 const EQUIPE_AGENDAMENTO={nome:"Gerlinton",fone:"5563984425762"};
+// Unidades do relatório: OA Palmas e OA Paraíso andam juntas; as outras, separadas.
+const REL_UNIDADES=[["OA","OA (Palmas + Paraíso)",/^OA\b/],["OPUS","OPUS",/^OPUS\b/],["ICOG Palmas","ICOG Palmas",/^ICOG Palmas/],["ICOG Porto","ICOG Porto",/^ICOG Porto/],["","Todas as clínicas",/./]];
 window.relatorioAgendamento=function(opc){
-  opc=opc||{}; const dias=opc.dias||7, MAX=25;
+  opc=opc||{}; const dias=opc.dias||7, MAX=30;
+  const U=REL_UNIDADES.find(u=>u[0]===(opc.local??"OA"))||REL_UNIDADES[0];
+  const daUnid=c=>U[2].test(c.local||"");
   const locAnt=S.fLocal; S.fLocal="";
   try{
     const h=hojeISO(), lim=iso(addDias(parse(h),dias));
-    const tel=p=>{ const f=fones(p.telefone)[0]; return f?` · ${f.replace(/^55/,"").replace(/^(\d{2})(\d{4,5})(\d{4})$/,"($1) $2-$3")}`:" · sem telefone"; };
+    const fone=p=>{ const f=fones(p.telefone)[0]; return f?f.replace(/^55/,"").replace(/^(\d{2})(\d{4,5})(\d{4})$/,"($1) $2-$3"):"sem telefone"; };
     const nm=c=>nomeCurto(pacOf(c).nome);
-    const lista=(arr,fmt)=>arr.slice(0,MAX).map(fmt).join("\n")+(arr.length>MAX?`\n… e mais ${arr.length-MAX}`:"");
-    const trat=S.casos.filter(c=>c.tipo!=="cirurgia"&&!["finalizado","desistiu"].includes(c.etapa)&&!ABERTAS.includes(c.etapa)&&!/\bTESTE\b/i.test(pacOf(c).nome)).map(c=>({c,s:statusTrat(c)}));
+    const olho=c=>c.olho?" "+c.olho:"";
+    const loc=c=>U[0]===""||U[0]==="OA"?` · ${c.local||"?"}`:"";
+    const plano=c=>ehConv(c)?(c.convenio||"convênio"):"Particular";
+    const lista=(arr,fmt)=>arr.slice(0,MAX).map(fmt).join("\n\n")+(arr.length>MAX?`\n\n… e mais ${arr.length-MAX}`:"");
+    const trat=S.casos.filter(c=>c.tipo!=="cirurgia"&&daUnid(c)&&!["finalizado","desistiu"].includes(c.etapa)&&!ABERTAS.includes(c.etapa)&&!/\bTESTE\b/i.test(pacOf(c).nome)).map(c=>({c,s:statusTrat(c)}));
     // já marcado na agenda do prontuário (EyecareBI/Amigo) a partir de hoje? então não precisa agendar
     const naAgenda=c=>(S.atend||[]).filter(a=>a.data>=h&&!/CANCEL|MISSED/i.test(a.status||"")&&nomeBate(a.paciente,pacOf(c).nome)&&["injecao","laser"].includes(classeItem(a.itens))).sort((a,b)=>a.data.localeCompare(b.data))[0]||null;
-    trat.forEach(x=>{ if(["late","lembrar","primeira"].includes(x.s.estado)) x.ag=naAgenda(x.c); });
+    trat.forEach(x=>{ if(["late","lembrar","primeira","avaliar"].includes(x.s.estado)) x.ag=naAgenda(x.c); });
     const marcados=trat.filter(x=>x.ag);
     const venc=trat.filter(x=>x.s.estado==="late"&&!x.ag).sort((a,b)=>b.s.dU-a.s.dU);
-    const avencer=trat.filter(x=>x.s.estado==="lembrar"&&!x.ag).sort((a,b)=>a.s.vence-b.s.vence);
-    const primeira=trat.filter(x=>x.s.estado==="primeira"&&!x.ag);
-    const lTrat=x=>`• ${nm(x.c)} · ${TIPO_LABEL[x.c.tipo]}${x.c.olho?" "+x.c.olho:""} · ${x.s.feitas.length+1}ª · ${x.c.local||"?"} · ${pagLabel(x.c)}${tel(pacOf(x.c))}\n   ${x.s.estado==="late"?`última ${dm(x.s.ultima)} · venceu ${dm(iso(x.s.vence))}`:`última ${dm(x.s.ultima)} · vence ${dm(iso(x.s.vence))}`}${x.s.avisado?` · já avisado ${dm(x.c.ultimo_contato)}`:""}`;
-    const prox=procsAgendados().filter(x=>x.data>=h&&x.data<=lim);
-    const conv=prox.filter(x=>ehConv(x.c)).sort((a,b)=>a.data.localeCompare(b.data));
-    const semData=S.casos.filter(c=>c.tipo==="cirurgia"&&c.etapa==="fechado"&&!c.data_agendada&&!c.data_realizado);
+    const podeAg=[...trat.filter(x=>x.s.estado==="lembrar"&&!x.ag).sort((a,b)=>a.s.vence-b.s.vence),...trat.filter(x=>x.s.estado==="primeira"&&!x.ag)];
+    const reav=trat.filter(x=>x.s.estado==="avaliar"&&!x.ag);
+    // o que fazer com o plano antes de marcar
+    const passoPlano=c=>ehConv(c)?`pedir guia/autorização ao ${plano(c)} e `:"";
+    const lTrat=x=>{ const c=x.c,s=x.s, n=s.feitas.length+1;
+      const quando=s.estado==="late"?`venceu ${dm(iso(s.vence))} (há ${s.dU-(c.intervalo_dias||VENCE_DIAS)} dias) → *${passoPlano(c)}agendar o quanto antes*`
+        :s.estado==="lembrar"?`última ${dm(s.ultima)} → *${passoPlano(c)}agendar até ${dm(iso(s.vence))}*`
+        :`→ *${passoPlano(c)}agendar a 1ª aplicação*`;
+      return `• *${nm(c)}* — ${TIPO_LABEL[c.tipo]}${olho(c)}, ${n}ª aplicação${loc(c)}\n   ${plano(c)} · ${fone(pacOf(c))}\n   ${quando}${s.avisado?` (já avisado ${dm(c.ultimo_contato)})`:""}`; };
+    const lReav=x=>`• *${nm(x.c)}* — ${TIPO_LABEL[x.c.tipo]}${olho(x.c)}, ciclo de ${x.s.total} completo (última ${dm(x.s.ultima)})${loc(x.c)}\n   ${plano(x.c)} · ${fone(pacOf(x.c))}\n   → *marcar consulta de reavaliação com a Dra.*${ehConv(x.c)?" (se ela indicar novo ciclo, já pedir nova guia)":""}`;
+    // plano de saúde: procedimentos de convênio marcados nos próximos dias + cirurgias esperando autorização
+    const prox=procsAgendados().filter(x=>x.data>=h&&x.data<=lim&&daUnid(x.c));
+    const guiaProx=prox.filter(x=>ehConv(x.c)).sort((a,b)=>a.data.localeCompare(b.data));
+    const cirAut=S.casos.filter(c=>c.tipo==="cirurgia"&&daUnid(c)&&ehConv(c)&&["indicado","orcamento","aguardando"].includes(c.etapa)&&!/\bTESTE\b/i.test(pacOf(c).nome))
+      .map(c=>({c,d:desde(c.orcamento_em||c.etapa_desde||c.data_indicacao)})).sort((a,b)=>(b.d||0)-(a.d||0));
+    const semData=S.casos.filter(c=>c.tipo==="cirurgia"&&daUnid(c)&&c.etapa==="fechado"&&!c.data_agendada&&!c.data_realizado);
     const lentes=prox.filter(x=>!x.ses&&ehFaco(x.c)&&colunasLente()&&(!temLente(x.c)||x.c.lente_conferir)).sort((a,b)=>a.data.localeCompare(b.data));
-    const partes=[`*Agendamento · ${br(h).slice(0,5)}* (portal da Dra. Renata)`];
-    partes.push(`\n*💉 Injeção/laser VENCIDOS* (${venc.length})\n`+(venc.length?lista(venc,lTrat):"Nenhum 👏"));
-    partes.push(`\n*⏰ Injeção/laser A VENCER · já pode agendar* (${avencer.length})\n`+(avencer.length?lista(avencer,lTrat):"Nenhum"));
-    if(marcados.length) partes.push(`\n*✅ Já marcados no prontuário* (${marcados.length})\n`+lista(marcados,x=>`• ${nm(x.c)} · ${TIPO_LABEL[x.c.tipo]}${x.c.olho?" "+x.c.olho:""} · ${dm(x.ag.data)} ${x.ag.local||""}`));
-    if(primeira.length) partes.push(`\n*🆕 1ª aplicação a agendar* (${primeira.length})\n`+lista(primeira,x=>`• ${nm(x.c)} · ${TIPO_LABEL[x.c.tipo]}${x.c.olho?" "+x.c.olho:""} · ${x.c.local||"?"} · ${pagLabel(x.c)}${tel(pacOf(x.c))}`));
-    partes.push(`\n*📋 Conferir plano de saúde / guia · próximos ${dias} dias* (${conv.length})\n`+(conv.length?lista(conv,x=>`• ${dm(x.data)} · ${nm(x.c)} · ${x.rot} · ${x.c.local||"?"} · ${pagLabel(x.c)}`):"Nenhum procedimento de convênio marcado"));
-    if(semData.length) partes.push(`\n*🔪 Cirurgias fechadas e sem data* (${semData.length})\n`+lista(semData,c=>`• ${nm(c)} · ${c.procedimento||"Cirurgia"}${c.olho?" "+c.olho:""} · ${c.local||"?"} · ${pagLabel(c)}${tel(pacOf(c))}`));
-    if(colunasLente()) partes.push(`\n*👁 Lente a conferir · cirurgias dos próximos ${dias} dias* (${lentes.length})\n`+(lentes.length?lista(lentes,x=>`• ${dm(x.data)} · ${nm(x.c)}${x.c.olho?" "+x.c.olho:""} · ${temLente(x.c)?txtLente(x.c)+" · conferir: "+(((x.c.lente_trechos||{}).motivos)||[]).join("; "):"lente não informada"}`):"Todas com lente informada ✔"));
-    return {texto:partes.join("\n"), totais:{vencidos:venc.length,aVencer:avencer.length,jaMarcados:marcados.length,primeira:primeira.length,convenio:conv.length,semData:semData.length,lentes:lentes.length}};
+    const partes=[`*Agendamento · ${U[1]} · ${br(h).slice(0,5)}*`,`_Portal da Dra. Renata. Quando marcar, avise para lançarmos no portal._`];
+    const sec=(tit,arr,fmt,vazio)=>{ if(!arr.length&&!vazio) return; partes.push(`\n${tit} (${arr.length})\n`+(arr.length?lista(arr,fmt):vazio)); };
+    sec("🔴 *VENCIDOS — agendar com urgência*",venc,lTrat,"Nenhum 👏");
+    sec("🟢 *JÁ PODE AGENDAR*",podeAg,lTrat,"Nenhum no momento");
+    sec("🔁 *CICLO COMPLETO — marcar reavaliação*",reav,lReav);
+    sec("📋 *PLANO DE SAÚDE — confirmar guia dos procedimentos marcados*",guiaProx,x=>`• ${dm(x.data)} · *${nm(x.c)}* — ${x.rot}${loc(x.c)}\n   ${plano(x.c)} → *confirmar se a guia está autorizada*`);
+    sec("📋 *PLANO DE SAÚDE — cirurgias esperando autorização*",cirAut,x=>`• *${nm(x.c)}* — ${x.c.procedimento||"Cirurgia"}${olho(x.c)}${loc(x.c)}\n   ${plano(x.c)} · ${fone(pacOf(x.c))}\n   → ${x.c.etapa==="indicado"?"*enviar o pedido ao plano*":`*cobrar resposta do plano*${x.d!=null?` (enviado há ${x.d} dias)`:""}`}`);
+    sec("🔪 *CIRURGIAS FECHADAS SEM DATA — marcar no centro cirúrgico*",semData,c=>`• *${nm(c)}* — ${c.procedimento||"Cirurgia"}${olho(c)}${loc(c)}\n   ${plano(c)} · ${fone(pacOf(c))}`);
+    if(colunasLente()) sec(`👁 *LENTE A CONFERIR — cirurgias dos próximos ${dias} dias*`,lentes,x=>`• ${dm(x.data)} · *${nm(x.c)}*${olho(x.c)} — ${temLente(x.c)?txtLente(x.c)+" · conferir com a Dra.":"lente não informada · confirmar com a Dra."}`);
+    sec("✅ *Já marcados no prontuário* (só para conferência)",marcados,x=>`• ${nm(x.c)} — ${TIPO_LABEL[x.c.tipo]}${olho(x.c)} · ${dm(x.ag.data)}${x.ag.local&&(U[0]===""||U[0]==="OA")?" "+x.ag.local:""}`);
+    return {texto:partes.join("\n"), unidade:U[1], totais:{vencidos:venc.length,podeAgendar:podeAg.length,reavaliacao:reav.length,guiaProx:guiaProx.length,cirurgiasAutorizacao:cirAut.length,semData:semData.length,lentes:lentes.length,jaMarcados:marcados.length}};
   } finally { S.fLocal=locAnt; }
 };
-function folhaRelAgendamento(){
-  const r=relatorioAgendamento(); const url=`https://wa.me/${EQUIPE_AGENDAMENTO.fone}?text=${encodeURIComponent(r.texto)}`;
-  abrir(`<header><div><h2>Relatório do agendamento</h2><div class="sub">Para o ${esc(EQUIPE_AGENDAMENTO.nome)} · confira e toque em enviar</div></div><button class="close" data-close aria-label="Fechar">×</button></header>
+function folhaRelAgendamento(local){
+  if(local===undefined){ try{ local=localStorage.getItem("relLocal"); }catch(e){} if(local===null||local===undefined) local="OA"; }
+  try{ localStorage.setItem("relLocal",local); }catch(e){}
+  const r=relatorioAgendamento({local}); const url=`https://wa.me/${EQUIPE_AGENDAMENTO.fone}?text=${encodeURIComponent(r.texto)}`;
+  abrir(`<header><div><h2>Enviar relatório</h2><div class="sub">Para o ${esc(EQUIPE_AGENDAMENTO.nome)} · confira e toque em enviar</div></div><button class="close" data-close aria-label="Fechar">×</button></header>
+  <label class="fcampo" style="margin-bottom:8px"><span>Clínica</span><select id="relLocal">${REL_UNIDADES.map(([v,t])=>`<option value="${v}" ${v===local?"selected":""}>${t}</option>`).join("")}</select></label>
   <pre style="white-space:pre-wrap;font:inherit;font-size:.85rem;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px;max-height:55vh;overflow:auto">${esc(r.texto)}</pre>
   <div class="actions"><a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Enviar ao ${esc(EQUIPE_AGENDAMENTO.nome)} no WhatsApp</a><button class="btn ghost" type="button" id="relCopiar">Copiar texto</button></div>`);
+  $("#relLocal").addEventListener("change",e=>folhaRelAgendamento(e.target.value));
   $("#relCopiar").addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText(r.texto); toast("Copiado ✔"); }catch(e){ toast("Não consegui copiar"); } });
 }
 // Planilha: coluna LIO → lente (só quando o prontuário ainda não informou e ninguém editou à mão)
