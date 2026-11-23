@@ -39,6 +39,8 @@ const BLUE = "#004AAD";
 const TREATMENTS = [
   {
     id: "retina",
+    img: IMG + "olho-3d-retina.webp",
+    imgAlt: "Ilustração 3D da retina, com os vasos e a mácula em destaque",
     links: [["Cirurgia de retina", "cirurgia-de-retina-palmas.html"], ["Retinopatia diabética", "retinopatia-diabetica.html"], ["Degeneração macular (DMRI)", "degeneracao-macular.html"], ["Descolamento de retina", "descolamento-de-retina.html"]],
     icon: ScanEye,
     tag: "Retina e Vítreo",
@@ -59,6 +61,8 @@ const TREATMENTS = [
   },
   {
     id: "catarata",
+    img: IMG + "olho-3d-cristalino.webp",
+    imgAlt: "Ilustração 3D do cristalino focando a luz dentro do olho",
     links: [["Cirurgia de catarata: guia completo", "cirurgia-de-catarata-palmas.html"], ["Qual lente escolher? Faça o simulador", "qual-lente-para-catarata.html"]],
     icon: Eye,
     tag: "Cirurgia",
@@ -79,6 +83,8 @@ const TREATMENTS = [
   },
   {
     id: "exames",
+    img: IMG + "olho-3d-macula.webp",
+    imgAlt: "Ilustração 3D da luz focada na mácula, centro da retina",
     links: [["Injeção intravítrea e laser", "injecao-intravitrea-e-laser-palmas.html"]],
     icon: Crosshair,
     tag: "Diagnóstico e Laser",
@@ -250,11 +256,9 @@ function TreatmentCard({ t, open, onToggle }) {
   const Icon = t.icon;
   return (
     <article className={`flex flex-col rounded-2xl border bg-white transition ${open ? "border-[#0E2A57]/30 shadow-[0_30px_60px_-36px_rgba(11,30,54,0.5)]" : "border-[#0E2A57]/10 hover:border-[#0E2A57]/25"}`}>
+      {t.img && <img src={t.img} alt={t.imgAlt} loading="lazy" className="aspect-[16/9] w-full rounded-t-2xl object-cover" />}
       <button onClick={onToggle} aria-expanded={open} className="flex w-full flex-col gap-5 p-6 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-[#79A9D2] sm:p-7">
-        <div className="flex items-start justify-between">
-          <span className="grid h-12 w-12 place-items-center rounded-full bg-[#EAF2FB] text-[#004AAD]">
-            <Icon className="h-[22px] w-[22px]" strokeWidth={1.6} />
-          </span>
+        <div className="flex items-start justify-end">
           <span className={`grid h-9 w-9 place-items-center rounded-full border border-[#0E2A57]/15 transition ${open ? "rotate-180 bg-[#004AAD] text-white border-[#004AAD]" : "text-[#004AAD]"}`}>
             <ChevronDown className="h-4 w-4" />
           </span>
@@ -314,10 +318,16 @@ function Treatments() {
   return (
     <section id="tratamentos" className="bg-gradient-to-b from-[#E6F2F2] via-[#F8FBFE] to-white pb-20 pt-10 lg:py-28">
       <div className="mx-auto max-w-6xl px-5 lg:px-8">
-        <div className="max-w-2xl">
-          <Eyebrow>Áreas de tratamento</Eyebrow>
-          <h2 className="mt-5 font-serif text-[36px] leading-[1.1] text-[#0E2A57] sm:text-[44px]">Do diagnóstico à cirurgia, com a mesma atenção.</h2>
-          <p className="mt-4 text-[18px] leading-relaxed text-[#33415C]">Toque em cada área para ver os sinais que pedem avaliação e como é o tratamento.</p>
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-14">
+          <div>
+            <Eyebrow>Áreas de tratamento</Eyebrow>
+            <h2 className="mt-5 font-serif text-[36px] leading-[1.1] text-[#0E2A57] sm:text-[44px]">Do diagnóstico à cirurgia, com a mesma atenção.</h2>
+            <p className="mt-4 text-[18px] leading-relaxed text-[#33415C]">Toque em cada área para ver os sinais que pedem avaliação e como é o tratamento.</p>
+          </div>
+          <figure>
+            <video src={IMG + "olho-luz-retina.mp4"} poster={IMG + "olho-luz-retina-capa.webp"} autoPlay muted loop playsInline preload="metadata" aria-label="Animação do olho em corte: a luz atravessa o cristalino e se concentra na retina" className="aspect-video w-full object-cover mix-blend-multiply" />
+            <figcaption className="mt-3 text-[14px] leading-snug text-[#33415C]/85">O cristalino foca a luz na retina. Na catarata, ele perde a transparência; nas doenças da retina, é a imagem que deixa de se formar bem.</figcaption>
+          </figure>
         </div>
         <div className="mt-12 grid items-start gap-5 lg:grid-cols-3">
           {TREATMENTS.map((t) => (
@@ -799,7 +809,7 @@ export default function LandingDraRenata() {
   return (
     <div className="min-h-screen bg-[#F6F9FD] text-[#0E2A57] antialiased [font-family:'Inter',system-ui,-apple-system,'Segoe_UI',sans-serif]">
       <style dangerouslySetInnerHTML={{ __html: `
-        .font-serif { font-family: 'Cormorant Garamond', 'Times New Roman', Georgia, serif; font-weight: 600; }
+        .font-serif { font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight: 500; letter-spacing: -0.01em; }
         html { scroll-behavior: smooth; }
         @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
         ::selection { background: ${BLUE}; color: #fff; }

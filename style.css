@@ -14,8 +14,8 @@
   --sage-soft: #e3eee8;
   --peach: #f6dccb;
   --alert-bg: #fbeee4;
-  --font-display: "Marcellus", "Gill Sans", "Trebuchet MS", serif;
-  --font-body: "Nunito Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   --step-0: 1.125rem;   /* 18px: leitura confortável para quem enxerga pouco */
   --step-1: 1.2rem;
   --step-2: clamp(1.4rem, 3.6vw, 1.7rem);
@@ -34,7 +34,7 @@ body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(
 img, video { max-width: 100%; display: block; }
 a { color: inherit; }
 a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
-h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.18; text-wrap: balance; margin: 0; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.18; text-wrap: balance; margin: 0; }
 h1 { font-size: var(--step-4); letter-spacing: -0.005em; }
 h2 { font-size: var(--step-3); }
 h3 { font-size: var(--step-1); font-family: var(--font-body); font-weight: 700; line-height: 1.3; }
