@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Marcellus&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/controle/lente.js"></script>
 <style>
 :root {
   /* Portal interno: mesma identidade do site (azul do logo + off-white), denso e operacional, pensado para o celular da secretária. */
@@ -831,6 +832,7 @@ function cardInd(c){
     <div class="row"><span class="grip" data-grip="${c.id}" title="Arraste para mudar de etapa" aria-hidden="true">⠿</span><div class="name"><button data-pac="${p.id}">${esc(nomeCurto(p.nome))}</button></div>${c.etapa==="fechado"?"":chipInt(c)}</div>
     <div class="row meta"><span class="chip blue">${TIPO_LABEL[c.tipo]}</span>${chipPag(c)}${c.local?`<span class="chip">${esc(c.local)}</span>`:""}</div>
     ${c.procedimento||c.olho?`<div class="meta"><b style="color:var(--ink)">${esc(c.procedimento||"")}</b>${c.olho?" · "+esc(c.olho):""}${c.valor?` · ${moeda(c.valor)}`:""}</div>`:""}
+    ${linhaLenteCard(c)}
     ${st.txt?`<div class="row"><span class="chip ${st.nivel==="late"?"late":st.nivel==="warn"?"warn":""}">${esc(st.txt)}</span></div>`:""}
     ${(()=>{ const o=orcDoCaso(c); return o?`<div class="meta">💰 Orçamento ${o.enviado_em?"enviado "+dm(o.enviado_em):"salvo"} · ${o.opcoes.length} opç${o.opcoes.length>1?"ões":"ão"} · ${moeda(Math.min(...o.opcoes.map(x=>x.vista)))}–${moeda(Math.max(...o.opcoes.map(x=>x.vista)))}/olho${o.escolhida?` · escolheu ${esc(o.escolhida)}`:""}</div>`:""; })()}
     <div class="row" style="justify-content:space-between">${contato(p.telefone)}
@@ -849,6 +851,7 @@ function cardExe(c){
   return `<div class="item card-dd ${parado?"warn":""}" data-card="${c.id}">
     <div class="row"><span class="grip" data-grip="${c.id}" aria-hidden="true">⠿</span><div class="name"><button data-pac="${p.id}">${esc(nomeCurto(p.nome))}</button></div>${chipPag(c)}</div>
     <div class="meta"><b style="color:var(--ink)">${esc(c.procedimento||"Cirurgia")}</b>${c.olho?" · "+esc(c.olho):""}${c.local?" · "+esc(c.local):""}</div>
+    ${linhaLenteCard(c)}
     ${info?`<div class="meta">${info}</div>`:""}
     ${c.etapa==="fechado"&&!c.data_agendada&&!c.data_realizado?`<div class="row"><span class="chip warn">Sem data · marcar no centro cirúrgico</span></div>`:""}
     ${(["realizado","pos_op"].includes(c.etapa)||c.data_realizado)?blocoPosCard(c):(dEt!==null&&dEt>=0&&c.etapa!=="agendado"?`<div class="row"><span class="chip ${parado?"warn":""}">${dEt===0?"Entrou hoje nesta etapa":`Há ${plural(dEt,"dia","dias")} nesta etapa`}</span></div>`:"")}
@@ -1957,7 +1960,7 @@ const PL={
           const obs=[...extra, PL.s(row[m.obs])]; const cv=muni?"MUNICÍPIO":PL.conv(row[m.cv]); const di=PL.d(row[m.ind]); const t=PL.tel(row[m.tel]);
           if(tipo==="cirurgia"){ const dp=PL.d(row[m.dt]); let e="indicado",dr=null,da=null; if(dp&&dp<=hoje){ e="realizado"; dr=dp; } else if(dp){ e="agendado"; da=dp; }
             let pr=PL.s(row[m.pr]); if(m.lio!==undefined&&PL.s(row[m.lio])) obs.push("LIO: "+PL.s(row[m.lio])); if(mes) obs.push("Planilha: "+mes);
-            add({n,t,loc,ti:"cirurgia",pr,o:PL.olho(pr),cv,e,di,dr,da},obs); }
+            add({n,t,loc,ti:"cirurgia",pr,o:PL.olho(pr),cv,e,di,dr,da,lio:m.lio!==undefined?(PL.s(row[m.lio])||null):null},obs); }
           else { const ses=m.datas.map(i=>PL.d(row[i])).filter(Boolean); const ol=PL.s(row[m.olho]); const o=PL.olho(ol); const pr=ol.replace(/\b(1º|OD|OE|AO)\b/gi,"").trim()||null;
             let e; if(modo==="finalizado") e="finalizado"; else if(modo==="indeciso"){ e="indicado"; obs.push("indeciso"); }
             else if(tipo==="laser") e=!ses.length?"indicado":(/FINALIZADO/i.test(obs.join(" "))?"finalizado":"em_tratamento"); else e=ses.length?"em_tratamento":"indicado";
@@ -2003,15 +2006,18 @@ window.importarPlanilhas=async function(arquivos,opc){
       const novo={paciente_id:pac.id,tipo:r.ti,procedimento:r.pr||null,olho:r.o||null,convenio:r.cv||null,etapa:r.e,data_indicacao:r.di||null,data_realizado:r.dr||null,data_agendada:r.da||null,obs:r.ob,
         total_sessoes:r.ti==="cirurgia"?null:Math.max(3,(r.s||[]).length),intervalo_dias:r.ti==="cirurgia"?null:30,local:r.loc,pagamento:r.cv==="PART"?"particular":"convenio",
         interesse:fech?"fechado":r.baixo?"baixo":"medio",fechado_em:fech?(r.dr||r.da):null,etapa_desde:r.dr||r.da||r.di||hojeISO()};
+      if(r.ti==="cirurgia"&&r.lio){ const L=lenteDaPlanilha(r.lio,r.o,r.di); if(L){ Object.assign(novo,L); res.lentes=(res.lentes||0)+1; } }
       const q=await sb.from("casos").insert(novo).select().single(); if(q.error) throw q.error; S.casos.push(q.data);
       for(let i=0;i<(r.s||[]).length;i++){ const s=await sb.from("sessoes").insert({caso_id:q.data.id,ciclo:1,numero:i+1,data_realizada:r.s[i]}).select().single(); if(!s.error&&s.data) S.sessoes.push(s.data); res.novasSessoes++; }
       continue; }
     // caso existente: só acrescenta
     if(r.ti==="cirurgia"){
       const upd={};
+      if(r.lio&&(!c.lente_fonte||c.lente_fonte==="planilha")){ const L=lenteDaPlanilha(r.lio,c.olho||r.o,r.di);
+        if(L&&["lente_modelo","lente_torica","lente_dioptria_od","lente_dioptria_oe"].some(k=>(c[k]??null)!==(L[k]??null))){ Object.assign(upd,L); res.lentes=(res.lentes||0)+1; } }
       if(r.dr&&!c.data_realizado&&!["realizado","pos_op","finalizado","desistiu"].includes(c.etapa)) Object.assign(upd,{etapa:"realizado",data_realizado:r.dr,etapa_desde:r.dr,interesse:"fechado",fechado_em:c.fechado_em||r.dr});
       else if(r.da&&!c.data_agendada&&["indicado","orcamento","aguardando","fechado"].includes(c.etapa)) Object.assign(upd,{etapa:"agendado",data_agendada:r.da,etapa_desde:hojeISO(),interesse:"fechado",fechado_em:c.fechado_em||hojeISO()});
-      if(Object.keys(upd).length){ res.atualizados++; res.detalhes.push(`atualizado: ${r.n} · ${r.pr} → ${upd.etapa}`); if(!opc.simular){ await sb.from("casos").update(upd).eq("id",c.id); Object.assign(c,upd); } }
+      if(Object.keys(upd).length){ if(upd.etapa) res.atualizados++; res.detalhes.push(`atualizado: ${r.n} · ${r.pr} → ${upd.etapa||"lente"}`); if(!opc.simular){ await sb.from("casos").update(upd).eq("id",c.id); Object.assign(c,upd); } }
     } else {
       const ja=S.sessoes.filter(s=>s.caso_id===c.id); const datas=new Set(ja.map(s=>s.data_realizada)); let num=ja.length;
       for(const d of (r.s||[])){ if(datas.has(d)) continue; num++; res.novasSessoes++; res.detalhes.push(`sessão: ${r.n} · ${r.ti} ${r.o||""} ${br(d)}`);
@@ -2077,7 +2083,7 @@ async function processarPlanilhasDrive(){
   for(const x of pend){
     const r1=await sb.from("planilhas_brutas").select("xlsx").eq("arquivo",x.arquivo).single(); if(r1.error) continue;
     try{ const r=await importarPlanilhas([{nome:x.nome,xlsx:r1.data.xlsx}],{corte:corte60()});
-      const txt=`${r.novosPacientes} paciente(s) · ${r.novosCasos} caso(s) · ${r.novasSessoes} sessão(ões) · ${r.atualizados} atualizado(s) · ${r.guardados||0} antigo(s) só guardado(s)`;
+      const txt=`${r.novosPacientes} paciente(s) · ${r.novosCasos} caso(s) · ${r.novasSessoes} sessão(ões) · ${r.atualizados} atualizado(s) · ${r.lentes||0} lente(s) · ${r.guardados||0} antigo(s) só guardado(s)`;
       tot.p+=r.novosPacientes; tot.c+=r.novosCasos; tot.s+=r.novasSessoes; tot.a+=r.atualizados; tot.g+=r.guardados||0;
       const agora=new Date().toISOString(); await sb.from("planilhas_brutas").update({processado_em:agora,resultado:txt}).eq("arquivo",x.arquivo); x.processado_em=agora; x.resultado=txt;
       await sb.from("sincronizacoes").insert({de:hojeISO(),ate:hojeISO(),recebidos:r.lidos,inseridos:r.novosCasos+r.novasSessoes+r.atualizados,origem:"drive",obs:x.nome});
@@ -2157,6 +2163,109 @@ window.completarTelefones=async function(itens){
     const q=await sb.from("pacientes").update({telefone:t}).eq("id",pac.id); if(!q.error){ pac.telefone=t; n++; } }
   return n;
 };
+// ===== Lente da catarata vinda do prontuário (EyecareBI / Amigo) =====
+// pacote (gzip+base64): {fonte, pacientes:[{nome, cirurgias:[{data,olho,status}], trechos:[{data,origem,texto,olho?}]}]}
+// Prioridade: prontuário > planilha. Caso editado à mão (lente_fonte='manual') nunca é tocado.
+// Olho e data da cirurgia: só preenche o que está vazio.
+const ehFaco=c=>c.tipo==="cirurgia"&&(/FACO|FACECT|CATARAT|LIO|LENTE/i.test(c.procedimento||"")||!c.procedimento);
+window.receberLentes=async function(pacote,opc){ opc=opc||{};
+  const bin=Uint8Array.from(atob(pacote),c=>c.charCodeAt(0));
+  const p=JSON.parse(await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"))).text());
+  const res={fonte:p.fonte,pacientes:(p.pacientes||[]).length,semCaso:0,atualizados:0,conferir:0,datas:0,manuais:0,detalhes:[]};
+  const hoje=hojeISO();
+  for(const px of (p.pacientes||[])){
+    const pac=pacPorNome(px.nome); const cs=pac?S.casos.filter(c=>c.paciente_id===pac.id&&ehFaco(c)&&c.etapa!=="desistiu"):[];
+    if(!cs.length){ res.semCaso++; continue; }
+    const cirs=(px.cirurgias||[]).filter(x=>x&&x.data&&!/CANCEL|MISSED/i.test(x.status||""));
+    for(const c of cs){
+      const upd={}; const olhoC=(c.olho||"").match(/OD|OE|AO/)?.[0]||null;
+      // olho: só se o caso não tem e o paciente tem um único caso de catarata com um único olho operado/agendado
+      const olhosCir=[...new Set(cirs.map(x=>x.olho).filter(o=>o==="OD"||o==="OE"))];
+      if(!olhoC&&cs.length===1&&olhosCir.length===1) upd.olho=olhosCir[0];
+      const olho=upd.olho||olhoC;
+      // data da cirurgia (só vazios)
+      const doOlho=cirs.filter(x=>!olho||olho==="AO"||!x.olho||x.olho===olho).sort((a,b)=>a.data.localeCompare(b.data));
+      const feita=doOlho.filter(x=>x.data<=hoje&&/FINISH|DONE|ARRIVED/i.test(x.status||"")).at(-1);
+      const futura=doOlho.find(x=>x.data>hoje);
+      if(feita&&!c.data_realizado&&["fechado","agendado","realizado","pos_op"].includes(c.etapa)) upd.data_realizado=feita.data;
+      if(futura&&!c.data_agendada&&!c.data_realizado) upd.data_agendada=futura.data;
+      if(upd.data_realizado||upd.data_agendada) res.datas++;
+      // lente
+      if(c.lente_fonte==="manual") res.manuais++;
+      else { const r=LENTE.resumoCaso(px.trechos||[],olho);
+        if(r&&(r.modelo||r.torica!==null||r.dioptria_od||r.dioptria_oe)){
+          const novo={lente_modelo:r.modelo,lente_torica:r.torica,lente_dioptria_od:r.dioptria_od,lente_dioptria_oe:r.dioptria_oe,lente_conferir:r.conferir,
+            lente_trechos:{fonte:p.fonte,motivos:r.motivos,itens:r.trechos}};
+          const K=["lente_modelo","lente_torica","lente_dioptria_od","lente_dioptria_oe"];
+          const mesmosValores=c.lente_fonte==="prontuario"&&K.every(k=>(c[k]??null)===(novo[k]??null));
+          if(!mesmosValores){ Object.assign(upd,novo,{lente_fonte:"prontuario",lente_em:new Date().toISOString()}); res.atualizados++; if(r.conferir) res.conferir++; }
+          // valores iguais: só renova os trechos; se a equipe já marcou "conferido", continua conferido
+          else if(JSON.stringify((c.lente_trechos||{}).itens||null)!==JSON.stringify(novo.lente_trechos.itens)) upd.lente_trechos={...novo.lente_trechos,conferido_em:(c.lente_trechos||{}).conferido_em||null};
+          if(mesmosValores&&c.lente_conferir) res.conferir++;
+        } }
+      if(Object.keys(upd).length){ res.detalhes.push({caso:c.id,olho:olho,etapa:c.etapa,lente:upd.lente_modelo!==undefined?txtLente({...c,...upd}):"(sem mudança)",conferir:upd.lente_conferir,motivos:(upd.lente_trechos||{}).motivos,datas:[upd.data_agendada,upd.data_realizado].filter(Boolean),olhoNovo:upd.olho});
+        if(opc.simular) continue;
+        const q=await sb.from("casos").update(upd).eq("id",c.id); if(q.error) return {erro:q.error.message,...res}; Object.assign(c,upd); }
+    }
+  }
+  if(!opc.simular){ await sb.from("sincronizacoes").insert({de:hojeISO(),ate:hojeISO(),recebidos:res.pacientes,inseridos:res.atualizados+res.datas,origem:"lentes-"+(p.fonte||""),obs:`${res.atualizados} lente(s) · ${res.conferir} a conferir`}); render(); }
+  return res;
+};
+// ----- Lente: textos e blocos de tela -----
+const FONTE_LENTE={prontuario:"prontuário",planilha:"planilha",manual:"editado no portal"};
+function temLente(c){ return !!(c.lente_modelo||c.lente_torica!==null&&c.lente_torica!==undefined||c.lente_dioptria_od||c.lente_dioptria_oe); }
+function txtLente(c){
+  if(!temLente(c)) return "";
+  const o=(c.olho||"").match(/OD|OE/)?.[0]; const ds=[];
+  if((!o||o==="OD")&&c.lente_dioptria_od) ds.push(`${o?"":"OD "}${c.lente_dioptria_od}`);
+  if((!o||o==="OE")&&c.lente_dioptria_oe) ds.push(`${o?"":"OE "}${c.lente_dioptria_oe}`);
+  return [c.lente_modelo||"modelo não informado", c.lente_torica===true?"tórica":c.lente_torica===false?"não tórica":null, ds.join(" · ")||null].filter(Boolean).join(" · ");
+}
+function linhaLenteCard(c){
+  if(!ehFaco(c)) return "";
+  if(!temLente(c)) return ["fechado","agendado"].includes(c.etapa)?`<div class="meta">👁 Lente: <i>não informada</i></div>`:"";
+  return `<div class="meta">👁 <b style="color:var(--ink)">${esc(txtLente(c))}</b>${c.lente_conferir?` <span class="chip warn" title="${esc(((c.lente_trechos||{}).motivos||[]).join(" · "))}">conferir lente</span>`:""}</div>`;
+}
+function blocoLentePac(c){
+  if(!ehFaco(c)) return "";
+  const T=c.lente_trechos||{}; const quando=c.lente_em?new Date(c.lente_em).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"}):"";
+  const fonte=c.lente_fonte?`${FONTE_LENTE[c.lente_fonte]||c.lente_fonte}${c.lente_fonte==="prontuario"&&T.fonte?` (${T.fonte==="amigo"?"Amigo":"EyecareBI"})`:""}${quando?" · "+quando:""}`:"";
+  const itens=(T.itens||[]).map(x=>`<li${x.usado?' style="font-weight:600"':""}>${x.data?br(x.data)+" · ":""}${esc(x.origem||"")}${x.olho?" "+esc(x.olho):""} — ${esc(x.texto)}</li>`).join("");
+  return `<div class="box" style="margin-top:4px;background:var(--paper)">
+    <div class="row"><b style="flex:1">👁 Lente</b>${c.lente_conferir?'<span class="chip warn">conferir</span>':temLente(c)&&c.lente_fonte!=="manual"?'<span class="chip ok">conferida</span>':""}</div>
+    <div>${temLente(c)?esc(txtLente(c)):'<span class="meta">Ainda não informada no prontuário nem na planilha.</span>'}</div>
+    ${fonte?`<div class="meta">Fonte: ${esc(fonte)}</div>`:""}
+    ${c.lente_conferir&&(T.motivos||[]).length?`<div class="meta" style="color:var(--warn)">⚠ ${esc(T.motivos.join(" · "))}</div>`:""}
+    ${itens?`<details><summary class="meta">Ver o que está escrito no prontuário</summary><ul class="meta" style="margin:6px 0 0 16px;padding:0">${itens}</ul></details>`:""}
+    ${(c.lente_dioptria_od||c.lente_dioptria_oe)?`<div class="meta" style="font-size:.78rem">Dioptria lida do texto do prontuário: confira na biometria antes de pedir a lente.</div>`:""}
+    <div class="actions">${c.lente_conferir?`<button class="btn small" data-act="lente-ok" data-id="${c.id}">Marcar como conferida</button>`:""}<button class="btn small ghost" data-act="lente-edit" data-id="${c.id}">Editar lente</button></div>
+  </div>`;
+}
+function folhaLente(c){
+  const t=c.lente_torica===true?"sim":c.lente_torica===false?"nao":"";
+  const dl=["Eyhance","PanOptix","Vivity","Odyssey","Synergy","Clareon","Tecnis","AcrySof SN60","MA60","Monofocal","Lente do plano"];
+  abrir(`<header><div><h2>Lente · ${esc(nomeCurto(pacOf(c).nome))}</h2><div class="sub">${esc(c.procedimento||"Catarata")}${c.olho?" · "+esc(c.olho):""}</div></div><button class="close" data-close aria-label="Fechar">×</button></header>
+  <form id="fLen" class="form">
+    <label>Modelo<input id="lMod" list="dlLentes" value="${esc(c.lente_modelo||"")}" placeholder="Ex.: Eyhance"><datalist id="dlLentes">${dl.map(x=>`<option value="${x}">`).join("")}</datalist></label>
+    <fieldset><legend>Tórica</legend>${radios("lTor",[["sim","Sim"],["nao","Não"],["","Não sei"]],t)}</fieldset>
+    <div class="grid2"><label>Dioptria OD<input id="lOD" value="${esc(c.lente_dioptria_od||"")}" placeholder="+21,00"></label><label>Dioptria OE<input id="lOE" value="${esc(c.lente_dioptria_oe||"")}" placeholder="+21,00"></label></div>
+    <div class="meta">Ao salvar, a lente passa a ser "editada no portal" e a sincronização noturna não muda mais estes campos.</div>
+    <button class="btn" type="submit">Salvar</button>
+    ${c.lente_fonte==="manual"?`<button class="btn ghost" type="button" id="lVolta">Voltar a seguir o prontuário</button>`:""}
+  </form>`);
+  const fmt=v=>{ v=String(v||"").trim().replace(/\s/g,""); if(!v) return null; const m=v.match(/^([+-]?)(\d{1,2})(?:[.,](\d{1,2}))?$/); if(!m) return v; return (m[1]==="-"?"-":"+")+m[2]+","+((m[3]||"00")+"0").slice(0,2); };
+  $("#fLen").addEventListener("submit",async e=>{ e.preventDefault(); const tv=document.querySelector('input[name="lTor"]:checked')?.value;
+    const upd={lente_modelo:$("#lMod").value.trim()||null,lente_torica:tv==="sim"?true:tv==="nao"?false:null,lente_dioptria_od:fmt($("#lOD").value),lente_dioptria_oe:fmt($("#lOE").value),lente_fonte:"manual",lente_conferir:false,lente_em:new Date().toISOString()};
+    fechar(); await salvar(sb.from("casos").update(upd).eq("id",c.id),"Lente salva ✔"); folhaPaciente(c.paciente_id); });
+  if($("#lVolta")) $("#lVolta").addEventListener("click",async()=>{ fechar(); await salvar(sb.from("casos").update({lente_fonte:null}).eq("id",c.id),"Lente volta a seguir o prontuário na próxima sincronização"); folhaPaciente(c.paciente_id); });
+}
+// Planilha: coluna LIO → lente (só quando o prontuário ainda não informou e ninguém editou à mão)
+function lenteDaPlanilha(txt,olho,data){
+  const r=LENTE.resumoCaso([{data:data||hojeISO(),origem:"planilha",texto:txt,olho:/^(OD|OE)$/.test(olho||"")?olho:null}],/^(OD|OE|AO)$/.test(olho||"")?olho:null);
+  if(!r||!(r.modelo||r.torica!==null||r.dioptria_od||r.dioptria_oe)) return null;
+  return {lente_modelo:r.modelo,lente_torica:r.torica,lente_dioptria_od:r.dioptria_od,lente_dioptria_oe:r.dioptria_oe,lente_conferir:r.conferir,
+    lente_trechos:{fonte:"planilha",motivos:r.motivos,itens:[{data:null,origem:"planilha",olho:olho||null,texto:"LIO: "+txt,usado:true}]},lente_fonte:"planilha",lente_em:new Date().toISOString()};
+}
 const tokN=s=>normNome(s).split(" ").filter(w=>w.length>2&&!["DOS","DAS","DE","DA","DO"].includes(w));
 function nomeBate(ext,ag){ if(mesmoPaciente(ext,ag)) return true; const A=tokN(ext),B=tokN(ag); if(!A.length||!B.length||A[0]!==B[0]) return false; return A.filter(w=>B.includes(w)).length>=Math.min(2,A.length,B.length); }
 // cirViaRepasse: na OA as cirurgias são faturadas pela GoCare (só confirmar); na OPUS a cirurgia vem no repasse da clínica.
@@ -3142,7 +3251,7 @@ function folhaPaciente(id){
       <div class="row meta">${chipPag(c)}${c.local?`<span class="chip">${esc(c.local)}</span>`:""}${c.interesse?`<span class="chip ${INTERESSE[c.interesse][1]}">${INTERESSE[c.interesse][0]}</span>`:""}</div>
       <div class="meta">Indicação ${br(c.data_indicacao)} · Orçamento/guia ${br(c.orcamento_em)} · Fechado ${br(c.fechado_em)}${c.tipo==="cirurgia"?` · Cirurgia ${br(c.data_agendada||c.data_realizado)}`:""}</div>`;
     const ses = c.tipo==="cirurgia" ? "" : `<div class="sesslist">${S.sessoes.filter(s=>s.caso_id===c.id).sort((a,b)=>a.ciclo-b.ciclo||a.numero-b.numero).map(s=>`<div class="sess"><span>Ciclo ${s.ciclo} · ${s.numero}ª</span><span>${s.data_realizada?"✔ "+br(s.data_realizada):"📅 "+br(s.data_prevista)}</span></div>`).join("")||'<span class="meta">Nenhuma aplicação registrada</span>'}</div>`;
-    return `<div class="box">${head}${ses}${c.obs?`<div class="meta">📝 ${esc(c.obs)}</div>`:""}<div class="actions"><button class="btn small ghost" data-act="editar" data-id="${c.id}">Editar</button></div></div>`;
+    return `<div class="box">${head}${ses}${c.obs?`<div class="meta">📝 ${esc(c.obs)}</div>`:""}${blocoLentePac(c)}<div class="actions"><button class="btn small ghost" data-act="editar" data-id="${c.id}">Editar</button></div></div>`;
   }).join("")}
   ${blocoHistorico(p)}
   <div class="actions"><button class="btn small" data-act="novo-do-pac" data-pid="${p.id}">+ Nova indicação para este paciente</button><button class="btn small ghost" data-act="editpac" data-pid="${p.id}">Editar paciente</button></div>`);
@@ -3195,6 +3304,8 @@ async function acao(act, el){
   if(act==="novo") return folhaIndicacao();
   if(act==="novo-do-pac") return folhaIndicacao(undefined, el.dataset.pid);
   if(act==="editar") return folhaIndicacao(c);
+  if(act==="lente-edit") return folhaLente(c);
+  if(act==="lente-ok"){ await salvar(sb.from("casos").update({lente_conferir:false,lente_trechos:{...(c.lente_trechos||{}),conferido_em:new Date().toISOString()}}).eq("id",id),"Lente marcada como conferida ✔"); return folhaPaciente(c.paciente_id); }
   if(act==="editpac") return folhaPacEdit(el.dataset.pid);
   if(act==="menu") return folhaMenu(c);
   if(act==="reativar") return salvar(sb.from("casos").update({etapa_desde:iso(hoje())}).eq("id",id),"Reativado ✔ · voltou para o quadro");
