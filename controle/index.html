@@ -2742,8 +2742,8 @@ const exMin=e=>/^OCT/.test(e)?e:e.charAt(0).toLowerCase()+e.slice(1);
 const listaPt=a=>a.length<=1?(a[0]||""):a.slice(0,-1).join(", ")+" e "+a.at(-1);
 // Qual mensagem: pelo grupo de risco; no checkup, pela ação (nunca fez / incompletos / anual)
 function chaveExMsg(P){ return P.g==="poscir"?"poscir":P.g==="retdiab"?(P.tratada?"retina":"diabetes"):P.g==="retina"?"retina":P.g==="diabetes"?"diabetes":["glaucoma","suspglauc"].includes(P.g)?"glaucoma":P.g==="catarata"?"catarata":P.abord==="nunca"?"nunca":P.abord==="incompleto"?"incompleto":"anual"; }
-function contatoAgenda(local){ return /^OA\b/.test(local||"")?"Para agendar, responda esta mensagem ou chame no WhatsApp (63) 98495-1184. Se preferir ligar: (63) 3215-3335."
-  : /^OPUS/.test(local||"")?"Para agendar, responda esta mensagem ou chame no WhatsApp (63) 3028-1483.":"Para agendar, é só responder esta mensagem."; }
+function contatoAgenda(local){ return /^OA\b/.test(local||"")?"Para agendar, responda esta mensagem ou chame no WhatsApp: https://wa.me/5563984951184\nSe preferir ligar: (63) 3215-3335."
+  : /^OPUS/.test(local||"")?"Para agendar, responda esta mensagem ou chame no WhatsApp: https://wa.me/556330281483":"Para agendar, é só responder esta mensagem."; }
 function tempoDesde(iso0){ const a=parse(iso0), b=hoje(); let m=(b.getFullYear()-a.getFullYear())*12+(b.getMonth()-a.getMonth()); if(b.getDate()<a.getDate()) m--;
   if(m<1) return "menos de um mês"; if(m<12) return m===1?"1 mês":m+" meses"; const y=Math.floor(m/12), r=m%12; return (y===1?"1 ano":y+" anos")+(r?` e ${r===1?"1 mês":r+" meses"}`:""); }
 function textoExMsg(P,modelo){
