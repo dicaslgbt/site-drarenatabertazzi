@@ -240,8 +240,9 @@ function Hero() {
               Envie sua dúvida ou recado
             </a>
           </div>
-          <a href="#tratamentos" className="mt-5 inline-flex items-center gap-1.5 text-[15.5px] font-semibold text-[#0E2A57] underline decoration-[#79A9D2] decoration-2 underline-offset-[6px] transition hover:decoration-[#004AAD]">
-            Conhecer os tratamentos <ArrowRight className="h-4 w-4" />
+          <a href="#tratamentos" className="group mt-6 inline-flex items-center gap-2 text-[14.5px] font-semibold tracking-[0.01em] text-[#0E2A57]/80 transition hover:text-[#0E2A57]">
+            Conhecer os tratamentos
+            <span className="grid h-7 w-7 place-items-center rounded-full border border-[#0E2A57]/20 transition group-hover:border-[#0E2A57]/50"><ChevronDown className="h-3.5 w-3.5" /></span>
           </a>
           <p className="mt-3 text-[14px] text-[#33415C]/80">Atendimento em Palmas, Paraíso do Tocantins e Porto Nacional.</p>
         </div>
