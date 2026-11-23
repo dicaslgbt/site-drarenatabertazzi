@@ -22,7 +22,9 @@ const GALLERY = [
   { src: IMG + "rotina-preparo-paciente-cirurgia.webp", alt: "Dra. Renata preparando o paciente para a cirurgia de catarata", step: "03", title: "Preparo do paciente", text: "Você é monitorado e acompanhado de perto do começo ao fim." },
   { src: IMG + "rotina-microscopio-cirurgico.webp", alt: "Dra. Renata operando ao microscópio cirúrgico", step: "04", title: "Precisão cirúrgica", text: "Cirurgia ao microscópio, com técnica moderna e segura." },
 ];
-const WHATSAPP = "5511978806444";
+const WHATSAPP = "5563984951184";
+const FONE_FIXO = { txt: "(63) 3215-3335", tel: "+556332153335" };
+const WA_TXT = "(63) 98495-1184";
 const WA_URL = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
   "Olá! Vim pelo site da Dra. Renata Bertazzi e gostaria de agendar uma consulta."
 )}`;
@@ -698,6 +700,10 @@ function Location() {
                 <b className="text-[#0E2A57]">Marcação pelo WhatsApp</b>. Informe a cidade de preferência e a equipe encontra o melhor horário. Agenda sujeita a alterações.
               </p>
             </div>
+            <div className="mt-4 grid gap-2 text-[15.5px] text-[#33415C]">
+              <p><b className="text-[#0E2A57]">WhatsApp (somente mensagens):</b>{" "}<a href={WA_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#0E2A57] underline decoration-[#79A9D2] underline-offset-4">{WA_TXT}</a></p>
+              <p><b className="text-[#0E2A57]">Ligações:</b>{" "}<a href={`tel:${FONE_FIXO.tel}`} className="font-semibold text-[#0E2A57] underline decoration-[#79A9D2] underline-offset-4">{FONE_FIXO.txt}</a></p>
+            </div>
             <PrimaryCTA className="mt-6 w-full">Agendar pelo WhatsApp</PrimaryCTA>
           </div>
 
@@ -745,6 +751,10 @@ function Footer() {
           <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 text-[15px] font-semibold text-[#0E2A57] underline decoration-[#79A9D2] underline-offset-4">
             <AtSign className="h-4 w-4" />@dra.renatabertazzi
           </a>
+          <p className="mt-3 text-[15px] leading-relaxed text-[#33415C]">
+            WhatsApp (somente mensagens): <a href={WA_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#0E2A57]">{WA_TXT}</a><br />
+            Ligações: <a href={`tel:${FONE_FIXO.tel}`} className="font-semibold text-[#0E2A57]">{FONE_FIXO.txt}</a>
+          </p>
         </div>
         <nav aria-label="Guias e conteúdos">
           <p className="text-[13px] font-bold uppercase tracking-[0.18em] text-[#0E2A57]">Guias e conteúdos</p>

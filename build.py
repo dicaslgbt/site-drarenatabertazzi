@@ -9,7 +9,9 @@ IG = "https://www.instagram.com/dra.renatabertazzi/"
 DM = "https://ig.me/m/dra.renatabertazzi"   # abre conversa direta no Instagram
 # WhatsApp da equipe para agendamento: preencha só com números, com DDI e DDD (ex.: "5563999999999").
 # Vazio = os botões continuam abrindo a conversa no Instagram.
-WHATSAPP = "5511978806444"
+WHATSAPP = "5563984951184"
+WA_TXT = "(63) 98495-1184"
+FONE_FIXO = ("(63) 3215-3335", "+556332153335")
 _WA_MSG = "Olá! Vim pelo site da Dra. Renata Bertazzi e gostaria de agendar uma consulta."
 from urllib.parse import quote as _q
 BOOK = f"https://wa.me/{WHATSAPP}?text={_q(_WA_MSG)}" if WHATSAPP else DM
@@ -139,6 +141,7 @@ def footer():
       <img src="img/logo-dra-renata-bertazzi.png" alt="Dra. Renata Bertazzi · Oftalmologia | Retina e Catarata" class="foot-logo" width="230" height="43" loading="lazy">
       <p><strong>Dra. Renata Carneiro Bertazzi</strong><br>Médica Oftalmologista · CRM-TO 7132 · RQE 3562<br>Membro da Sociedade Brasileira de Retina e Vítreo (SBRV)</p>
       <p><a href="{IG}" target="_blank" rel="noopener">Instagram @dra.renatabertazzi</a></p>
+      <p>WhatsApp (somente mensagens): <a href="{BOOK}" target="_blank" rel="noopener">{WA_TXT}</a><br>Ligações: <a href="tel:{FONE_FIXO[1]}">{FONE_FIXO[0]}</a></p>
     </div>
     <div class="stack">
       <b>Tratamentos e doenças</b>
