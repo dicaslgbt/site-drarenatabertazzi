@@ -16,8 +16,8 @@ jobs:
       VERCEL_PROJECT_ID: prj_NPJK05lySybcis8wkfpFl1dcofiZ
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Publicar
         run: |
           if [ -z "$VERCEL_TOKEN" ]; then echo "Falta o secret VERCEL_TOKEN"; exit 1; fi
-          npx --yes vercel@39.1.0 deploy --prod --yes --token "$VERCEL_TOKEN"
+          npx --yes vercel@65.9.0 deploy --prod --yes --token "$VERCEL_TOKEN"
