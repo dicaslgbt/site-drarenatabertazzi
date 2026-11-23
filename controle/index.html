@@ -2301,7 +2301,9 @@ window.relatorioAgendamento=function(opc){
     const marcados=trat.filter(x=>x.ag);
     const venc=trat.filter(x=>x.s.estado==="late"&&!x.ag).sort((a,b)=>b.s.dU-a.s.dU);
     const podeAg=[...trat.filter(x=>x.s.estado==="lembrar"&&!x.ag).sort((a,b)=>a.s.vence-b.s.vence),...trat.filter(x=>x.s.estado==="primeira"&&!x.ag)];
-    const reav=trat.filter(x=>x.s.estado==="avaliar"&&!x.ag);
+    // ciclo completo: um item por paciente (junta OD e OE)
+    const reav=[]; trat.filter(x=>x.s.estado==="avaliar"&&!x.ag).forEach(x=>{ const k=x.c.paciente_id+"|"+x.c.tipo; const j=reav.find(y=>y.k===k);
+      if(j){ if(x.c.olho&&!j.olhos.includes(x.c.olho)) j.olhos.push(x.c.olho); if(x.s.ultima>j.s.ultima) j.s=x.s; } else reav.push({k,c:x.c,s:x.s,olhos:x.c.olho?[x.c.olho]:[]}); });
     // o que fazer com o plano antes de marcar
     const passoPlano=c=>ehConv(c)?`pedir guia/autorização ao ${plano(c)} e `:"";
     const lTrat=x=>{ const c=x.c,s=x.s, n=s.feitas.length+1;
@@ -2309,12 +2311,12 @@ window.relatorioAgendamento=function(opc){
         :s.estado==="lembrar"?`última ${dm(s.ultima)} → *${passoPlano(c)}agendar até ${dm(iso(s.vence))}*`
         :`→ *${passoPlano(c)}agendar a 1ª aplicação*`;
       return `• *${nm(c)}* — ${TIPO_LABEL[c.tipo]}${olho(c)}, ${n}ª aplicação${loc(c)}\n   ${plano(c)} · ${fone(pacOf(c))}\n   ${quando}${s.avisado?` (já avisado ${dm(c.ultimo_contato)})`:""}`; };
-    const lReav=x=>`• *${nm(x.c)}* — ${TIPO_LABEL[x.c.tipo]}${olho(x.c)}, ciclo de ${x.s.total} completo (última ${dm(x.s.ultima)})${loc(x.c)}\n   ${plano(x.c)} · ${fone(pacOf(x.c))}\n   → *marcar consulta de reavaliação com a Dra.*${ehConv(x.c)?" (se ela indicar novo ciclo, já pedir nova guia)":""}`;
+    const lReav=x=>`• *${nm(x.c)}* — ${TIPO_LABEL[x.c.tipo]}${x.olhos.length?" "+x.olhos.sort().join(" e "):""}, ciclo completo (última ${dm(x.s.ultima)})${loc(x.c)}\n   ${plano(x.c)} · ${fone(pacOf(x.c))}\n   → *marcar consulta de reavaliação com a Dra.*${ehConv(x.c)?" (se ela indicar novo ciclo, já pedir nova guia)":""}`;
     // plano de saúde: procedimentos de convênio marcados nos próximos dias + cirurgias esperando autorização
     const prox=procsAgendados().filter(x=>x.data>=h&&x.data<=lim&&daUnid(x.c));
     const guiaProx=prox.filter(x=>ehConv(x.c)).sort((a,b)=>a.data.localeCompare(b.data));
     const cirAut=S.casos.filter(c=>c.tipo==="cirurgia"&&daUnid(c)&&ehConv(c)&&["indicado","orcamento","aguardando"].includes(c.etapa)&&!/\bTESTE\b/i.test(pacOf(c).nome))
-      .map(c=>({c,d:desde(c.orcamento_em||c.etapa_desde||c.data_indicacao)})).sort((a,b)=>(b.d||0)-(a.d||0));
+      .map(c=>({c,d:desde(c.orcamento_em||c.etapa_desde||c.data_indicacao)})).filter(x=>x.d===null||x.d<=90).sort((a,b)=>(b.d||0)-(a.d||0));
     const semData=S.casos.filter(c=>c.tipo==="cirurgia"&&daUnid(c)&&c.etapa==="fechado"&&!c.data_agendada&&!c.data_realizado);
     const lentes=prox.filter(x=>!x.ses&&ehFaco(x.c)&&colunasLente()&&(!temLente(x.c)||x.c.lente_conferir)).sort((a,b)=>a.data.localeCompare(b.data));
     const partes=[`*Agendamento · ${U[1]} · ${br(h).slice(0,5)}*`,`_Portal da Dra. Renata. Quando marcar, avise para lançarmos no portal._`];
