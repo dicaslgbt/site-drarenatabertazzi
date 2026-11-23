@@ -2567,16 +2567,15 @@ const EX_GRUPOS=[
   {k:"suspglauc",nome:"Suspeita de glaucoma",cor:"warn",dias:180,ex:["Campimetria","OCT de nervo óptico","Tonometria","Paquimetria"],por:"suspeita de glaucoma (H40.0), glaucoma na família ou exames de investigação no histórico: reavaliar nervo e pressão a cada 6–12 meses"},
   {k:"catarata",nome:"Catarata a operar",cor:"warn",dias:180,ex:["Biometria","Microscopia especular","Ceratoscopia","Mapeamento de retina"],por:"catarata diagnosticada (H25–H26) e ainda não operada: reavaliar e deixar os exames pré-operatórios prontos"},
   {k:"poscir",nome:"Pós-cirurgia de catarata",cor:"blue",dias:365,ex:["Mapeamento de retina","Tonometria","Microscopia especular"],por:"pseudofacia (Z96.1) ou cirurgia de catarata no histórico: revisão da retina e da pressão do olho"},
-  {k:"cat70",nome:"70+ sem catarata operada conosco",cor:"blue",dias:365,ex:["Mapeamento de retina","Microscopia especular","Ceratoscopia","Biometria"],por:"70+ sem cirurgia de catarata registrada aqui (pode ter operado em outro local; use o botão \"Já operou\" para mover para pós-catarata): catarata é muito frequente nessa idade; avaliar o cristalino com os exames que já preparam uma eventual cirurgia"},
-  {k:"idoso",nome:"65 a 69 anos",cor:"blue",dias:365,ex:["Tonometria","Mapeamento de retina","Retinografia","OCT de mácula"],por:"65+: maior risco de glaucoma, DMRI e catarata (AAO: exame completo ao menos a cada 1–2 anos; regra da clínica 6 meses)"},
+  {k:"idoso",nome:"65 anos ou mais",cor:"blue",dias:365,ex:["Tonometria","Mapeamento de retina","Retinografia","Microscopia especular"],por:"65+: mais risco de glaucoma, DMRI e catarata (AAO: avaliação a cada 1–2 anos; aqui anual, com lembrete aos 11 meses). A partir dos 70 a mensagem pede para avisar se já operou catarata em outro lugar"},
   {k:"has",nome:"Hipertensão ou alta miopia",cor:"",dias:365,ex:["Mapeamento de retina","Retinografia","Tonometria"],por:"hipertensão (I10) pede olhar a retina (retinopatia hipertensiva); alta miopia (H52.1) tem mais risco de descolamento e glaucoma; avaliação anual"},
   {k:"checkup",nome:"Checkup ocular",cor:"",dias:365,ex:["Tonometria","Mapeamento de retina","Retinografia"],por:"sem fator de risco registrado: checkup ocular anual (AAO: adultos sem risco a cada 1–2 anos)"}];
-const EX_PART=["retdiab","retina","cat70"]; // grupos que também incluem particular
+const EX_PART=["retdiab","retina"]; // grupos que também incluem particular (e 65+ a partir dos 70)
 const EX_LEVE=["checkup","idoso","has","poscir"]; // grupos de checkup: abordagem por tempo sem retorno
 const EX_G=Object.fromEntries(EX_GRUPOS.map(g=>[g.k,g]));
-const EX_COND=[["diabetes","Diabetes (E10–E14)"],["ret_diab","Retinopatia diabética (H36.0)"],["glaucoma","Glaucoma (H40.1–H40.9)"],["susp_glauc","Suspeita de glaucoma (H40.0)"],["fam_glaucoma","Glaucoma na família"],["dmri","DMRI (H35.3)"],["descol","Descolamento / retina operada (H33)"],["catarata","Catarata não operada (H25–H26)"],["pseudo","Já operou catarata (Z96.1)"],["has","Hipertensão (I10)"],["miopia","Alta miopia (H52.1)"]];
+const EX_COND=[["diabetes","Diabetes (E10–E14)"],["ret_diab","Retinopatia diabética (H36.0)"],["glaucoma","Glaucoma (H40.1–H40.9)"],["susp_glauc","Suspeita de glaucoma (H40.0)"],["fam_glaucoma","Glaucoma na família"],["dmri","DMRI (H35.3)"],["descol","Descolamento / retina operada (H33)"],["retina_vasc","Oclusão vascular da retina (H34)"],["catarata","Catarata não operada (H25–H26)"],["pseudo","Já operou catarata (Z96.1)"],["has","Hipertensão (I10)"],["miopia","Alta miopia (−6,00 ou mais)"]];
 // CID / texto do diagnóstico -> condição (para importar planilha do prontuário)
-const EX_CID=[["ret_diab",/H36\.?0|RETINOPATIA DIAB|EDEMA MACULAR DIAB|\bRDNP\b|\bRDP\b|\bEMD\b/],["diabetes",/\bE1[0-4]|DIABET|\bDM ?(I|II|1|2)?\b/],["susp_glauc",/H40\.?0|SUSPEIT[AO] DE GLAUC|HIPERTENSAO OCULAR/],["glaucoma",/H40\.?[1-9]|H42|(?<!SUSPEITA DE |SUSPEITO DE )GLAUCOMA/],["dmri",/H35\.?3|DMRI|DEGENERACAO MACULAR/],["descol",/H33|DESCOLAMENTO DE RETINA|BURACO MACULAR/],["pseudo",/Z96\.?1|PSEUDOFAC/],["catarata",/H2[5-6]|CATARATA/],["has",/\bI10\b|HIPERTENSAO ARTERIAL|\bHAS\b/],["miopia",/H52\.?1|ALTA MIOPIA|MIOPIA/]];
+const EX_CID=[["ret_diab",/H36\.?0|\bE1[0-4]\.?3|RETINOPATIA DIAB|EDEMA MACULAR DIAB|\bRDNP\b|\bRDP\b|\bEMD\b/],["diabetes",/\bE1[0-4]|DIABET|\bDM ?(I|II|1|2)?\b/],["susp_glauc",/H40\.?0|SUSPEIT[AO] DE GLAUC|HIPERTENSAO OCULAR/],["glaucoma",/H40\.?[1-9]|H42|(?<!SUSPEITA DE |SUSPEITO DE )GLAUCOMA/],["dmri",/H35\.?3|DMRI|DEGENERACAO MACULAR/],["descol",/H33|DESCOLAMENTO DE RETINA|BURACO MACULAR/],["pseudo",/Z96\.?1|PSEUDOFAC/],["catarata",/H2[5-6]|CATARATA/],["has",/\bI10\b|HIPERTENSAO ARTERIAL|\bHAS\b/],["retina_vasc",/\bH34|OCLUS[AÃ]O (DE )?(VEIA|ARTERIA|VASCULAR)|\bOVCR\b|\bORVR\b|\bOACR\b/],["miopia",/ALTA MIOPIA/]];
 // Tom: humano e sério, sem emojis, sem diagnóstico e sem lista de exames; com a data e o tempo desde a última consulta.
 const EX_MSG_TIT={onze:"Checkup anual · 11 meses (sem fator de risco)",retina:"Retina tratada / DMRI / retinopatia já tratada (3 meses)",diabetes:"Diabetes / retinopatia sem tratamento (6 meses)",glaucoma:"Glaucoma e suspeita (6 meses)",catarata:"Catarata a operar (6 meses)",poscir:"Pós-catarata (6 meses no 1º ano, depois 12)",anual:"Checkup anual · 65+ · 70+ · hipertensão/miopia (12 meses)",incompleto:"Checkup · exames incompletos",nunca:"Checkup · nunca fez exames"};
 const EX_MSG={
@@ -2593,12 +2592,16 @@ function exMsgDe(k){ try{ return localStorage.getItem("exMsg4_"+k)||EX_MSG[k]; }
 const EX_NOMES=[[/OCT[^+,]*(PAPILA|NERVO|GLAUC)|PAPILA|CAMADA DE FIBRAS/,"OCT de nervo óptico"],[/MAPEAMENTO|\bMAP\b/,"Mapeamento de retina"],[/RETINOGRAF|\bRETINO\b/,"Retinografia"],[/TOMOGRAFIA DE COER|\bOCT\b/,"OCT de mácula"],[/CAMPIMETR|CAMPO VISUAL|\bCAM\b|\bCAMPO\b/,"Campimetria"],[/MICROSCOPIA ESPEC|\bMICRO\b|\bMICR\b/,"Microscopia especular"],[/CERATOSCOP|\bCERA\b/,"Ceratoscopia"],[/PAQUIMETR|\bPAQUI\b/,"Paquimetria"],[/BIOMETRIA|\bBIO\b/,"Biometria"],[/TOPOGRAF/,"Topografia"],[/GONIOSCOP/,"Gonioscopia"],[/TONOMETR|\bTONO\b/,"Tonometria"],[/FUNDOSCOP/,"Fundoscopia"],[/MOTILIDADE|\bMOT\b/,"Motilidade ocular"],[/ULTRASSON/,"Ultrassom"]];
 function nomesExames(a){ const t=(String(a.itens||"")+" "+String(a.descricao||"").replace(/#.*$/,"")).toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g,""); const out=[]; EX_NOMES.forEach(([re,n])=>{ if(re.test(t)&&!out.includes(n)) out.push(n); }); if(out.includes("OCT de nervo óptico")&&!/OCT[^+,]*MACUL/.test(t)) return out.filter(x=>x!=="OCT de mácula"); return out; }
 function exLemb(){ if(S.exLemb) return S.exLemb; try{ return JSON.parse(localStorage.getItem("exLemb")||"[]"); }catch(e){ return []; } }
+function exCondAuto(k){ const a=(S.pacCid||{})[k]; if(!a) return []; const out=new Set();
+  (a.cids||[]).forEach(c=>{ const t=String(c).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); EX_CID.forEach(([cond,re])=>{ if(re.test(t)) out.add(cond); }); });
+  if(a.esf!=null&&a.esf<=-6) out.add("miopia"); return [...out]; }
+function exCondTodas(k){ return [...new Set([...exCond(k),...exCondAuto(k)])]; }
 function exCond(k){ const c=(S.exConds||{})[k]; if(c) return c.condicoes||[]; try{ return (JSON.parse(localStorage.getItem("exConds")||"{}")[k])||[]; }catch(e){ return []; } }
 const idadeDe=n=>{ if(!n) return null; const d=parse(n), h=hoje(); let a=h.getFullYear()-d.getFullYear(); if(h<new Date(h.getFullYear(),d.getMonth(),d.getDate())) a--; return a>0&&a<120?a:null; };
 function classificaEx(P){
   const sinais=[], ts=P.vis.map(a=>String(a.itens||"")+" "+String(a.descricao||"").replace(/#.*$/,"")).join(" | ").toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
   const pac=pacPorNome(P.nome), cs=pac?S.casos.filter(c=>c.paciente_id===pac.id&&c.etapa!=="desistiu"):[];
-  const cond=exCond(P.k);
+  const cond=exCondTodas(P.k), auto=exCondAuto(P.k), cidTxt=((S.pacCid||{})[P.k]?.cids||[]).map(c=>String(c).split(" - ")[0]).join(", ");
   // retina tratada
   const inj=cs.find(c=>c.tipo==="injecao"&&!["indicado","orcamento","aguardando","duvida"].includes(c.etapa)), las=cs.find(c=>c.tipo==="laser"&&!["indicado","orcamento","aguardando","duvida"].includes(c.etapa)), vv=cs.find(c=>c.tipo==="cirurgia"&&/VVPP|VITRECT|RETIN/i.test(c.procedimento||"")&&c.data_realizado);
   if(inj) sinais.push("injeção intravítrea"+(inj.procedimento?" ("+inj.procedimento+")":"")); else if(/INTRAVITRE|AVASTIN|EYLIA|LUCENTIS|VABYSMO|QUIMIOTERAP/.test(ts)) sinais.push("injeção intravítrea no histórico");
@@ -2607,15 +2610,17 @@ function classificaEx(P){
   const retina=sinais.length>0;
   const diab=cond.includes("diabetes")||cond.includes("ret_diab")||/DIABET|RETINOPATIA DIAB|\bEMD\b/.test(ts+" "+cs.map(c=>(c.procedimento||"")+" "+(c.obs||"")).join(" ").toUpperCase());
   if(diab) sinais.push(cond.includes("diabetes")?"diabetes":"diabetes citado no histórico");
-  const gl=cond.includes("fam_glaucoma")||/CAMPIMETR|CAMPO VISUAL|GONIOSCOP|GLAUC|OCT[^|]*PAPILA|\bPIO\b/.test(ts);
-  if(cond.includes("glaucoma")) sinais.push("glaucoma"); if(cond.includes("susp_glauc")) sinais.push("suspeita de glaucoma"); if(gl) sinais.push(cond.includes("fam_glaucoma")?"glaucoma na família":"exames de investigação de glaucoma no histórico");
+  const gl=cond.includes("fam_glaucoma");
+  if(cond.includes("glaucoma")) sinais.push("glaucoma"); if(cond.includes("susp_glauc")) sinais.push("suspeita de glaucoma"); if(gl) sinais.push("glaucoma na família");
   const faco=cs.find(c=>c.tipo==="cirurgia"&&/FACO/i.test(c.procedimento||"")&&c.data_realizado&&desde(c.data_realizado)<=730);
   const pos=!!faco||/FACECTOMIA|FACOEMULS|CAPSULOTOMIA|\bYAG\b/.test(ts);
   if(pos) sinais.push(faco?`cirurgia de catarata em ${br(faco.data_realizado)}`:"cirurgia de catarata / YAG no histórico");
   if(cond.includes("dmri")) sinais.push("DMRI");
   if(cond.includes("has")) sinais.push("hipertensão");
-  if(cond.includes("miopia")) sinais.push("alta miopia");
+  if(cond.includes("miopia")) sinais.push("alta miopia"+((S.pacCid||{})[P.k]?.esf!=null&&(S.pacCid||{})[P.k].esf<=-6?` (${String((S.pacCid||{})[P.k].esf).replace(".",",")})`:""));
   if(cond.includes("descol")) sinais.push("descolamento / retina operada");
+  if(cond.includes("retina_vasc")) sinais.push("oclusão vascular da retina");
+  if(cidTxt) sinais.push("CID no prontuário: "+cidTxt);
   if(cond.includes("ret_diab")) sinais.push("retinopatia diabética");
   if(cond.includes("catarata")&&!pos) sinais.push("catarata diagnosticada");
   if(cond.includes("pseudo")&&!pos) sinais.push("já operou catarata");
@@ -2623,13 +2628,12 @@ function classificaEx(P){
   // Árvore de decisão (o primeiro ramo que se aplica)
   const tem=k=>cond.includes(k);
   const g = (tem("ret_diab")||(diab&&retina)) ? "retdiab"
-    : (retina||tem("dmri")||tem("descol")) ? "retina"
+    : (retina||tem("dmri")||tem("descol")||tem("retina_vasc")) ? "retina"
     : tem("glaucoma") ? "glaucoma"
     : diab ? "diabetes"
     : (gl||tem("susp_glauc")) ? "suspglauc"
     : (tem("catarata")&&!pos&&!tem("pseudo")) ? "catarata"
     : (pos||tem("pseudo")) ? "poscir"
-    : (id!=null&&id>=70) ? "cat70"
     : (id!=null&&id>=65) ? "idoso"
     : (tem("has")||tem("miopia")) ? "has"
     : "checkup";
@@ -2637,7 +2641,7 @@ function classificaEx(P){
   return {g,sinais,emCiclo,tratada:retina,facoData:faco?faco.data_realizado:null};
 }
 function pacientesExames(){
-  const at=(S.atend||[]); const sig=at.length+"|"+exLemb().length+"|"+Object.keys(S.exConds||{}).length+"|"+S.casos.length;
+  const at=(S.atend||[]); const sig=at.length+"|"+exLemb().length+"|"+Object.keys(S.exConds||{}).length+"|"+Object.keys(S.pacCid||{}).length+"|"+S.casos.length;
   if(S._exC&&S._exC.sig===sig) return S._exC.v;
   const h=hojeISO(), M={};
   at.forEach(a=>{ const k=chaveNome(a.paciente); if(!k) return; const P=M[k]||(M[k]={k,nome:a.paciente,vis:[],fut:[],tel:null,nasc:null});
@@ -2651,7 +2655,7 @@ function pacientesExames(){
     const comEx=[...P.vis].reverse().find(a=>nomesExames(a).length); P.exData=comEx?comEx.data:null;
     P.exames=comEx?[...new Set(P.vis.filter(a=>a.data===comEx.data).flatMap(nomesExames))]:[];
     P.todosEx=[...new Set(P.vis.flatMap(nomesExames))];
-    Object.assign(P,classificaEx(P)); if(!P.conv&&!EX_PART.includes(P.g)) return; // particular só nos grupos de retina grave e 70+ sem catarata
+    Object.assign(P,classificaEx(P)); if(!P.conv&&!EX_PART.includes(P.g)&&!(P.g==="idoso"&&P.idade>=70)) return; // particular só nos grupos de retina grave e 70+ sem catarata
     const G=EX_G[P.g];
     P.sug=G.ex.map(e=>({e,novo:!P.todosEx.includes(e)}));
     P.prazo=P.g==="retdiab"?(P.tratada?90:180):P.g==="poscir"?(P.facoData&&desde(P.facoData)<=365?180:365):["checkup","idoso","has"].includes(P.g)?335:G.dias; // sem fator de risco: lembrete aos 11 meses
@@ -2690,15 +2694,15 @@ function telaExames(){
   const st=S.exSt||"enviar", gr=S.exGr||"";
   const T=todos.filter(P=>!gr||P.g===gr);
   const n=k=>T.filter(P=>P.sit===k).length;
-  const PRIO=["retdiab","retina","diabetes","poscir","glaucoma","suspglauc","catarata","cat70","idoso","has","checkup"];
+  const PRIO=["retdiab","retina","diabetes","poscir","glaucoma","suspglauc","catarata","idoso","has","checkup"];
   const L=T.filter(P=>st==="todos"?!["emdia","ciclo"].includes(P.sit):P.sit===st).sort((a,b)=>PRIO.indexOf(a.g)-PRIO.indexOf(b.g)||a.falta-b.falta);
   const ch=(k,cls,t)=>`<button class="stat ${cls} ${st===k?"on":""}" data-pset="exSt=${k}" aria-pressed="${st===k}"><b>${n(k)}</b><span>${t}</span></button>`;
   const planos=[...new Set(pacientesExames().map(P=>P.plano.toUpperCase()))].sort();
   const gcard=G=>{ const its=todos.filter(P=>P.g===G.k), env=its.filter(P=>P.sit==="enviar"); const ec=env.filter(P=>P.conv).length, ep=env.length-ec;
-    return `<button class="exg ${gr===G.k?"on":""} ${G.cor}" data-pset="exGr=${gr===G.k?"":G.k}" aria-pressed="${gr===G.k}"><span class="exg-n">${G.nome}</span><b>${env.length}</b><small>para enviar · ${its.length} no grupo</small><small class="exg-r">a cada ${Math.round(G.dias/30)} meses · ${EX_PART.includes(G.k)?"convênio e particular":"convênio"}</small></button>`; };
+    return `<button class="exg ${gr===G.k?"on":""} ${G.cor}" data-pset="exGr=${gr===G.k?"":G.k}" aria-pressed="${gr===G.k}"><span class="exg-n">${G.nome}</span><b>${env.length}</b><small>para enviar · ${its.length} no grupo</small><small class="exg-r">a cada ${Math.round(G.dias/30)} meses · ${EX_PART.includes(G.k)?"convênio e particular":G.k==="idoso"?"convênio (e particular 70+)":"convênio"}</small></button>`; };
   const linha=P=>{ const f=telIntl(P.tel), G=EX_G[P.g];
     const st2= P.sit==="enviado"?`<span class="fl ok">Lembrete enviado ${dm(P.lemb.em)}</span>` : P.sit==="marcado"?`<span class="fl ok">Retorno marcado ${dm(P.fut[0].data)}</span>` : P.sit==="adiado"?`<span class="fl">Adiado até ${dm(P.lemb.adiar_ate)}</span>` : P.sit==="nao"?`<span class="fl">Não enviar</span>` : P.sit==="ciclo"?`<span class="fl blue">Em ciclo de injeção</span>` : P.falta<=0?`<span class="fl late">Venceu há ${-P.falta} dias</span>`:`<span class="fl warn">Vence em ${P.falta} dias</span>`;
-    const acts=["marcado","ciclo"].includes(P.sit)?"":`${f?`<button class="btn small okb" data-act="ex-whats" data-k="${esc(P.k)}">${P.sit==="enviado"?"Reenviar":"Enviar WhatsApp"}</button>`:`<span class="fl">sem telefone</span>`}${P.sit==="enviado"?"":`<button class="btn small ghost" data-act="ex-marca" data-k="${esc(P.k)}" data-st="enviado">Marcar enviado</button>`}${["cat70","catarata"].includes(P.g)?`<button class="btn small ghost" data-act="ex-pseudo" data-k="${esc(P.k)}" title="Operou a catarata (aqui ou em outro local): passa para Pós-catarata">Já operou catarata</button>`:""}${["enviar","breve"].includes(P.sit)?`<button class="btn small ghost" data-act="ex-marca" data-k="${esc(P.k)}" data-st="adiado">Adiar 30 dias</button><button class="btn small ghost" data-act="ex-marca" data-k="${esc(P.k)}" data-st="nao_enviar">Não enviar</button>`:""}`;
+    const acts=["marcado","ciclo"].includes(P.sit)?"":`${f?`<button class="btn small okb" data-act="ex-whats" data-k="${esc(P.k)}">${P.sit==="enviado"?"Reenviar":"Enviar WhatsApp"}</button>`:`<span class="fl">sem telefone</span>`}${P.sit==="enviado"?"":`<button class="btn small ghost" data-act="ex-marca" data-k="${esc(P.k)}" data-st="enviado">Marcar enviado</button>`}${(P.g==="catarata"||(P.g==="idoso"&&P.idade>=70))?`<button class="btn small ghost" data-act="ex-pseudo" data-k="${esc(P.k)}" title="Operou a catarata (aqui ou em outro local): passa para Pós-catarata">Já operou catarata</button>`:""}${["enviar","breve"].includes(P.sit)?`<button class="btn small ghost" data-act="ex-marca" data-k="${esc(P.k)}" data-st="adiado">Adiar 30 dias</button><button class="btn small ghost" data-act="ex-marca" data-k="${esc(P.k)}" data-st="nao_enviar">Não enviar</button>`:""}`;
     return `<div class="tk-row pr-row ex-row"><div class="inj-nome"><div class="ex-l1"><button class="ex-trat" data-act="ex-sexo" data-k="${esc(P.k)}" title="Tocar para trocar Sr./Sra.">${sexoDe(P)==="f"?"Sra.":"Sr."}</button><b class="ex-nome">${esc(nomeCurto(P.nome))}</b><span class="ex-risco ${G.cor}">${G.nome}</span>${P.abord==="nunca"?`<span class="fl warn">Nunca fez exames → convidar para o checkup</span>`:P.abord==="retorno10"?`<span class="fl warn">Sem retorno há ${Math.floor(P.diasAt/30)} meses → reconvidar</span>`:P.abord==="onze"?`<span class="fl blue">Veio há ${Math.floor(P.diasAt/30)} meses → lembrar do checkup anual</span>`:P.abord==="vencido"?`<span class="fl warn">Exames vencidos (último ${dm(P.exData)}) → repetir</span>`:P.abord==="incompleto"?`<span class="fl blue">Exames incompletos → faltam: ${esc(P.novos.join(", "))}</span>`:""}${st2}</div>
       <small><span class="ttag ${P.conv?"t-injecao":"t-cirurgia"}">${esc(P.plano)}</span> ${esc(P.local||"")}${P.idade!=null?` · ${P.idade} anos`:""} · último atendimento ${br(P.base)}</small>
       <div class="ex-hist"><span class="ex-lab">Por quê</span><span class="ex-por">${esc(P.sinais.filter(x=>!/ anos$/.test(x)).join(" · ")||G.por)}</span><button class="linkbtn ex-cond" data-act="ex-cond" data-k="${esc(P.k)}">${exCond(P.k).length?"editar condições":"+ condição (diabetes, glaucoma…)"}</button></div>
@@ -2710,8 +2714,8 @@ function telaExames(){
   <details class="panel resumo ex-como"><summary><b>Como funciona a triagem</b> · grupos, prazos e exames</summary>
     <ol><li><b>Quem entra:</b> pacientes de <b>convênio</b> atendidos (agenda do EyecareBI + Amigo, desde fev/26). <b>Particular</b> também entra nos grupos de cuidado de <b>retina grave</b> (retinopatia diabética, retina tratada/DMRI) e no <b>70+ sem catarata</b>. Use o filtro Pagamento para separar. Quem está em ciclo de injeção fica de fora.</li>
     <li><b>Checkup anual da visão (grupos sem doença grave)</b>, separado pela ação da equipe: <b>nunca fez exames</b> → convidar para o checkup; <b>exames incompletos</b> → faltam exames complementares; <b>exames vencidos</b> → último exame passou do prazo do grupo, repetir; <b>checkup anual · 11 meses</b> → veio há 11 meses e não tem fator de risco, lembrar do checkup anual; <b>sem retorno há 12+ meses</b> → reconvidar.</li>
-    <li><b>Mapeamos o histórico:</b> exames já feitos, procedimentos (injeção, laser, cirurgias), idade e <b>diagnósticos (CID)</b>. Os diagnósticos entram pela planilha exportada do prontuário (botão <b>Importar diagnósticos</b>) ou marcados na mão em "+ condição".</li>
-    <li><b>Árvore de decisão</b> (o primeiro ramo que se aplica): Retinopatia diabética → Retina tratada/DMRI → Glaucoma → Diabetes sem retinopatia → Suspeita de glaucoma → Catarata a operar → Pós-catarata → 70+ sem catarata → 65 a 69 anos → Hipertensão/alta miopia → Checkup.</li>
+    <li><b>Mapeamos o histórico:</b> exames já feitos, procedimentos (injeção, laser, cirurgias), idade e <b>diagnósticos (CID)</b>. Os CIDs e o grau de miopia vêm <b>sozinhos do prontuário do EyecareBI</b> (leitura noturna); também dá para marcar na mão em "+ condição" (vale junto com o automático). Alta miopia = grau de −6,00 ou mais. Suspeita de glaucoma só com CID H40.0 ou glaucoma na família (tonometria e campimetria de rotina não contam).</li>
+    <li><b>Árvore de decisão</b> (o primeiro ramo que se aplica): Retinopatia diabética → Retina (tratada, DMRI, oclusão vascular, descolamento) → Glaucoma → Diabetes sem retinopatia → Suspeita de glaucoma → Catarata a operar → Pós-catarata → 65+ → Hipertensão/alta miopia → Checkup.</li>
     <li><b>Prazo:</b> conta a partir dos últimos exames (ou do último atendimento, se não fez exame). Retina tratada 3 meses; diabetes, glaucoma e catarata a operar 6 meses; pós-catarata 6 meses no 1º ano e depois 12; sem fator de risco 12 meses. Entra em "Enviar agora" quando vence; aparece em "Vence em até 30 dias" antes.</li>
     <li><b>Mensagem:</b> tom humano e sério, sem emojis e sem detalhar exames nem diagnósticos (a indicação é feita na consulta). Na tela, os exames que o paciente <b>nunca fez</b> aparecem marcados como NOVO, para a equipe.</li>
     <li><b>Sai da lista sozinho</b> quando marca retorno na agenda. Lembrete enviado, adiado (30 dias) ou "não enviar" ficam registrados.</li></ol>
@@ -2731,7 +2735,9 @@ async function marcaExame(P,status,extra){
   const L=exLemb(); L.push(row); try{ localStorage.setItem("exLemb",JSON.stringify(L)); }catch(e){} S.exLemb=L; S._exC=null; render(); toast("Registrado neste aparelho ✔");
 }
 async function carregaExLemb(){ const r=await sb.from("exames_lembretes").select("*").order("criado_em",{ascending:false}).limit(5000); if(r.error){ S.exSemTabela=true; S.exLemb=null; } else { S.exSemTabela=false; S.exLemb=r.data||[]; }
-  const c=await sb.from("paciente_condicoes").select("*"); S.exConds=c.error?null:Object.fromEntries((c.data||[]).map(x=>[x.paciente,x])); S._exC=null; }
+  const c=await sb.from("paciente_condicoes").select("*"); S.exConds=c.error?null:Object.fromEntries((c.data||[]).map(x=>[x.paciente,x]));
+  let pc=[]; for(let k=0;k<20;k++){ const q=await sb.from("paciente_cid").select("nome,cids,esf_min").range(k*1000,k*1000+999); if(q.error||!q.data) break; pc=pc.concat(q.data); if(q.data.length<1000) break; }
+  S.pacCid=Object.fromEntries(pc.map(x=>[chaveNome(x.nome),{cids:x.cids||[],esf:x.esf_min==null?null:Number(x.esf_min)}])); S._exC=null; }
 // Tratamento Sr./Sra. pelo primeiro nome (a equipe pode corrigir no paciente)
 const NOMES_F=new Set("ALICE BEATRIZ RAQUEL ISABEL ISABEL ESTER ESTHER RUTH RUTE MIRIAM MIRIAN CARMEM CARMEN LURDES LOURDES MERCEDES IRACI IRACY NOEMI NOEMIA INES LIZ LUZ NEIDE CLEIDE ZELI DIRCE CLARICE BERENICE EUNICE DENISE IVONE MARLENE IRENE ROSIMEIRE ROSEMEIRE ELIZABETH ELISABETH ELISABETE ELIZABETE SIMONE JAQUELINE JACQUELINE MICHELE MICHELLE GISELE GISELLE YASMIN JASMIN KAREN KELLY SUELY SUELI NELI NELY ODETE IVETE ELIETE MARILENE DAIANE ROSANGELA ABIGAIL RAQUEL HELOISA ADELIA IOLANDA SOLANGE ROSE ROSI ROSY GLADYS DORIS LUCILENE LUZIA EDILEUSA NILCE ALCIONE CREUZA ZULEIDE ESMERALDA MARIZE MARISE HELOIZE ELOISE ELISE DOLORES LAIS SIRLEY DORACY HELLEN HELEN MARLY CONSUELO DOMINGAS LILLIAN LILIAN DEBORAH DEBORA INGRED INGRID GUIOMAR NICOLE HEMILLY YASMIM DYRCE CORACI JURACY MARLE LENILSE GRAZIELE GLEYCE KETLYN LORANNY ALINY SOLENI CELENI NAIDES EIDES LALISSE JOSENY IRANI ELIECY SUENNE MARIANNE RAYANNE PABLLYNE HALYNE KAROLLYNE GABRIELLY DAYSE DEISE NEUSA NAIR ZILAH SARAH SARA LEAH MIRIAM EDNA MARLI MARLY SHIRLEY SHIRLEI CLEIDE".split(" "));
 const NOMES_M=new Set("JONNY JHONNY JHONY JOHNNY WESLEY JUSLEY DAUVESLEY WELLINGTON JOSE JOAO LUCA LUKA JOSUA JOSHUA NOA BATISTA BAPTISTA SAMUEL DANIEL MANUEL MANOEL GABRIEL RAFAEL MIGUEL ISRAEL EZEQUIEL NATANAEL ABEL JOEL NOEL ARIEL ADRIEL UZIEL CARMELITA_M".split(" "));
@@ -2759,7 +2765,7 @@ function textoExMsg(P,modelo){
     ultima:(P.exData&&key!=="nunca")?`Os seus últimos exames com a Dra. foram em ${parse(P.exData).toLocaleDateString("pt-BR",{day:"numeric",month:"long",year:"numeric"})}, há ${tempoDesde(P.exData)}.`:`A sua última consulta com a Dra. foi em ${d.toLocaleDateString("pt-BR",{day:"numeric",month:"long",year:"numeric"})}, há ${tempoDesde(P.base)}.`,
     contato:contatoAgenda(P.local),cirurgia,revisao:fc&&desde(P.facoData)<=365?"de 6 meses":"anual",
     ano_novo:anoNovo?` Que tal já começar ${proxAno} com a visão em dia?`:"",
-    aviso_catarata:P.g==="cat70"?`\n\nSe ${pron} já fez cirurgia de catarata, mesmo em outro lugar, por favor nos avise.`:"",
+    aviso_catarata:(P.g==="idoso"&&P.idade>=70)?`\n\nSe ${pron} já fez cirurgia de catarata, mesmo em outro lugar, por favor nos avise.`:"",
     ano:String(proxAno),meses:String(Math.floor((P.diasAt||0)/30)),data_mes:mesAno(d),data_atend:br(P.base)};
   return (modelo||exMsgDe(key)).replace(/\{(\w+)\}/g,(m,k)=>V[k]!==undefined?V[k]:m).replace(/\n{3,}/g,"\n\n").trim();
 }
