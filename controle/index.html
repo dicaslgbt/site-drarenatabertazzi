@@ -2580,15 +2580,15 @@ const EX_CID=[["ret_diab",/H36\.?0|RETINOPATIA DIAB|EDEMA MACULAR DIAB|\bRDNP\b|
 // Tom: humano e sério, sem emojis, sem diagnóstico e sem lista de exames; com a data e o tempo desde a última consulta.
 const EX_MSG_TIT={retina:"Retina tratada / DMRI / retinopatia já tratada (3 meses)",diabetes:"Diabetes / retinopatia sem tratamento (6 meses)",glaucoma:"Glaucoma e suspeita (6 meses)",catarata:"Catarata a operar (6 meses)",poscir:"Pós-catarata (6 meses no 1º ano, depois 12)",anual:"Checkup anual · 65+ · 70+ · hipertensão/miopia (12 meses)",incompleto:"Checkup · exames incompletos",nunca:"Checkup · nunca fez exames"};
 const EX_MSG={
-  retina:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Pelo seu histórico de tratamento da retina, o acompanhamento precisa ser frequente para confirmar que tudo segue estável. Alterações podem voltar sem dar sintomas, por isso a reavaliação no prazo faz diferença.\n\n{contato}",
-  diabetes:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Pelo seu histórico, a retina precisa ser avaliada a cada 6 meses. As alterações costumam começar sem sintomas, e identificar cedo é o que protege a visão.\n\n{contato}",
-  glaucoma:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} No acompanhamento da pressão e do nervo do olho, as reavaliações regulares são o que mantém a visão protegida, mesmo quando não há nenhum sintoma.\n\n{contato}",
-  catarata:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Na sua última avaliação, a Dra. acompanhou a transparência do cristalino, a lente natural do olho, e gostaria de reavaliar. Se ler, ver televisão ou dirigir à noite ficou mais difícil, vale comentar na consulta.\n\nSe {pronome} já fez cirurgia de catarata, mesmo em outro lugar, por favor nos avise para ajustarmos o seu acompanhamento.\n\n{contato}",
-  poscir:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{cirurgia} A Dra. gostaria de ver {pronome} para a revisão {revisao} da lente intraocular e da retina.\n\n{contato}",
-  anual:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Mesmo sem queixas, a recomendação é avaliar os olhos uma vez por ano, porque alterações como glaucoma, catarata e problemas de retina podem começar sem sintomas.{ano_novo}{aviso_catarata}\n\n{contato}",
-  incompleto:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Na ocasião, ficaram faltando alguns exames complementares para concluir a sua avaliação. Mesmo sem queixas, a recomendação é avaliar os olhos uma vez por ano, porque alterações como glaucoma, catarata e problemas de retina podem começar sem sintomas.{ano_novo}\n\n{contato}",
-  nunca:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Ainda não constam no seu cadastro os exames do checkup ocular anual. Mesmo sem queixas, a recomendação é avaliar os olhos uma vez por ano, porque alterações como glaucoma, catarata e problemas de retina podem começar sem sintomas.{ano_novo}\n\n{contato}"};
-function exMsgDe(k){ try{ return localStorage.getItem("exMsg3_"+k)||EX_MSG[k]; }catch(e){ return EX_MSG[k]; } }
+  retina:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} É importante manter o acompanhamento em dia, mesmo sem sintomas.\n\n{contato}\n\nVamos cuidar juntos da sua visão.",
+  diabetes:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} É importante manter o acompanhamento em dia, mesmo sem sintomas.\n\n{contato}\n\nVamos cuidar juntos da sua visão.",
+  glaucoma:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} É importante manter o acompanhamento em dia, mesmo sem sintomas.\n\n{contato}\n\nVamos cuidar juntos da sua visão.",
+  catarata:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} A Dra. gostaria de reavaliar a sua visão. Se ler, ver televisão ou dirigir à noite ficou mais difícil, vale comentar na consulta.\n\nSe {pronome} já fez cirurgia de catarata, mesmo em outro lugar, por favor nos avise.\n\n{contato}\n\nVamos cuidar juntos da sua visão.",
+  poscir:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{cirurgia} A Dra. gostaria de ver {pronome} para a revisão {revisao} da lente intraocular e da retina.\n\n{contato}\n\nVamos cuidar juntos da sua visão.",
+  anual:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} É importante manter o acompanhamento em dia, mesmo sem sintomas.{ano_novo}{aviso_catarata}\n\n{contato}\n\nVamos cuidar juntos da sua visão.",
+  incompleto:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Na ocasião, ficaram faltando alguns exames para concluir a sua avaliação. É importante completá-los, mesmo sem sintomas.{ano_novo}\n\n{contato}\n\nVamos cuidar juntos da sua visão.",
+  nunca:"Olá, {trat} {nome}. Aqui é da equipe da Dra. Renata Bertazzi, sua oftalmologista.\n\n{ultima} Ainda não constam no seu cadastro os exames do checkup ocular anual. É importante fazê-los, mesmo sem sintomas.{ano_novo}\n\n{contato}\n\nVamos cuidar juntos da sua visão."};
+function exMsgDe(k){ try{ return localStorage.getItem("exMsg4_"+k)||EX_MSG[k]; }catch(e){ return EX_MSG[k]; } }
 const EX_NOMES=[[/OCT[^+,]*(PAPILA|NERVO|GLAUC)|PAPILA|CAMADA DE FIBRAS/,"OCT de nervo óptico"],[/MAPEAMENTO|\bMAP\b/,"Mapeamento de retina"],[/RETINOGRAF|\bRETINO\b/,"Retinografia"],[/TOMOGRAFIA DE COER|\bOCT\b/,"OCT de mácula"],[/CAMPIMETR|CAMPO VISUAL|\bCAM\b|\bCAMPO\b/,"Campimetria"],[/MICROSCOPIA ESPEC|\bMICRO\b|\bMICR\b/,"Microscopia especular"],[/CERATOSCOP|\bCERA\b/,"Ceratoscopia"],[/PAQUIMETR|\bPAQUI\b/,"Paquimetria"],[/BIOMETRIA|\bBIO\b/,"Biometria"],[/TOPOGRAF/,"Topografia"],[/GONIOSCOP/,"Gonioscopia"],[/TONOMETR|\bTONO\b/,"Tonometria"],[/FUNDOSCOP/,"Fundoscopia"],[/MOTILIDADE|\bMOT\b/,"Motilidade ocular"],[/ULTRASSON/,"Ultrassom"]];
 function nomesExames(a){ const t=(String(a.itens||"")+" "+String(a.descricao||"").replace(/#.*$/,"")).toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g,""); const out=[]; EX_NOMES.forEach(([re,n])=>{ if(re.test(t)&&!out.includes(n)) out.push(n); }); if(out.includes("OCT de nervo óptico")&&!/OCT[^+,]*MACUL/.test(t)) return out.filter(x=>x!=="OCT de mácula"); return out; }
 function exLemb(){ if(S.exLemb) return S.exLemb; try{ return JSON.parse(localStorage.getItem("exLemb")||"[]"); }catch(e){ return []; } }
@@ -2757,8 +2757,8 @@ function textoExMsg(P,modelo){
     data_consulta:d.toLocaleDateString("pt-BR",{day:"numeric",month:"long",year:"numeric"}),tempo:tempoDesde(P.base),
     ultima:(P.exData&&key!=="nunca")?`Os seus últimos exames com a Dra. foram em ${parse(P.exData).toLocaleDateString("pt-BR",{day:"numeric",month:"long",year:"numeric"})}, há ${tempoDesde(P.exData)}.`:`A sua última consulta com a Dra. foi em ${d.toLocaleDateString("pt-BR",{day:"numeric",month:"long",year:"numeric"})}, há ${tempoDesde(P.base)}.`,
     contato:contatoAgenda(P.local),cirurgia,revisao:fc&&desde(P.facoData)<=365?"de 6 meses":"anual",
-    ano_novo:anoNovo?` Que tal já começar ${proxAno} com o checkup ocular em dia?`:"",
-    aviso_catarata:P.g==="cat70"?`\n\nSe ${pron} já fez cirurgia de catarata, mesmo em outro lugar, por favor nos avise para ajustarmos o seu acompanhamento.`:"",
+    ano_novo:anoNovo?` Que tal já começar ${proxAno} com a visão em dia?`:"",
+    aviso_catarata:P.g==="cat70"?`\n\nSe ${pron} já fez cirurgia de catarata, mesmo em outro lugar, por favor nos avise.`:"",
     ano:String(proxAno),meses:String(Math.floor((P.diasAt||0)/30)),data_mes:mesAno(d),data_atend:br(P.base)};
   return (modelo||exMsgDe(key)).replace(/\{(\w+)\}/g,(m,k)=>V[k]!==undefined?V[k]:m).replace(/\n{3,}/g,"\n\n").trim();
 }
@@ -2776,7 +2776,7 @@ function folhaExMsg(){
   const prev=()=>{ const el=$("#exMsgPrev"); if(el) el.textContent=ex?textoExMsg(ex,$("#exMsgTx").value):"Nenhum paciente neste grupo agora."; };
   $("#exMsgTx").addEventListener("input",prev); prev();
   $("#exMsgG").addEventListener("change",e=>{ S.exMsgG=e.target.value; folhaExMsg(); });
-  $("#fexm").addEventListener("submit",e=>{ e.preventDefault(); try{ localStorage.setItem("exMsg3_"+g,$("#exMsgTx").value); }catch(err){} fechar(); toast("Mensagem salva ✔"); });
+  $("#fexm").addEventListener("submit",e=>{ e.preventDefault(); try{ localStorage.setItem("exMsg4_"+g,$("#exMsgTx").value); }catch(err){} fechar(); toast("Mensagem salva ✔"); });
   $("#exMsgPad").addEventListener("click",()=>{ $("#exMsgTx").value=EX_MSG[g]; });
 }
 function folhaExImport(){
