@@ -133,7 +133,7 @@ function PrimaryCTA({ className = "", children = "Agendar Consulta via WhatsApp"
       href={WA_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group inline-flex min-h-[56px] items-center justify-center gap-3 whitespace-nowrap rounded-full bg-[#004AAD] px-6 text-[16px] font-semibold text-white shadow-[0_16px_34px_-16px_rgba(0,74,173,0.6)] transition hover:bg-[#003C8F] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#79A9D2] ${className}`}
+      className={`group inline-flex min-h-[54px] items-center justify-center gap-3 whitespace-nowrap rounded-lg bg-[#0E2A57] px-6 text-[15.5px] font-semibold tracking-[0.01em] text-white shadow-[0_8px_20px_-12px_rgba(14,42,87,0.55)] transition hover:bg-[#123A75] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#79A9D2] ${className}`}
     >
       <MessageCircle className="h-5 w-5 text-[#CFE0F3]" strokeWidth={2} />
       {children}
@@ -156,7 +156,7 @@ function Header() {
           {links.map(([h, t]) => (
             <a key={h} href={h} className="whitespace-nowrap text-[15px] font-medium text-[#0E2A57]/75 transition hover:text-[#0E2A57]">{t}</a>
           ))}
-          <a href={WA_URL} target="_blank" rel="noopener noreferrer" className="whitespace-nowrap rounded-full bg-[#004AAD] px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-[#003C8F]">Agendar</a>
+          <a href={WA_URL} target="_blank" rel="noopener noreferrer" className="whitespace-nowrap rounded-lg bg-[#0E2A57] px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-[#123A75]">Agendar</a>
         </nav>
         <button
           className="grid h-11 w-11 place-items-center rounded-full border border-[#0E2A57]/15 lg:hidden"
@@ -218,7 +218,7 @@ function Hero() {
           </p>
 
           {/* credenciais */}
-          <dl className="mt-7 grid grid-cols-3 divide-x divide-[#79A9D2]/45 rounded-2xl bg-white/85 py-3.5 shadow-[0_14px_34px_-24px_rgba(0,74,173,0.5)] ring-1 ring-[#79A9D2]/40 backdrop-blur">
+          <dl className="mt-7 grid grid-cols-3 divide-x divide-[#79A9D2]/45 rounded-lg bg-white/85 py-3.5 shadow-[0_14px_34px_-24px_rgba(0,74,173,0.5)] ring-1 ring-[#79A9D2]/40 backdrop-blur">
             {[
               ["CRM-TO", "7132"],
               ["RQE", "3562"],
@@ -235,9 +235,8 @@ function Hero() {
             <PrimaryCTA />
             <a
               href="#fale"
-              className="inline-flex min-h-[56px] items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-[#79A9D2] bg-white px-7 text-[16px] font-semibold text-[#004AAD] transition hover:border-[#004AAD]"
+              className="inline-flex min-h-[54px] items-center justify-center gap-2.5 whitespace-nowrap rounded-lg border border-[#0E2A57]/25 bg-white/80 px-7 text-[15.5px] font-semibold text-[#0E2A57] transition hover:border-[#0E2A57] hover:bg-white"
             >
-              <MessageSquareHeart className="h-5 w-5" strokeWidth={1.8} />
               Envie sua dúvida ou recado
             </a>
           </div>
@@ -359,7 +358,7 @@ function LensQuiz() {
             <h2 className="mt-5 font-serif text-[36px] leading-[1.1] sm:text-[46px]">Vai operar catarata? Descubra a lente ideal para você.</h2>
             <p className="mt-5 text-[18px] leading-[1.7] text-white/85">Marque como é o seu dia a dia e veja, na hora, como você enxergaria de longe, no computador e de perto com cada tipo de lente.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <a href={QUIZ_URL} className="inline-flex flex-none items-center justify-center gap-2 whitespace-nowrap rounded-full bg-white px-7 py-4 text-[17px] font-semibold text-[#0E2A57] shadow-lg transition hover:bg-[#E6F2F2] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#7CCBB8]">
+              <a href={QUIZ_URL} className="inline-flex flex-none items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-white px-7 py-4 text-[16px] font-semibold text-[#0E2A57] shadow-lg transition hover:bg-[#E6F2F2] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#7CCBB8]">
                 Fazer o quiz <ArrowRight className="h-5 w-5" aria-hidden="true" />
               </a>
               <span className="text-[15px] text-white/75">Leva menos de 1 minuto · resultado na hora</span>
@@ -636,10 +635,10 @@ function Messages() {
         </div>
 
         <form onSubmit={enviar} noValidate className="grid gap-5 rounded-2xl bg-white p-6 shadow-[0_30px_60px_-40px_rgba(0,74,173,0.55)] ring-1 ring-[#79A9D2]/40 sm:p-8">
-          <div role="radiogroup" aria-label="O que você quer enviar?" className="grid grid-cols-2 gap-1.5 rounded-full bg-[#EEF4FB] p-1.5">
+          <div role="radiogroup" aria-label="O que você quer enviar?" className="grid grid-cols-2 gap-1.5 rounded-lg bg-[#EEF4FB] p-1.5">
             {[["duvida", "Enviar dúvida"], ["recado", "Deixar recado"]].map(([k, t]) => (
               <button key={k} type="button" role="radio" aria-checked={tipo === k} onClick={() => setTipo(k)}
-                className={`min-h-[46px] rounded-full px-3 text-[15px] font-semibold transition ${tipo === k ? "bg-[#004AAD] text-white shadow" : "text-[#33415C] hover:text-[#004AAD]"}`}>{t}</button>
+                className={`min-h-[46px] rounded-md px-3 text-[15px] font-semibold transition ${tipo === k ? "bg-[#004AAD] text-white shadow" : "text-[#33415C] hover:text-[#004AAD]"}`}>{t}</button>
             ))}
           </div>
           <Field label="Seu nome"><input className={inputCls} value={f.nome} onChange={set("nome")} maxLength={80} autoComplete="name" required /></Field>
@@ -660,7 +659,7 @@ function Messages() {
             <input type="checkbox" checked={f.consentimento} onChange={set("consentimento")} className="mt-0.5 h-5 w-5 flex-none accent-[#004AAD]" />
             Concordo que a equipe da Dra. Renata use estes dados apenas para ler e responder a minha mensagem.
           </label>
-          <button type="submit" disabled={st.state === "enviando"} className="inline-flex min-h-[56px] items-center justify-center gap-2.5 rounded-full bg-[#004AAD] px-6 text-[16px] font-semibold text-white shadow-[0_16px_34px_-16px_rgba(0,74,173,0.6)] transition hover:bg-[#003C8F] disabled:opacity-60">
+          <button type="submit" disabled={st.state === "enviando"} className="inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-lg bg-[#0E2A57] px-6 text-[15.5px] font-semibold text-white transition hover:bg-[#123A75] disabled:opacity-60">
             <Send className="h-5 w-5" strokeWidth={1.9} />{st.state === "enviando" ? "Enviando…" : "Enviar mensagem"}
           </button>
           <div role="status" aria-live="polite" className="text-[15.5px] font-semibold">
