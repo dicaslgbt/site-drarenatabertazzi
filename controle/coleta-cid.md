@@ -1,7 +1,7 @@
 # Coleta de diagnósticos (CID) e refração — EyecareBI
 
 Somente leitura no EyecareBI. Pede ao portal (Supabase) a lista de pacientes pendentes, lê o histórico de cada um
-e grava CIDs e o grau esférico mais negativo em `paciente_cid` (função `receber_cid`). A chave vem no prompt da rotina
+e grava CIDs (com a data mais recente de cada um: "AAAA-MM-DD|CID - descrição") e o grau esférico mais negativo em `paciente_cid` (função `receber_cid`). A chave vem no prompt da rotina
 (`CHAVE_CID`); no repositório fica só o hash dela.
 
 Rodar na aba do EyecareBI (logada). Processa até `LIM` pacientes por rodada; o progresso fica em `window.__cid`.
@@ -19,7 +19,9 @@ const envia=async()=>{ if(!lote.length) return; const it=lote.splice(0); await f
 const num=v=>{ const s=String(v||'').toUpperCase().replace(',','.').trim(); if(/^PL/.test(s)) return 0; const m=s.match(/^[+-]?\d+(\.\d+)?/); return m?Number(m[0]):null; };
 const um=async p=>{ const [root,unit]=ids(p.unidade); let cids=new Set(), esf=null;
   try{ const r=await fetch(API+'attendances/patient/history',{method:'POST',headers:{Authorization:'Bearer '+tok,'X-Root-Clinic':root,'X-Unity':unit,Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({patient_id:p.paciente_id,clinic_id:unit,attendance_types:['ATTENDANCE','EXAM','SURGERY','PRE_CONSULTATION'],modules:[],date:null})});
-    if(r.ok){ const h=await r.json(); (function w(o,k){ if(o&&typeof o==='object'){ for(const kk in o) w(o[kk],kk); } else if(k==='cid'&&o) cids.add(String(o).slice(0,120)); else if(/^olho(Direito|Esquerdo)Esferico(Din)?$/.test(k)){ const n=num(o); if(n!=null&&n>-30&&n<20) esf=esf==null?n:Math.min(esf,n); } })(h,''); window.__cid.ok++; }
+    if(r.ok){ const h=await r.json(); const ult={}; // CID -> data mais recente em que apareceu
+      for(const [data,arr] of Object.entries(h||{})){ (function w(o,k){ if(o&&typeof o==='object'){ for(const kk in o) w(o[kk],kk); } else if(k==='cid'&&o){ const c=String(o).slice(0,120); if(!ult[c]||data>ult[c]) ult[c]=data; } else if(/^olho(Direito|Esquerdo)Esferico(Din)?$/.test(k)){ const n=num(o); if(n!=null&&n>-30&&n<20) esf=esf==null?n:Math.min(esf,n); } })(arr,''); }
+      Object.entries(ult).forEach(([c,d])=>cids.add(/^\d{4}-\d{2}-\d{2}$/.test(d)?d+'|'+c:c)); window.__cid.ok++; }
     else window.__cid.erro++;
   }catch(e){ window.__cid.erro++; }
   lote.push({paciente_id:p.paciente_id,nome:p.nome,cids:[...cids],esf_min:esf,ultima:p.ultima}); if(lote.length>=50) await envia(); };

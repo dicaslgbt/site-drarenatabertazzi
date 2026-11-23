@@ -2594,16 +2594,21 @@ function exMsgDe(k){ try{ return localStorage.getItem("exMsg7_"+k)||EX_MSG[k]; }
 const EX_NOMES=[[/OCT[^+,]*(PAPILA|NERVO|GLAUC)|PAPILA|CAMADA DE FIBRAS/,"OCT de nervo óptico"],[/MAPEAMENTO|\bMAP\b/,"Mapeamento de retina"],[/RETINOGRAF|\bRETINO\b/,"Retinografia"],[/TOMOGRAFIA DE COER|\bOCT\b/,"OCT de mácula"],[/CAMPIMETR|CAMPO VISUAL|\bCAM\b|\bCAMPO\b/,"Campimetria"],[/MICROSCOPIA ESPEC|\bMICRO\b|\bMICR\b/,"Microscopia especular"],[/CERATOSCOP|\bCERA\b/,"Ceratoscopia"],[/PAQUIMETR|\bPAQUI\b/,"Paquimetria"],[/BIOMETRIA|\bBIO\b/,"Biometria"],[/TOPOGRAF/,"Topografia"],[/GONIOSCOP/,"Gonioscopia"],[/TONOMETR|\bTONO\b/,"Tonometria"],[/FUNDOSCOP/,"Fundoscopia"],[/MOTILIDADE|\bMOT\b/,"Motilidade ocular"],[/ULTRASSON/,"Ultrassom"]];
 function nomesExames(a){ const t=(String(a.itens||"")+" "+String(a.descricao||"").replace(/#.*$/,"")).toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g,""); const out=[]; EX_NOMES.forEach(([re,n])=>{ if(re.test(t)&&!out.includes(n)) out.push(n); }); if(out.includes("OCT de nervo óptico")&&!/OCT[^+,]*MACUL/.test(t)) return out.filter(x=>x!=="OCT de mácula"); return out; }
 function exLemb(){ if(S.exLemb) return S.exLemb; try{ return JSON.parse(localStorage.getItem("exLemb")||"[]"); }catch(e){ return []; } }
+// CIDs do prontuário: só valem os dos últimos 2 anos (o item vem como "AAAA-MM-DD|H269 - Catarata ...")
+function cidsRecentes(k){ const a=(S.pacCid||{})[k]; if(!a) return []; const lim=iso(addDias(hoje(),-730));
+  return (a.cids||[]).map(c=>{ const m=String(c).match(/^(\d{4}-\d{2}-\d{2})\|(.*)$/); return m?{data:m[1],txt:m[2]}:{data:null,txt:String(c)}; }).filter(c=>!c.data||c.data>=lim); }
 function exCondAuto(k){ const a=(S.pacCid||{})[k]; if(!a) return []; const out=new Set();
-  (a.cids||[]).forEach(c=>{ const t=String(c).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); EX_CID.forEach(([cond,re])=>{ if(re.test(t)) out.add(cond); }); });
+  cidsRecentes(k).forEach(c=>{ const t=c.txt.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); EX_CID.forEach(([cond,re])=>{ if(re.test(t)) out.add(cond); }); });
   if(a.esf!=null&&a.esf<=-6) out.add("miopia"); return [...out]; }
-function exCondTodas(k){ return [...new Set([...exCond(k),...exCondAuto(k)])]; }
+// manual + automático, menos o que a equipe marcou como "não se aplica" (nao:xxx)
+function exCondTodas(k){ const man=exCond(k), fora=man.filter(x=>/^nao:/.test(x)).map(x=>x.slice(4));
+  return [...new Set([...man.filter(x=>!/^(nao:|sexo_)/.test(x)),...exCondAuto(k)])].filter(x=>!fora.includes(x)); }
 function exCond(k){ const c=(S.exConds||{})[k]; if(c) return c.condicoes||[]; try{ return (JSON.parse(localStorage.getItem("exConds")||"{}")[k])||[]; }catch(e){ return []; } }
 const idadeDe=n=>{ if(!n) return null; const d=parse(n), h=hoje(); let a=h.getFullYear()-d.getFullYear(); if(h<new Date(h.getFullYear(),d.getMonth(),d.getDate())) a--; return a>0&&a<120?a:null; };
 function classificaEx(P){
   const sinais=[], ts=P.vis.map(a=>String(a.itens||"")+" "+String(a.descricao||"").replace(/#.*$/,"")).join(" | ").toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
   const pac=pacPorNome(P.nome), cs=pac?S.casos.filter(c=>c.paciente_id===pac.id&&c.etapa!=="desistiu"):[];
-  const cond=exCondTodas(P.k), auto=exCondAuto(P.k), cidTxt=((S.pacCid||{})[P.k]?.cids||[]).map(c=>String(c).split(" - ")[0]).join(", ");
+  const cond=exCondTodas(P.k), auto=exCondAuto(P.k), cidTxt=[...new Set(cidsRecentes(P.k).map(c=>c.txt.split(" - ")[0]))].join(", ");
   // retina tratada
   const inj=cs.find(c=>c.tipo==="injecao"&&!["indicado","orcamento","aguardando","duvida"].includes(c.etapa)), las=cs.find(c=>c.tipo==="laser"&&!["indicado","orcamento","aguardando","duvida"].includes(c.etapa)), vv=cs.find(c=>c.tipo==="cirurgia"&&/VVPP|VITRECT|RETIN/i.test(c.procedimento||"")&&c.data_realizado);
   if(inj) sinais.push("injeção intravítrea"+(inj.procedimento?" ("+inj.procedimento+")":"")); else if(/INTRAVITRE|AVASTIN|EYLIA|LUCENTIS|VABYSMO|QUIMIOTERAP/.test(ts)) sinais.push("injeção intravítrea no histórico");
@@ -2712,6 +2717,7 @@ function telaExames(){
     return `<div class="tk-row pr-row ex-row"><div class="inj-nome"><div class="ex-l1"><button class="ex-trat" data-act="ex-sexo" data-k="${esc(P.k)}" title="Tocar para trocar Sr./Sra.">${sexoDe(P)==="f"?"Sra.":"Sr."}</button><b class="ex-nome">${esc(nomeCurto(P.nome))}</b><span class="ex-risco ${G.cor}">${G.nome}</span>${P.abord==="nunca"?`<span class="fl warn">Nunca fez exames → convidar para o checkup</span>`:P.abord==="retorno10"?`<span class="fl warn">Sem retorno há ${Math.floor(P.diasAt/30)} meses → reconvidar</span>`:P.abord==="onze"?`<span class="fl blue">Veio há ${Math.floor(P.diasAt/30)} meses → lembrar do checkup anual</span>`:P.abord==="vencido"?`<span class="fl warn">Exames vencidos (último ${dm(P.exData)}) → repetir</span>`:P.abord==="incompleto"?`<span class="fl blue">Exames incompletos → faltam: ${esc(P.novos.join(", "))}</span>`:""}${st2}</div>
       <small><span class="ttag ${P.conv?"t-injecao":"t-cirurgia"}">${esc(P.plano)}</span> ${esc(P.local||"")}${P.idade!=null?` · ${P.idade} anos`:""} · último atendimento ${br(P.base)}</small>
       <div class="ex-hist"><span class="ex-lab">Por quê</span><span class="ex-por">${esc(P.sinais.filter(x=>!/ anos$/.test(x)).join(" · ")||G.por)}</span><button class="linkbtn ex-cond" data-act="ex-cond" data-k="${esc(P.k)}">${exCond(P.k).length?"editar condições":"+ condição (diabetes, glaucoma…)"}</button></div>
+      ${(()=>{ const au=exCondAuto(P.k).filter(c=>exCondTodas(P.k).includes(c)); return au.length?`<div class="ex-hist"><span class="ex-lab">Do prontuário</span>${au.map(c=>`<button class="fl ex-tag" data-act="ex-na" data-k="${esc(P.k)}" data-c="${c}" title="Toque se não se aplica a este paciente">${esc((EX_COND.find(x=>x[0]===c)||[c,c])[1])} ✕</button>`).join("")}</div>`:""; })()}
       <div class="ex-hist"><span class="ex-lab">Últimos exames${P.exData?" "+dm(P.exData):""}</span>${P.exames.length?P.exames.map(e=>`<span class="fl ex-tag">${esc(e)}</span>`).join(""):`<span class="ex-por">nenhum exame registrado</span>`}</div>
       <div class="ex-hist"><span class="ex-lab">Sugeridos</span>${P.sug.map(s=>`<span class="fl ex-sug">${esc(s.e)}${s.novo?` <i>novo</i>`:""}</span>`).join("")}</div>
       ${["marcado","ciclo"].includes(P.sit)?"":`<details class="ex-prev"><summary>Ver a mensagem</summary><div class="ex-prev-t">${esc(textoExMsg(P))}</div></details>`}</div>
@@ -2720,7 +2726,7 @@ function telaExames(){
   <details class="panel resumo ex-como"><summary><b>Como funciona a triagem</b> · grupos, prazos e exames</summary>
     <ol><li><b>Quem entra:</b> pacientes de <b>convênio</b> atendidos (agenda do EyecareBI + Amigo, desde fev/26). <b>Particular</b> também entra nos grupos de cuidado de <b>retina grave</b> (retinopatia diabética, retina tratada/DMRI) e no <b>70+ sem catarata</b>. Use o filtro Pagamento para separar. Quem está em ciclo de injeção fica de fora.</li>
     <li><b>Checkup anual da visão (grupos sem doença grave)</b>, separado pela ação da equipe: <b>nunca fez exames</b> → convidar para o checkup; <b>exames incompletos</b> → faltam exames complementares; <b>exames vencidos</b> → último exame passou do prazo do grupo, repetir; <b>checkup anual · 11 meses</b> → veio há 11 meses e não tem fator de risco, lembrar do checkup anual; <b>sem retorno há 12+ meses</b> → reconvidar.</li>
-    <li><b>Mapeamos o histórico:</b> exames já feitos, procedimentos (injeção, laser, cirurgias), idade e <b>diagnósticos (CID)</b>. Os CIDs e o grau de miopia vêm <b>sozinhos do prontuário do EyecareBI</b> (leitura noturna); também dá para marcar na mão em "+ condição" (vale junto com o automático). Alta miopia = grau de −6,00 ou mais. Suspeita de glaucoma só com CID H40.0 ou glaucoma na família (tonometria e campimetria de rotina não contam).</li>
+    <li><b>Mapeamos o histórico:</b> exames já feitos, procedimentos (injeção, laser, cirurgias), idade e <b>diagnósticos (CID)</b>. Os CIDs e o grau de miopia vêm <b>sozinhos do prontuário do EyecareBI</b> (leitura noturna); também dá para marcar na mão em "+ condição" (vale junto com o automático). Alta miopia = grau de −6,00 ou mais. Só contam CIDs dos <b>últimos 2 anos</b>; se um diagnóstico do prontuário não se aplica, toque nele em "Do prontuário" (✕) e o paciente é reclassificado. Suspeita de glaucoma só com CID H40.0 ou glaucoma na família (tonometria e campimetria de rotina não contam).</li>
     <li><b>Árvore de decisão</b> (o primeiro ramo que se aplica): Retinopatia diabética → Retina (tratada, DMRI, oclusão vascular, descolamento) → Glaucoma → Diabetes sem retinopatia → Suspeita de glaucoma → Uveíte → Ceratocone → Catarata a operar → Pós-catarata → 65+ → Hipertensão/alta miopia → Checkup.</li>
     <li><b>Prazo:</b> conta a partir dos últimos exames (ou do último atendimento, se não fez exame). Retina tratada 3 meses; diabetes, glaucoma e catarata a operar 6 meses; pós-catarata 6 meses no 1º ano e depois 12; sem fator de risco 12 meses. Entra em "Enviar agora" quando vence; aparece em "Vence em até 30 dias" antes.</li>
     <li><b>Mensagem:</b> tom humano e sério, sem emojis e sem detalhar exames nem diagnósticos (a indicação é feita na consulta). Na tela, os exames que o paciente <b>nunca fez</b> aparecem marcados como NOVO, para a equipe.</li>
@@ -2815,10 +2821,11 @@ function folhaExImport(){
     }catch(err){ out.innerHTML=`<div class="msg err">${esc(err.message)}</div>`; } });
 }
 function folhaExCond(P){
-  const at=exCond(P.k);
+  const at=exCondTodas(P.k), auto=exCondAuto(P.k);
   abrir(`<header><div><h2>Condições · ${esc(nomeCurto(P.nome))}</h2><div class="sub">Marque o que a Dra. já sabe deste paciente. Isso muda o grupo de risco e os exames sugeridos.</div></div><button class="close" data-close aria-label="Fechar">×</button></header>
-  <form id="fec" class="form"><div class="ex-conds">${EX_COND.map(([k,t])=>`<label class="ex-ck"><input type="checkbox" value="${k}" ${at.includes(k)?"checked":""}> ${t}</label>`).join("")}</div><button class="btn" type="submit">Salvar</button></form>`);
-  $("#fec").addEventListener("submit",async e=>{ e.preventDefault(); const v=[...document.querySelectorAll('#fec input:checked')].map(x=>x.value); fechar();
+  <form id="fec" class="form"><div class="ex-conds">${EX_COND.map(([k,t])=>`<label class="ex-ck"><input type="checkbox" value="${k}" ${at.includes(k)?"checked":""}> ${t}${auto.includes(k)?' <small style="color:var(--soft)">· do prontuário</small>':""}</label>`).join("")}</div><button class="btn" type="submit">Salvar</button></form>`);
+  $("#fec").addEventListener("submit",async e=>{ e.preventDefault(); const ch=[...document.querySelectorAll('#fec input:checked')].map(x=>x.value); fechar();
+    const v=[...exCond(P.k).filter(x=>/^sexo_/.test(x)), ...ch.filter(k=>!auto.includes(k)), ...auto.filter(k=>!ch.includes(k)).map(k=>"nao:"+k)];
     const r=await sb.from("paciente_condicoes").upsert({paciente:P.k,nome:P.nome,condicoes:v,atualizado_em:new Date().toISOString(),por:S.user?.email||null});
     if(r.error){ let o={}; try{ o=JSON.parse(localStorage.getItem("exConds")||"{}"); }catch(err){} o[P.k]=v; try{ localStorage.setItem("exConds",JSON.stringify(o)); }catch(err){} toast("Salvo neste aparelho ✔"); }
     else { await carregaExLemb(); toast("Condições salvas ✔"); }
@@ -3470,6 +3477,10 @@ async function acao(act, el){
   if(act==="ex-whats"){ const P=pacientesExames().find(x=>x.k===el.dataset.k); if(P) folhaExWhats(P); return; }
   if(act==="ex-marca"){ const P=pacientesExames().find(x=>x.k===el.dataset.k); if(!P) return; const stt=el.dataset.st; return marcaExame(P,stt,stt==="adiado"?{adiar_ate:iso(addDias(hoje(),30))}:null); }
   if(act==="ex-msg") return folhaExMsg();
+  if(act==="ex-na"){ const P=pacientesExames().find(x=>x.k===el.dataset.k); if(!P) return; const c=el.dataset.c; const v=[...new Set([...exCond(P.k).filter(x=>x!==c),"nao:"+c])];
+    const r=await sb.from("paciente_condicoes").upsert({paciente:P.k,nome:P.nome,condicoes:v,atualizado_em:new Date().toISOString(),por:S.user?.email||null});
+    if(r.error){ let o={}; try{ o=JSON.parse(localStorage.getItem("exConds")||"{}"); }catch(e){} o[P.k]=v; try{ localStorage.setItem("exConds",JSON.stringify(o)); }catch(e){} } else await carregaExLemb();
+    S._exC=null; render(); toast("Marcado: não se aplica · o paciente foi reclassificado"); return; }
   if(act==="ex-pseudo"){ const P=pacientesExames().find(x=>x.k===el.dataset.k); if(!P) return; const v=[...new Set([...exCond(P.k).filter(x=>x!=="catarata"),"pseudo"])];
     const r=await sb.from("paciente_condicoes").upsert({paciente:P.k,nome:P.nome,condicoes:v,atualizado_em:new Date().toISOString(),por:S.user?.email||null});
     if(r.error){ let o={}; try{ o=JSON.parse(localStorage.getItem("exConds")||"{}"); }catch(e){} o[P.k]=v; try{ localStorage.setItem("exConds",JSON.stringify(o)); }catch(e){} } else await carregaExLemb();
