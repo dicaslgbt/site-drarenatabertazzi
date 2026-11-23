@@ -1295,7 +1295,7 @@ function blocoDia(){
     else if(!lancado) acts=`<button class="btn small okb" data-act="reg-hist" data-id="${c.id}" data-data="${d}">+ Lançar no quadro</button>`;
     else acts=`${po?.contato_em?`<span class="fl ok">✔ Contato ${dm(po.contato_em)}</span>`:`<button class="btn small ghost" data-act="pos-contato" data-key="${key}">Contato feito</button>`}${po?.whatsapp_em?`<span class="fl ok">✔ WhatsApp</span>`:`<button class="btn small okb" data-act="pos-whats" data-key="${key}">WhatsApp pós</button>`}`;
     const item=String(a.itens||"").replace(/PCT-HM - |PCT-HOSP - |PAR - |TAXA DE INSTRUMENTADOR CIRÚRGICO \+ /gi,"").slice(0,70);
-    return `<div class="tk-row"><div class="inj-nome">${p?`<button class="linklike" data-pac="${p.id}">${esc(nomeCurto(p.nome))}</button>`:`<b>${esc(a.paciente)}</b>`}<small>${esc(item)} · ${esc(a.local)}${a.plano?" · "+esc(a.plano):""}</small></div><div class="inj-acts">${p?contato(p.telefone):""}${acts}</div></div>`; };
+    return `<div class="tk-row"><div class="inj-nome">${p?`<button class="linklike" data-pac="${p.id}">${esc(nomeCurto(p.nome))}</button>`:`<b>${esc(a.paciente)}</b>`}<small>${esc(item)} · ${esc(a.local)}${a.plano?" · "+esc(a.plano):""}</small>${k==="cirurgia"&&c&&chipLente(c)?`<div class="pos-st">${chipLente(c)}</div>`:""}</div><div class="inj-acts">${p?contato(p.telefone):""}${acts}</div></div>`; };
   const bloco=(k,t)=>grupos[k].length?`<div class="tk-g"><div class="tk-gt">${t} <span class="count">${grupos[k].length}</span></div>${grupos[k].map(a=>linha(a,k)).join("")}</div>`:"";
   const rot=off===0?"Hoje":off===1?"Ontem":dt.toLocaleDateString("pt-BR",{weekday:"short",day:"2-digit",month:"2-digit"});
   return `<div class="inj-box dia-box"><div class="panel-h"><h3>📞 Procedimentos do dia · contatos</h3><div class="agsem-nav"><button class="rchip" data-diaoff="${off+1}" aria-label="Dia anterior">◀</button><b>${rot} · ${br(d).slice(0,5)}</b>${off>0?`<button class="rchip" data-diaoff="${off-1}" aria-label="Próximo dia">▶</button><button class="linkbtn" data-diaoff="0">Hoje</button>`:""}</div></div>
@@ -1528,7 +1528,7 @@ function linhaAgendado(x){
   const c=x.c,p=pacOf(c),passou=x.data<hojeISO(),ev=passou||x.data===hojeISO()?evolucaoPront(c,x.data):null;
   const kid=x.ses?`data-sid="${x.ses.id}"`:"";
   const nr=(S.nr||[]).filter(r=>r.caso_id===c.id).length;
-  const tags=[passou?(ev?`<span class="fl ok">Evolução no prontuário · confirme</span>`:`<span class="fl late">Passou da data · registrar</span>`):ev?`<span class="fl ok">Evolução no prontuário · confirme</span>`:"", nr?`<span class="fl">${nr}× não realizado antes</span>`:"", x.fut?`<span class="fl warn" title="Foi lançado como realizado, mas a data ainda não chegou">Lançado como feito com data futura</span>`:"", ...tagsFonte(c,x)].join("");
+  const tags=[passou?(ev?`<span class="fl ok">Evolução no prontuário · confirme</span>`:`<span class="fl late">Passou da data · registrar</span>`):ev?`<span class="fl ok">Evolução no prontuário · confirme</span>`:"", nr?`<span class="fl">${nr}× não realizado antes</span>`:"", x.fut?`<span class="fl warn" title="Foi lançado como realizado, mas a data ainda não chegou">Lançado como feito com data futura</span>`:"", chipLente(c), ...tagsFonte(c,x)].join("");
   return `<div class="tk-row pr-row ${passou?"pr-late":""}"><div class="inj-nome"><button class="linklike" data-pac="${p.id}">${esc(nomeCurto(p.nome))}</button><small>${tipoTag(c.tipo)} ${esc(x.rot.replace(/^(Cirurgia|Injeção|Laser) ?/,""))}${c.local?" · "+esc(c.local):""} · ${esc(pagLabel(c))}</small>${tags?`<div class="pos-st">${tags}</div>`:""}</div>
     <div class="inj-acts">${contato(p.telefone)}<button class="btn small okb" data-act="ag-feito" data-id="${c.id}" ${kid} data-data="${x.data}">Realizado</button><button class="btn small ghost" data-act="ag-nao" data-id="${c.id}" ${kid} data-data="${x.data}">Não realizado</button><button class="btn small ghost" data-act="ag-remarcar" data-id="${c.id}" ${kid} data-data="${x.data}">Remarcar</button></div></div>`;
 }
@@ -2231,6 +2231,12 @@ function txtLente(c){
   if((!o||o==="OD")&&c.lente_dioptria_od) ds.push(`${o?"":"OD "}${c.lente_dioptria_od}`);
   if((!o||o==="OE")&&c.lente_dioptria_oe) ds.push(`${o?"":"OE "}${c.lente_dioptria_oe}`);
   return [c.lente_modelo||"modelo não informado", c.lente_torica===true?"tórica":c.lente_torica===false?"não tórica":null, ds.join(" · ")||null].filter(Boolean).join(" · ");
+}
+// etiqueta curta da lente, para listas por data (agendados, procedimentos do dia)
+function chipLente(c){
+  if(!c||!ehFaco(c)||!colunasLente()) return "";
+  if(!temLente(c)) return `<span class="fl" title="Lente ainda não informada no prontuário nem na planilha">👁 lente não informada</span>`;
+  return `<span class="fl ${c.lente_conferir?"warn":"src"}" title="${esc(c.lente_conferir?"Conferir: "+(((c.lente_trechos||{}).motivos)||[]).join(" · "):"Lente do "+(FONTE_LENTE[c.lente_fonte]||"portal"))}">👁 ${esc(txtLente(c))}${c.lente_conferir?" · conferir":""}</span>`;
 }
 function linhaLenteCard(c){
   if(!ehFaco(c)||!colunasLente()) return "";
