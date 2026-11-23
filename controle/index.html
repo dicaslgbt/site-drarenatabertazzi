@@ -2733,6 +2733,7 @@ function telaExames(){
     <li><b>Sai da lista sozinho</b> quando marca retorno na agenda. Lembrete enviado, adiado (30 dias) ou "não enviar" ficam registrados.</li></ol>
     <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Grupo</th><th>Prazo</th><th>Exames do grupo</th><th>Por quê</th></tr></thead><tbody>${EX_GRUPOS.map(G=>`<tr><td><b>${G.nome}</b></td><td>${G.k==="retdiab"?"3 meses (já tratada) · 6 meses":G.k==="poscir"?"6 meses no 1º ano · depois 12":["checkup","idoso","has"].includes(G.k)?"12 meses (lembrete aos 11)":G.dias>=365?"12 meses":Math.round(G.dias/30)+" meses"}</td><td>${G.ex.join(", ")}</td><td style="white-space:normal;font-size:.8rem;color:var(--soft)">${G.por}</td></tr>`).join("")}</tbody></table></div>
     <div class="sub" style="font-size:.76rem">Referências: AAO Preferred Practice Pattern (Comprehensive Adult Medical Eye Evaluation, 2026; Diabetic Retinopathy). Os exames são sugestão do sistema; a indicação final é da Dra. na consulta.</div></details>
+  ${blocoResultado()}
   ${exFiltroClin(base0)}
   <div class="exgs">${EX_GRUPOS.map(gcard).join("")}</div>
   ${exSubgrupos(base1,gr)}
@@ -2740,6 +2741,30 @@ function telaExames(){
   <div class="ptool-nota"><span>O grupo vem do histórico (procedimentos, exames feitos e idade); diabetes e outras condições a equipe marca no paciente. Os exames sugeridos são uma sugestão do sistema: a indicação final é da Dra. na consulta. Pacientes em ciclo de injeção ficam de fora (já são acompanhados lá).</span>${gr?`<span><button class="linkbtn" data-pset="exGr=">Ver todos os grupos</button></span>`:""}</div>
   ${S.exSemTabela?`<div class="empty" style="margin-bottom:10px">Envios e condições estão sendo guardados só neste aparelho. Para valer para toda a equipe, rode uma vez o arquivo <b>controle/sql/2026-11-12-exames-lembretes.sql</b> no SQL Editor do Supabase.</div>`:""}
   <div class="inj-box"><div class="inj-list">${L.map(linha).join("")||'<div class="empty">Ninguém nesta lista. 👏</div>'}</div></div>`;
+}
+// Resultado das mensagens: quem recebeu o lembrete e depois apareceu na agenda do prontuário (agendado ou atendido)
+function resultadoCampanha(dias){
+  const lim=iso(addDias(hoje(),-(dias||90))), h=hojeISO();
+  const env=exLemb().filter(l=>l.status==="enviado"&&l.em>=lim);
+  const ult={}; env.forEach(l=>{ if(!ult[l.paciente]||l.em>ult[l.paciente].em) ult[l.paciente]=l; }); // último envio por paciente
+  const porK=Object.fromEntries(pacientesExames().map(P=>[P.k,P]));
+  const ag={}; (S.atend||[]).forEach(a=>{ const k=chaveNome(a.paciente); if(!k||/CANCEL|MISSED/.test(a.status||"")) return; (ag[k]=ag[k]||[]).push(a); });
+  const linhas=Object.values(ult).map(l=>{ const vs=(ag[l.paciente]||[]).filter(a=>a.data>=l.em).sort((x,y)=>x.data.localeCompare(y.data));
+    const atendido=vs.find(a=>a.status==="FINISHED"), marcado=vs.find(a=>a.data>=h&&a.status!=="FINISHED"); const P=porK[l.paciente];
+    return {l,P,grupo:P?EX_G[P.g]?.nome||P.g:"—",local:P?.local||"—",st:atendido?"atendido":marcado?"marcado":"sem",data:(atendido||marcado)?.data||null,dias:(atendido||marcado)?diff(parse((atendido||marcado).data),parse(l.em)):null}; });
+  return linhas;
+}
+function blocoResultado(){
+  const dias=S.exResDias||90, L=resultadoCampanha(dias); if(!L.length) return `<details class="panel resumo"><summary><b>Resultado das mensagens</b> · ainda sem envios registrados nos últimos ${dias} dias</summary></details>`;
+  const n=k=>L.filter(x=>x.st===k).length, tot=L.length, ok=n("atendido")+n("marcado"), pct=v=>tot?Math.round(100*v/tot)+"%":"—";
+  const por=(campo)=>{ const g={}; L.forEach(x=>{ const k=x[campo]; g[k]=g[k]||{t:0,a:0,m:0}; g[k].t++; if(x.st==="atendido") g[k].a++; if(x.st==="marcado") g[k].m++; }); return Object.entries(g).sort((a,b)=>b[1].t-a[1].t).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v.t}</td><td>${v.m}</td><td>${v.a}</td><td><b>${Math.round(100*(v.a+v.m)/v.t)}%</b></td></tr>`).join(""); };
+  const temp=L.filter(x=>x.dias!=null).map(x=>x.dias).sort((a,b)=>a-b), med=temp.length?temp[Math.floor(temp.length/2)]:null;
+  return `<details class="panel resumo"><summary><b>Resultado das mensagens</b> · ${tot} enviadas · <b>${ok} voltaram para a agenda (${pct(ok)})</b></summary>
+    <div class="seg" style="margin:8px 0">${[30,90,180].map(d=>`<button data-pset="exResDias=${d}" aria-pressed="${dias===d}">Últimos ${d} dias</button>`).join("")}</div>
+    <div class="stats"><div class="stat"><b>${tot}</b><span>mensagens enviadas</span></div><div class="stat ok"><b>${n("marcado")}</b><span>já têm consulta marcada</span></div><div class="stat ok"><b>${n("atendido")}</b><span>já foram atendidos</span></div><div class="stat"><b>${n("sem")}</b><span>ainda não voltaram</span></div>${med!=null?`<div class="stat"><b>${med} dias</b><span>tempo típico até a consulta</span></div>`:""}</div>
+    <div class="sub" style="font-size:.78rem;margin:6px 0">Conta como "voltou" quem aparece na agenda do prontuário (EyecareBI ou Amigo) com consulta <b>depois</b> da data da mensagem, marcada ou já atendida. Cancelados e faltas não contam.</div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Grupo</th><th>Enviadas</th><th>Marcaram</th><th>Atendidos</th><th>Retorno</th></tr></thead><tbody>${por("grupo")}</tbody></table></div>
+    <div class="tbl-wrap" style="margin-top:8px"><table class="tbl"><thead><tr><th>Clínica</th><th>Enviadas</th><th>Marcaram</th><th>Atendidos</th><th>Retorno</th></tr></thead><tbody>${por("local")}</tbody></table></div></details>`;
 }
 async function marcaExame(P,status,extra){
   const row={paciente:P.k,nome:P.nome,base_data:P.base,status,em:hojeISO(),por:S.user?.email||null,...(extra||{})};
@@ -2761,8 +2786,8 @@ const exMin=e=>/^OCT/.test(e)?e:e.charAt(0).toLowerCase()+e.slice(1);
 const listaPt=a=>a.length<=1?(a[0]||""):a.slice(0,-1).join(", ")+" e "+a.at(-1);
 // Qual mensagem: pelo grupo de risco; no checkup, pela ação (nunca fez / incompletos / anual)
 function chaveExMsg(P){ return P.g==="poscir"?"poscir":P.g==="retdiab"?(P.tratada?"retina":"diabetes"):P.g==="retina"?"retina":P.g==="diabetes"?"diabetes":["glaucoma","suspglauc"].includes(P.g)?"glaucoma":["uveite","ceratocone"].includes(P.g)?"glaucoma":P.g==="catarata"?"catarata":P.abord==="nunca"?"nunca":P.abord==="onze"?"onze":P.abord==="incompleto"?"incompleto":"anual"; }
-function contatoAgenda(local){ return /^OA\b/.test(local||"")?"Para agendar, responda esta mensagem ou chame no WhatsApp: https://wa.me/5563984951184\nSe preferir ligar: (63) 3215-3335."
-  : /^OPUS/.test(local||"")?"Para agendar, responda esta mensagem ou chame no WhatsApp: https://wa.me/556330281483":"Para agendar, é só responder esta mensagem."; }
+function contatoAgenda(local){ return /^OA\b/.test(local||"")?"Para agendar, responda esta mensagem ou chame no WhatsApp: https://drarenatabertazzi.com.br/agendar\nSe preferir ligar: (63) 3215-3335."
+  : /^OPUS/.test(local||"")?"Para agendar, responda esta mensagem ou chame no WhatsApp: https://drarenatabertazzi.com.br/agendar-opus":"Para agendar, é só responder esta mensagem."; }
 function tempoDesde(iso0){ const a=parse(iso0), b=hoje(); let m=(b.getFullYear()-a.getFullYear())*12+(b.getMonth()-a.getMonth()); if(b.getDate()<a.getDate()) m--;
   if(m<1) return "menos de um mês"; if(m<12) return m===1?"1 mês":m+" meses"; const y=Math.floor(m/12), r=m%12; return (y===1?"1 ano":y+" anos")+(r?` e ${r===1?"1 mês":r+" meses"}`:""); }
 function textoExMsg(P,modelo){
