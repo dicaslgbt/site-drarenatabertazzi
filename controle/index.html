@@ -2167,6 +2167,16 @@ window.completarTelefones=async function(itens){
 // pacote (gzip+base64): {fonte, pacientes:[{nome, cirurgias:[{data,olho,status}], trechos:[{data,origem,texto,olho?}]}]}
 // Prioridade: prontuário > planilha. Caso editado à mão (lente_fonte='manual') nunca é tocado.
 // Olho e data da cirurgia: só preenche o que está vazio.
+// Nome do prontuário × cadastro: exato; senão aceita 1 letra trocada por palavra (MENEZ × MENES),
+// desde que só um paciente do cadastro bata.
+function lev1(a,b){ if(a===b) return true; if(Math.abs(a.length-b.length)>1||Math.min(a.length,b.length)<4) return false;
+  let i=0,j=0,d=0; while(i<a.length&&j<b.length){ if(a[i]===b[j]){i++;j++;continue;} if(++d>1) return false; if(a.length>b.length) i++; else if(b.length>a.length) j++; else {i++;j++;} } return d+(a.length-i)+(b.length-j)<=1; }
+function pacPorNomeParecido(nome){
+  const exato=pacPorNome(nome); if(exato) return exato;
+  const t=chaveNome(nome).split(" ").filter(Boolean); if(t.length<2) return null;
+  const achados=S.pacientes.filter(p=>{ const u=chaveNome(p.nome).split(" ").filter(Boolean); return u.length===t.length&&u.every((w,i)=>lev1(w,t[i])); });
+  return achados.length===1?achados[0]:null;
+}
 const colunasLente=()=>!S.casos.length||Object.prototype.hasOwnProperty.call(S.casos[0],"lente_fonte");
 const ehFaco=c=>c.tipo==="cirurgia"&&(/FACO|FACECT|CATARAT|LIO|LENTE/i.test(c.procedimento||"")||!c.procedimento);
 window.receberLentes=async function(pacote,opc){ opc=opc||{}; if(!colunasLente()) return {erro:"faltam as colunas de lente no banco: rode controle/sql/2026-11-23-lentes.sql"};
@@ -2175,7 +2185,7 @@ window.receberLentes=async function(pacote,opc){ opc=opc||{}; if(!colunasLente()
   const res={fonte:p.fonte,pacientes:(p.pacientes||[]).length,semCaso:0,atualizados:0,conferir:0,datas:0,manuais:0,detalhes:[]};
   const hoje=hojeISO();
   for(const px of (p.pacientes||[])){
-    const pac=pacPorNome(px.nome); const cs=pac?S.casos.filter(c=>c.paciente_id===pac.id&&ehFaco(c)&&c.etapa!=="desistiu"):[];
+    const pac=pacPorNomeParecido(px.nome); const cs=pac?S.casos.filter(c=>c.paciente_id===pac.id&&ehFaco(c)&&c.etapa!=="desistiu"):[];
     if(!cs.length){ res.semCaso++; continue; }
     const cirs=(px.cirurgias||[]).filter(x=>x&&x.data&&!/CANCEL|MISSED/i.test(x.status||""));
     for(const c of cs){

@@ -39,6 +39,8 @@
     const uniq = [...new Set(achados)];
     // "X OU Y" → ainda em decisão
     if(uniq.length > 1 && /\bOU\b/.test(l)) return {duvida: uniq};
+    // "OPÇÕES: ..." é lista de alternativas, não escolha
+    if(uniq.length && /\bOPC(OES|AO)\b/.test(l)) return {duvida: uniq};
     // "Monofocal" junto de um nome comercial: fica o nome comercial
     const fortes = uniq.filter(m => !["Monofocal","Multifocal","Trifocal","Bifocal","EDOF"].includes(m));
     return fortes[0] || uniq[0] || null;
@@ -110,6 +112,7 @@
     const todos = [...deste, ...semOlho].sort(maisNovo);
     const mod = todos.find(c => c.modelo) || null;
     const tor = todos.find(c => c.torica !== null) || null;
+    if(mod && todos.some(c => c.opcoes && c.data && mod.data && c.data >= mod.data)) motivos.push("lente ainda em decisão (" + [...new Set(todos.filter(c => c.opcoes).flatMap(c => c.opcoes))].join(" ou ") + ")");
     if(mod){ const outros = todos.filter(c => c.modelo && c.modelo !== mod.modelo && c.data && mod.data && (Date.parse(mod.data) - Date.parse(c.data)) / 864e5 <= 120 && !["Monofocal"].includes(c.modelo));
       if(outros.length) motivos.push(`modelo diferente em outra anotação (${[...new Set(outros.map(c => c.modelo))].join(", ")})`); }
     else if(todos.some(c => c.opcoes)) motivos.push("lente ainda em decisão (" + [...new Set(todos.filter(c => c.opcoes).flatMap(c => c.opcoes))].join(" ou ") + ")");
