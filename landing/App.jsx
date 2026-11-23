@@ -218,18 +218,11 @@ function Hero() {
           </p>
 
           {/* credenciais */}
-          <dl className="mt-7 grid grid-cols-3 divide-x divide-[#79A9D2]/45 rounded-lg bg-white/85 py-3.5 shadow-[0_14px_34px_-24px_rgba(0,74,173,0.5)] ring-1 ring-[#79A9D2]/40 backdrop-blur">
-            {[
-              ["CRM-TO", "7132"],
-              ["RQE", "3562"],
-              ["SBRV", "Titular"],
-            ].map(([k, v]) => (
-              <div key={k} className="flex flex-col items-center justify-center px-2 text-center">
-                <dt className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#2F7FDC]">{k}</dt>
-                <dd className="mt-1.5 text-[19px] font-semibold leading-none tabular-nums text-[#0E2A57]">{v}</dd>
-              </div>
-            ))}
-          </dl>
+          <p className="mt-7 border-l-2 border-[#0E2A57]/70 pl-4 text-[15px] leading-relaxed text-[#33415C]">
+            <b className="font-semibold text-[#0E2A57]">Dra. Renata Carneiro Bertazzi</b><br />
+            CRM-TO 7132 · RQE 3562<br />
+            Membro titular da Sociedade Brasileira de Retina e Vítreo
+          </p>
 
           <div id="hero-cta" className="mt-7 flex flex-col gap-3 sm:flex-row">
             <PrimaryCTA />
@@ -375,9 +368,9 @@ function LensQuiz() {
                 </li>
               ))}
             </ul>
-            <div className="mt-5 grid grid-cols-3 gap-2 text-center text-[13px] font-semibold">
+            <div className="mt-5 grid grid-cols-3 gap-2 text-center text-[12px] font-semibold tracking-[-0.01em] min-[400px]:text-[13px]">
               {[["Longe", "dirigir, TV"], ["Intermediário", "computador"], ["Perto", "celular, leitura"]].map(([a, b]) => (
-                <div key={a} className="rounded-xl bg-[#E2F3EF] px-2 py-3 text-[#0F5A4E]"><Eye className="mx-auto mb-1 h-5 w-5" aria-hidden="true" />{a}<span className="block text-[12px] font-normal text-[#33615A]">{b}</span></div>
+                <div key={a} className="min-w-0 rounded-lg bg-[#E2F3EF] px-1 py-3 text-[#0F5A4E]"><Eye className="mx-auto mb-1 h-5 w-5" aria-hidden="true" />{a}<span className="block text-[11.5px] font-normal text-[#33615A] min-[400px]:text-[12px]">{b}</span></div>
               ))}
             </div>
           </a>
